@@ -9,7 +9,7 @@ livox_ros_driver2:
   # support packages that stores their package.xml under a different name. For any
   # other modification, regular patch files should be used.
   package_xml_name: package_ROS2.xml
-# TODO: remove autoware_utils and it's sub packages after they are released in rolling
+# TODO: remove autoware_utils and it's sub packages after they are released in lyrical
 autoware_utils:
   tag: release/jazzy/autoware_utils/1.4.2-1
   url: https://github.com/ros2-gbp/autoware_utils-release.git
@@ -58,7 +58,7 @@ autoware_utils_visualization:
   tag: release/jazzy/autoware_utils_visualization/1.4.2-1
   url: https://github.com/ros2-gbp/autoware_utils-release.git
   version: 1.4.2
-# TODO: remove autoware_core and it's sub packages after they are released in rolling
+# TODO: remove autoware_core and it's sub packages after they are released in lyrical
 autoware_cmake:
   tag: release/jazzy/autoware_cmake/1.1.0-1
   url: https://github.com/ros2-gbp/autoware_cmake-release.git
@@ -327,7 +327,7 @@ autoware_qos_utils:
   tag: release/humble/autoware_qos_utils/1.7.0-1
   url: https://github.com/ros2-gbp/autoware_core-release.git
   version: 1.7.0
-# TODO: remove autoware msgs and it's sub packages after they are released in rolling
+# TODO: remove autoware msgs and it's sub packages after they are released in lyrical
 autoware_internal_localization_msgs:
   tag: release/jazzy/autoware_internal_localization_msgs/1.10.0-1
   url: https://github.com/ros2-gbp/autoware_internal_msgs-release.git
@@ -420,6 +420,6 @@ cm_executors:
   version: 0.9.1
 # temporal addition
 ur_client_library:
-  tag: release/rolling/ur_client_library/2.10.0-1
+  tag: release/lyrical/ur_client_library/2.10.0-1
   url: https://github.com/ros2-gbp/Universal_Robots_Client_Library-release.git
   version: 2.10.0

@@ -1,6 +1,6 @@
 [workspace]
-name = "ros-rolling"
-description = "RoboStack repo to package ros-rolling packages as conda packages"
+name = "ros-lyrical"
+description = "RoboStack repo to package ros-lyrical packages as conda packages"
 authors = ["Tobias Fischer <tobias.fischer@qut.edu.au>", "Wolf Vollprecht <w.vollprecht@gmail.com>", "Silvio Traversaro <silvio@traversaro.it>", "Daisuke Nishimatsu <daisuke.nishimatsu1021@gmail.com>"]
 channels = ["https://repo.prefix.dev/conda-forge"]
 platforms = ["osx-arm64", "linux-64", "osx-64", "linux-aarch64", "win-64"]
@@ -35,12 +35,12 @@ vinca = { git = "https://github.com/RoboStack/vinca.git", rev = "187a794e7dbdf51
 generate-recipes = { cmd = "vinca -m", depends-on = ["remove-recipes"] }
 generate-gha-workflows = { cmd = "vinca-gha --trigger-branch dummy_build_branch_as_it_is_unused -d ./recipes", depends-on = ["generate-recipes"] }
 check-patches = { cmd = "python check_patches_clean_apply.py", depends-on = ["generate-recipes"] }
-create_snapshot = { cmd = "vinca-snapshot -d rolling -o rosdistro_snapshot.yaml" }
-upload = "rattler-build upload prefix -c robostack-rolling --generate-attestation"
-build_continue_on_failure = { cmd = "rattler-build build --recipe-dir ./recipes -m ./conda_build_config.yaml -c robostack-rolling -c https://repo.prefix.dev/conda-forge --continue-on-failure --skip-existing", depends-on = ["generate-recipes"] }
+create_snapshot = { cmd = "vinca-snapshot -d lyrical -o rosdistro_snapshot.yaml" }
+upload = "rattler-build upload prefix -c robostack-lyrical --generate-attestation"
+build_continue_on_failure = { cmd = "rattler-build build --recipe-dir ./recipes -m ./conda_build_config.yaml -c robostack-lyrical -c https://repo.prefix.dev/conda-forge --continue-on-failure --skip-existing", depends-on = ["generate-recipes"] }
 
 [tasks.build]
-cmd = "rattler-build build --recipe-dir ./recipes -m ./conda_build_config.yaml -c https://prefix.dev/robostack-rolling -c https://prefix.dev/conda-forge --skip-existing"
+cmd = "rattler-build build --recipe-dir ./recipes -m ./conda_build_config.yaml -c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge --skip-existing"
 depends-on = ["generate-recipes"]
 description = "Build all packages, from the ./recipes dir. This will skip already existing packages, so it can be used to build only a subset of packages by first removing the recipes of the packages you want to rebuild (see `pixi remove-recipes`)."
 
@@ -49,7 +49,7 @@ cmd = "rm -rf recipes_only_patch; rm -rf recipes; mkdir recipes"
 description = "Remove all generated recipes, before regenerating them."
 
 [tasks.build-one]
-cmd = "cp ./patch/{{ PACKAGE }}.*patch ./recipes/{{ PACKAGE }}/patch/; rattler-build build --recipe ./recipes/{{ PACKAGE }}/recipe.yaml -m ./conda_build_config.yaml -c https://prefix.dev/robostack-rolling -c https://prefix.dev/conda-forge"
-args = [{ arg = "PACKAGE", default = "ros-rolling-ros-workspace" }]
-description = "Build a single package, from the ./recipes dir. Add the `ros-rolling-` prefix to the package name, e.g. `pixi build-one --package ros-rolling-ros-workspace`"
+cmd = "cp ./patch/{{ PACKAGE }}.*patch ./recipes/{{ PACKAGE }}/patch/; rattler-build build --recipe ./recipes/{{ PACKAGE }}/recipe.yaml -m ./conda_build_config.yaml -c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge"
+args = [{ arg = "PACKAGE", default = "ros-lyrical-ros-workspace" }]
+description = "Build a single package, from the ./recipes dir. Add the `ros-lyrical-` prefix to the package name, e.g. `pixi build-one --package ros-lyrical-ros-workspace`"
 

@@ -1,26 +1,26 @@
-# RoboStack (for ROS rolling)
+# RoboStack (for ROS lyrical)
 
-[![Conda](https://img.shields.io/conda/dn/robostack-rolling/ros-rolling-desktop?style=flat-square)](https://anaconda.org/robostack/)
-[![GitHub Repo stars](https://img.shields.io/github/stars/robostack/ros-rolling?style=flat-square)](https://github.com/RoboStack/ros-rolling/)
+[![Conda](https://img.shields.io/conda/dn/robostack-lyrical/ros-lyrical-desktop?style=flat-square)](https://anaconda.org/robostack/)
+[![GitHub Repo stars](https://img.shields.io/github/stars/robostack/ros-lyrical?style=flat-square)](https://github.com/RoboStack/ros-lyrical/)
 [![QUT Centre for Robotics](https://img.shields.io/badge/collection-QUT%20Robotics-%23043d71?style=flat-square)](https://qcr.github.io/)
 
-[![Platforms](https://img.shields.io/badge/platforms-linux%20%7C%20win%20%7C%20macos%20%7C%20macos_arm64%20%7C%20linux_aarch64-green.svg?style=flat-square)](https://github.com/RoboStack/ros-rolling)
-[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-rolling/linux.yml?branch=buildbranch_linux&label=build%20linux&style=flat-square)](https://github.com/RoboStack/ros-rolling/actions/workflows/linux.yml)
-[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-rolling/win.yml?branch=buildbranch_win&label=build%20win&style=flat-square)](https://github.com/RoboStack/ros-rolling/actions/workflows/win.yml)
-[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-rolling/osx.yml?branch=buildbranch_osx&label=build%20osx&style=flat-square)](https://github.com/RoboStack/ros-rolling/actions/workflows/osx.yml)
-[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-rolling/osx_arm64.yml?branch=buildbranch_osx_arm64&label=build%20osx-arm64&style=flat-square)](https://github.com/RoboStack/ros-rolling/actions/workflows/osx_arm64.yml)
-[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-rolling/build_linux_aarch64.yml?branch=buildbranch_linux_aarch64&label=build%20aarch64&style=flat-square)](https://github.com/RoboStack/ros-rolling/actions/workflows/build_linux_aarch64.yml)
+[![Platforms](https://img.shields.io/badge/platforms-linux%20%7C%20win%20%7C%20macos%20%7C%20macos_arm64%20%7C%20linux_aarch64-green.svg?style=flat-square)](https://github.com/RoboStack/ros-lyrical)
+[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-lyrical/linux.yml?branch=buildbranch_linux&label=build%20linux&style=flat-square)](https://github.com/RoboStack/ros-lyrical/actions/workflows/linux.yml)
+[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-lyrical/win.yml?branch=buildbranch_win&label=build%20win&style=flat-square)](https://github.com/RoboStack/ros-lyrical/actions/workflows/win.yml)
+[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-lyrical/osx.yml?branch=buildbranch_osx&label=build%20osx&style=flat-square)](https://github.com/RoboStack/ros-lyrical/actions/workflows/osx.yml)
+[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-lyrical/osx_arm64.yml?branch=buildbranch_osx_arm64&label=build%20osx-arm64&style=flat-square)](https://github.com/RoboStack/ros-lyrical/actions/workflows/osx_arm64.yml)
+[![Azure DevOps builds (branch)](https://img.shields.io/github/actions/workflow/status/robostack/ros-lyrical/build_linux_aarch64.yml?branch=buildbranch_linux_aarch64&label=build%20aarch64&style=flat-square)](https://github.com/RoboStack/ros-lyrical/actions/workflows/build_linux_aarch64.yml)
 
-[![GitHub issues](https://img.shields.io/github/issues-raw/robostack/ros-rolling?style=flat-square)](https://github.com/RoboStack/ros-rolling/issues)
-[![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/robostack/ros-rolling?style=flat-square)](https://github.com/RoboStack/ros-rolling/issues?q=is%3Aissue+is%3Aclosed)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/robostack/ros-rolling?style=flat-square)](https://github.com/RoboStack/ros-rolling/pulls)
-[![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed-raw/robostack/ros-rolling?style=flat-square)](https://github.com/RoboStack/ros-rolling/pulls?q=is%3Apr+is%3Aclosed)
+[![GitHub issues](https://img.shields.io/github/issues-raw/robostack/ros-lyrical?style=flat-square)](https://github.com/RoboStack/ros-lyrical/issues)
+[![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/robostack/ros-lyrical?style=flat-square)](https://github.com/RoboStack/ros-lyrical/issues?q=is%3Aissue+is%3Aclosed)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/robostack/ros-lyrical?style=flat-square)](https://github.com/RoboStack/ros-lyrical/pulls)
+[![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed-raw/robostack/ros-lyrical?style=flat-square)](https://github.com/RoboStack/ros-lyrical/pulls?q=is%3Apr+is%3Aclosed)
 
-[__Table with all available packages & architectures__](https://robostack.github.io/rolling.html)
+[__Table with all available packages & architectures__](https://robostack.github.io/lyrical.html)
 
 ## Why ROS and Conda?
 
-Welcome to RoboStack, which tightly couples ROS with Conda, a cross-platform, language-agnostic package manager. We provide ROS binaries for Linux, macOS, Windows and ARM (Linux). Installing other recent packages via conda-forge side-by-side works easily, e.g. you can install TensorFlow/PyTorch in the same environment as ROS rolling without any issues. As no system libraries are used, you can also easily install ROS rolling on any recent Linux Distribution - including older versions of Ubuntu. As the packages are pre-built, it saves you from compiling from source, which is especially helpful on macOS and Windows. No root access is required, all packages live in your home directory. We have recently written up a [paper](https://arxiv.org/abs/2104.12910) and [blog post](https://medium.com/robostack/cross-platform-conda-packages-for-ros-fa1974fd1de3) with more information.
+Welcome to RoboStack, which tightly couples ROS with Conda, a cross-platform, language-agnostic package manager. We provide ROS binaries for Linux, macOS, Windows and ARM (Linux). Installing other recent packages via conda-forge side-by-side works easily, e.g. you can install TensorFlow/PyTorch in the same environment as ROS lyrical without any issues. As no system libraries are used, you can also easily install ROS lyrical on any recent Linux Distribution - including older versions of Ubuntu. As the packages are pre-built, it saves you from compiling from source, which is especially helpful on macOS and Windows. No root access is required, all packages live in your home directory. We have recently written up a [paper](https://arxiv.org/abs/2104.12910) and [blog post](https://medium.com/robostack/cross-platform-conda-packages-for-ros-fa1974fd1de3) with more information.
 
 ## Attribution
 

@@ -40,7 +40,7 @@ for recipe in ${CURRENT_RECIPES[@]}; do
 	pixi run -v rattler-build build \
 		--recipe ${FEEDSTOCK_ROOT}/recipes/${recipe} \
 		-m ${FEEDSTOCK_ROOT}/conda_build_config.yaml \
-		-c https://prefix.dev/robostack-rolling -c https://prefix.dev/conda-forge \
+		-c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge \
 		${extra_channel} \
 		--output-dir $CONDA_BLD_PATH \
 		${cross_compile}
