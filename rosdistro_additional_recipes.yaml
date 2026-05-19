@@ -418,8 +418,3 @@ cm_executors:
   tag: 0.9.1
   url: https://github.com/cellumation/cm_executors.git
   version: 0.9.1
-# temporal addition
-ur_client_library:
-  tag: release/lyrical/ur_client_library/2.10.0-1
-  url: https://github.com/ros2-gbp/Universal_Robots_Client_Library-release.git
-  version: 2.10.0
