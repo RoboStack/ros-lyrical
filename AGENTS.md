@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Working notes for future coding agents in a RoboStack repo. Replace $DISTRO with e.g. noetic/humble/kilted/lyrical and so forth; you can check the working directory.
+Working notes for future coding agents in a RoboStack repo. Replace $DISTRO with e.g. noetic/humble/kilted/lyrical/rolling and so forth; you can check the working directory.
 
 ## Session defaults for this repo
 
