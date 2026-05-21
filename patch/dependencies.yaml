@@ -1,9 +1,9 @@
 ament_package:
   add_host: ['importlib_resources']
 foxglove_bridge:
-  add_host: ["ros-rolling-ament-cmake"]
+  add_host: ["ros-lyrical-ament-cmake"]
 ros_ign_interfaces:
-  add_host: ["ros-rolling-rcl-interfaces"]
+  add_host: ["ros-lyrical-rcl-interfaces"]
 cartographer_ros:
   add_host: ["cartographer 2.*", "libboost-devel", "ceres-solver * cpu*"]
 libyaml_vendor:
@@ -48,7 +48,7 @@ behaviortree_cpp:
   add_host: ["libboost-devel", "cppzmq", "zeromq", "sqlite"]
   add_run: ["libboost"]
 plotjuggler:
-  add_host: ["libxcb", "${{ 'elfutils' if linux }}", "ros-rolling-ros-workspace"]
+  add_host: ["libxcb", "${{ 'elfutils' if linux }}", "ros-lyrical-ros-workspace"]
 embree_vendor:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "libpng", "libjpeg-turbo", "openimageio", "tbb", "tbb-devel", "embree"]
 ign_rviz_common:
@@ -64,7 +64,7 @@ image_view:
 nao_lola:
   add_host: ["libboost-devel"]
 ros_ign_gazebo:
-  add_host: ["ros-rolling-std-msgs", "ros-rolling-rclcpp", "${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
+  add_host: ["ros-lyrical-std-msgs", "ros-lyrical-rclcpp", "${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
 ros_ign_gazebo_demos:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
 rosbag2_bag_v2_plugins:
@@ -78,8 +78,8 @@ libg2o:
 fmilibrary_vendor:
   add_host: ["fmilib"]
 mrpt2:
-  add_host:  ["assimp", "octomap", "tinyxml2", "libboost-devel", "jsoncpp", "gtest", "libboost-python-devel", "libdc1394", "xorg-libxcomposite", "libftdi", "ros-rolling-octomap"]
-  add_run:   ["assimp", "octomap", "tinyxml2", "libboost-devel", "jsoncpp", "gtest", "libboost-python-devel", "libdc1394", "xorg-libxcomposite", "libftdi", "ros-rolling-octomap"]
+  add_host:  ["assimp", "octomap", "tinyxml2", "libboost-devel", "jsoncpp", "gtest", "libboost-python-devel", "libdc1394", "xorg-libxcomposite", "libftdi", "ros-lyrical-octomap"]
+  add_run:   ["assimp", "octomap", "tinyxml2", "libboost-devel", "jsoncpp", "gtest", "libboost-python-devel", "libdc1394", "xorg-libxcomposite", "libftdi", "ros-lyrical-octomap"]
   add_build: ["${{ cdt('libxcomposite-devel') if linux }}"]
 ros1_rosbag_storage_vendor:
   add_host: ["ros-noetic-roscpp", "ros-noetic-roslz4", "ros-noetic-rostest"]
@@ -89,7 +89,7 @@ popf:
 rtabmap:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "ceres-solver", "libdc1394", "libusb", "vtk"]
 backward_ros:
-  add_host: ["${{ 'binutils' if linux }}", "${{ 'elfutils' if linux }}", "ros-rolling-ament-cmake-libraries"]
+  add_host: ["${{ 'binutils' if linux }}", "${{ 'elfutils' if linux }}", "ros-lyrical-ament-cmake-libraries"]
 nav2_smac_planner:
   add_build: ["${{ 'llvm-openmp' if osx }}"]
   add_host: ["${{ 'llvm-openmp' if osx }}", "ompl", "libode"]
@@ -113,8 +113,8 @@ qt_gui_cpp:
 rqt_gui_cpp:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
 ur_moveit_config:
-  add_host: ["ros-rolling-rclpy"]
-  add_run: ["ros-rolling-rclpy"]
+  add_host: ["ros-lyrical-rclpy"]
+  add_run: ["ros-lyrical-rclpy"]
 gscam:
   add_host: ["glib"]
 dolly_ignition:
@@ -154,7 +154,7 @@ moveit_visual_tools:
 force_torque_sensor_broadcaster:
   add_host: ["typeguard", "jinja2"]
 ros_gz_sim:
-  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "ros-rolling-gz-sensors-vendor"]
+  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "ros-lyrical-gz-sensors-vendor"]
 geometric_shapes:
   add_host: ["libboost-devel", "octomap"]
 ros_image_to_qimage:
@@ -175,7 +175,7 @@ uncrustify_vendor:
 mimick_vendor:
   add_build: ["vcstool"]
 gz_cmake_vendor:
-  # https://github.com/gazebo-release/gz_cmake_vendor/blob/rolling/CMakeLists.txt#L6 for select the right major version
+  # https://github.com/gazebo-release/gz_cmake_vendor/blob/lyrical/CMakeLists.txt#L6 for select the right major version
   # (this is true for all gz-* vendor packages) or https://github.com/gazebo-tooling/gazebodistro/blob/master/collection-harmonic.yaml
   # See https://gazebosim.org/docs/latest/ros_installation/#summary-of-compatible-ros-and-gazebo-combinations for mapping between ROS2 and Gazebo distros
   add_host: ["gz-cmake"]
@@ -239,7 +239,7 @@ gz_ogre_next_vendor:
 rosx_introspection:
   add_host: ["rapidjson"]
 gz_ros2_control:
-  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "ros-rolling-gz-sensors-vendor"]
+  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "ros-lyrical-gz-sensors-vendor"]
 gz_ros2_control_demos:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
 octomap_ros:

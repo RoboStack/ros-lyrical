@@ -1,7 +1,7 @@
 tests:
   # Regression test for https://github.com/RoboStack/ros-jazzy/issues/125
   - script:
-    - ros2 pkg prefix desktop
+    - ros2 pkg prefix turtlebot3
     requirements:
       run:
-        - ros-rolling-ros2pkg
+        - ros-lyrical-ros2pkg

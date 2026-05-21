@@ -4,4 +4,4 @@ tests:
     - ros2 pkg prefix desktop_full
     requirements:
       run:
-        - ros-rolling-ros2pkg
+        - ros-lyrical-ros2pkg

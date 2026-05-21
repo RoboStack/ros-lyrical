@@ -1,4 +1,4 @@
-ros_distro: rolling
+ros_distro: lyrical
 
 # mapping for package keys
 conda_index:
@@ -41,7 +41,7 @@ packages_remove_from_deps:
 
 skip_existing:
   # - output
-  - https://prefix.dev/robostack-rolling/
+  - https://prefix.dev/robostack-lyrical/
 
 packages_select_by_deps:
   - ament_cmake_core

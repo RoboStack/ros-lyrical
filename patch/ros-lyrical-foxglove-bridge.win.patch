@@ -1,9 +1,9 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 71deedd3..04e1ecc0 100644
+index 9285c891..45347a4 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -23,7 +23,7 @@ option(FOXGLOVE_BRIDGE_REMOTE_ACCESS "Build with remote access gateway support"
- 
+@@ -23,7 +23,7 @@ option(USE_LOCAL_SDK "Use pre-built Foxglove SDK binaries from local source tree
+
  macro(enable_strict_compiler_warnings target)
    if (MSVC)
 -    target_compile_options(${target} PRIVATE /WX /W4)
@@ -11,17 +11,17 @@ index 71deedd3..04e1ecc0 100644
    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
      target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Werror -Wold-style-cast -Wfloat-equal -Wmost -Wunused-exception-parameter)
    else()
-@@ -75,6 +75,75 @@ FetchContent_Declare(
-   URL_HASH SHA256=${FOXGLOVE_SDK_SHA}
- )
- FetchContent_MakeAvailable(foxglove_sdk)
-+if(MSVC)
-+  file(READ
-+    "${foxglove_sdk_SOURCE_DIR}/include/foxglove/parameter.hpp"
-+    _foxglove_parameter_hpp
-+  )
-+  string(REPLACE "\r\n" "\n" _foxglove_parameter_hpp "${_foxglove_parameter_hpp}")
-+  string(REPLACE
+@@ -87,6 +87,75 @@ else()
+     URL_HASH SHA256=${FOXGLOVE_SDK_SHA}
+   )
+   FetchContent_MakeAvailable(foxglove_sdk)
++  if(MSVC)
++    file(READ
++      "${foxglove_sdk_SOURCE_DIR}/include/foxglove/server/parameter.hpp"
++      _foxglove_parameter_hpp
++    )
++    string(REPLACE "\r\n" "\n" _foxglove_parameter_hpp "${_foxglove_parameter_hpp}")
++    string(REPLACE
 +[=[
 +  [[nodiscard]] bool isArray() const noexcept {
 +    if (!this->isArray<ParameterValueView>()) {
@@ -53,10 +53,10 @@ index 71deedd3..04e1ecc0 100644
 +    }
 +  }
 +]=]
-+    _foxglove_parameter_hpp
-+    "${_foxglove_parameter_hpp}"
-+  )
-+  string(REPLACE
++      _foxglove_parameter_hpp
++      "${_foxglove_parameter_hpp}"
++    )
++    string(REPLACE
 +[=[
 +  [[nodiscard]] bool isDict() const noexcept {
 +    if (!this->isDict<ParameterValueView>()) {
@@ -76,37 +76,24 @@ index 71deedd3..04e1ecc0 100644
 +      const auto& dict = value->get<ParameterValueView::Dict>();
 +      return std::all_of(
 +]=]
-+    _foxglove_parameter_hpp
-+    "${_foxglove_parameter_hpp}"
-+  )
-+  file(WRITE
-+    "${foxglove_sdk_SOURCE_DIR}/include/foxglove/parameter.hpp"
-+    "${_foxglove_parameter_hpp}"
-+  )
-+endif()
- file(GLOB_RECURSE FOXGLOVE_SDK_SOURCES CONFIGURE_DEPENDS "${foxglove_sdk_SOURCE_DIR}/src/*.cpp")
- 
- add_library(foxglove_cpp_shared SHARED)
-@@ -86,10 +155,27 @@ target_include_directories(foxglove_cpp_shared SYSTEM
- target_sources(foxglove_cpp_shared PRIVATE ${FOXGLOVE_SDK_SOURCES})
- # Import the prebuilt C shared library from the fetched SDK
- add_library(foxglove-shared SHARED IMPORTED)
--set_target_properties(foxglove-shared PROPERTIES
--  IMPORTED_LOCATION ${foxglove_sdk_SOURCE_DIR}/lib/libfoxglove.so
--)
-+if(WIN32)
-+  set_target_properties(foxglove-shared PROPERTIES
-+    IMPORTED_IMPLIB ${foxglove_sdk_SOURCE_DIR}/lib/foxglove.dll.lib
-+    IMPORTED_LOCATION ${foxglove_sdk_SOURCE_DIR}/lib/foxglove.dll
-+  )
-+else()
-+  set_target_properties(foxglove-shared PROPERTIES
-+    IMPORTED_LOCATION ${foxglove_sdk_SOURCE_DIR}/lib/libfoxglove.so
-+  )
-+endif()
- target_link_libraries(foxglove_cpp_shared PRIVATE foxglove-shared)
-+if(WIN32)
-+  target_link_libraries(foxglove_cpp_shared PRIVATE
++      _foxglove_parameter_hpp
++      "${_foxglove_parameter_hpp}"
++    )
++    file(WRITE
++      "${foxglove_sdk_SOURCE_DIR}/include/foxglove/server/parameter.hpp"
++      "${_foxglove_parameter_hpp}"
++    )
++  endif()
+   add_library(foxglove_cpp_static STATIC)
+   target_include_directories(foxglove_cpp_static SYSTEM
+     PUBLIC
+@@ -96,7 +165,15 @@ else()
+   file(GLOB_RECURSE FOXGLOVE_SDK_SOURCES CONFIGURE_DEPENDS "${foxglove_sdk_SOURCE_DIR}/src/*.cpp")
+   target_sources(foxglove_cpp_static PRIVATE ${FOXGLOVE_SDK_SOURCES})
+   set_target_properties(foxglove_cpp_static PROPERTIES POSITION_INDEPENDENT_CODE ON)
+-  target_link_libraries(foxglove_cpp_static PRIVATE ${foxglove_sdk_SOURCE_DIR}/lib/libfoxglove.a)
++  target_link_libraries(foxglove_cpp_static PRIVATE
++    ${foxglove_sdk_SOURCE_DIR}/lib/foxglove.lib
 +    Ws2_32.lib
 +    Userenv.lib
 +    Ntdll.lib
@@ -114,10 +101,9 @@ index 71deedd3..04e1ecc0 100644
 +    Secur32.lib
 +    Ncrypt.lib
 +  )
-+endif()
- set_target_properties(foxglove_cpp_shared PROPERTIES
-   INSTALL_RPATH "$ORIGIN"
-   BUILD_WITH_INSTALL_RPATH TRUE
+ endif()
+ 
+ find_program(GIT_SCM git DOC "Git version control")
 diff --git a/src/ros2_foxglove_bridge.cpp b/src/ros2_foxglove_bridge.cpp
 index 2229aadc..f79a93ce 100644
 --- a/src/ros2_foxglove_bridge.cpp
