@@ -39,6 +39,11 @@ packages_remove_from_deps:
       - tlsf
       - tlsf_cpp
 
+# Rebuild a package when its upstream version changes (e.g. after a
+# rosdistro snapshot sync), instead of skipping any name already present
+# on the channel. Without this, version bumps are never rebuilt.
+trigger_new_versions: true
+
 skip_existing:
   # - output
   - https://prefix.dev/robostack-lyrical/
