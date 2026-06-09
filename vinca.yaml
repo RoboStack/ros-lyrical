@@ -46,6 +46,7 @@ skip_existing:
 packages_select_by_deps:
   - ament_cmake_core
   - ament_cmake_catch2
+  - ament_cmake_clang_tidy
   - ament_cmake_mypy
   - rosidl_buffer
   - rosidl_buffer_backend
