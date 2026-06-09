@@ -1,27 +1,27 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 9285c891..d8b058ab 100644
+index 8ee07c2..7426013 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -68,6 +68,18 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "aar
+@@ -98,6 +98,18 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "aarc
  elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-     set(FOXGLOVE_SDK_PLATFORM "x86_64-unknown-linux-gnu")
-     set(FOXGLOVE_SDK_SHA "f3d2f6a8ba97fedeae13b978f5e8a51dec4803eddfd23b198a292bf9ab6675ff")
-+  elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
-+    set(FOXGLOVE_SDK_PLATFORM "aarch64-apple-darwin")
-+    set(FOXGLOVE_SDK_SHA "6cb695e997e47a61c317177f13dd911c90ec1a95477473e1c5fb86db8a2da8ed")
-+  elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-+    set(FOXGLOVE_SDK_PLATFORM "x86_64-apple-darwin")
-+    set(FOXGLOVE_SDK_SHA "21cba2f3d032b3d0a921b7eda8ef103393f93f66ab891cbc4851f57c8080b94b")
-+  elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM64")
-+    set(FOXGLOVE_SDK_PLATFORM "aarch64-pc-windows-msvc")
-+    set(FOXGLOVE_SDK_SHA "602676101883defac7494e70fdc6bc8dd2daa1783da07645906ef595e6654a05")
-+  elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
-+    set(FOXGLOVE_SDK_PLATFORM "x86_64-pc-windows-msvc")
-+    set(FOXGLOVE_SDK_SHA "6cdf69d23ae45a1643f6e430b9928c5546679ffa3b9fb54a79f244b93bdc8323")
-   else()
-     message(FATAL_ERROR "Unsupported platform/architecture combination: ${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM_NAME}")
-   endif()
-@@ -163,6 +175,12 @@ target_link_libraries(foxglove_bridge_component
+   set(FOXGLOVE_SDK_PLATFORM "x86_64-unknown-linux-gnu")
+   set(FOXGLOVE_SDK_SHA "0b9d348df3a8e98d2c2cee2360cc9f52e83bb3445044debd771d1b46dc358be4")
++elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
++  set(FOXGLOVE_SDK_PLATFORM "aarch64-apple-darwin")
++  set(FOXGLOVE_SDK_SHA "c9dfa5061d72795af2620c2840a85e695b9dacce19475eaec8caf0102c4940ef")
++elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
++  set(FOXGLOVE_SDK_PLATFORM "x86_64-apple-darwin")
++  set(FOXGLOVE_SDK_SHA "3531502efd958be3f9dca06a099c167512dd3006b98ac3eecf8250d376eaa16b")
++elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM64")
++  set(FOXGLOVE_SDK_PLATFORM "aarch64-pc-windows-msvc")
++  set(FOXGLOVE_SDK_SHA "da293bf4dac2b973b7c72d1d368932f7f4f989fcac9311d529b93c7d2b84eae9")
++elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
++  set(FOXGLOVE_SDK_PLATFORM "x86_64-pc-windows-msvc")
++  set(FOXGLOVE_SDK_SHA "09d2ff5dbb6a5216a303f9470fbec186c0ebd849713570d6b8145a9d22d804af")
+ else()
+   message(FATAL_ERROR "Unsupported platform/architecture combination: ${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM_NAME}")
+ endif()
+@@ -202,6 +214,12 @@ target_link_libraries(foxglove_bridge_component
    rosx_introspection::rosx_introspection
  )
  
@@ -33,9 +33,9 @@ index 9285c891..d8b058ab 100644
 +
  rclcpp_components_register_nodes(foxglove_bridge_component "foxglove_bridge::FoxgloveBridge")
  enable_strict_compiler_warnings(foxglove_bridge_component)
- 
+ set_target_properties(foxglove_bridge_component PROPERTIES
 diff --git a/src/message_definition_cache.cpp b/src/message_definition_cache.cpp
-index ef72c9c1..ed857459 100644
+index ef72c9c..ed85745 100644
 --- a/src/message_definition_cache.cpp
 +++ b/src/message_definition_cache.cpp
 @@ -3,6 +3,7 @@
