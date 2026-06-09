@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 20bdedf..4e9d53d 100644
+index 75d5822..ff9d333 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -5,8 +5,10 @@ project(apriltag_ros)
@@ -15,68 +15,3 @@ index 20bdedf..4e9d53d 100644
  endif()
  
  option(ASAN "use AddressSanitizer to detect memory issues" OFF)
-diff --git a/src/AprilTagNode.cpp b/src/AprilTagNode.cpp
-index c13bf26..4dcbc0e 100644
---- a/src/AprilTagNode.cpp
-+++ b/src/AprilTagNode.cpp
-@@ -13,7 +13,7 @@
- #include <rclcpp_components/register_node_macro.hpp>
- #include <sensor_msgs/msg/camera_info.hpp>
- #include <sensor_msgs/msg/image.hpp>
--#include <tf2_ros/transform_broadcaster.h>
-+#include <tf2_ros/transform_broadcaster.hpp>
- 
- // apriltag
- #include "tag_functions.hpp"
-@@ -99,13 +99,13 @@ AprilTagNode::AprilTagNode(const rclcpp::NodeOptions& options)
-     td(apriltag_detector_create()),
-     // topics
-     sub_cam(image_transport::create_camera_subscription(
--        this,
-+        *this,
-         this->get_node_topics_interface()->resolve_topic_name("image_rect"),
-         std::bind(&AprilTagNode::onCamera, this, std::placeholders::_1, std::placeholders::_2),
-         declare_parameter("image_transport", "raw", descr({}, true)),
--        rmw_qos_profile_sensor_data)),
-+        rclcpp::SensorDataQoS())),
-     pub_detections(create_publisher<apriltag_msgs::msg::AprilTagDetectionArray>("detections", rclcpp::QoS(1))),
--    tf_broadcaster(this)
-+    tf_broadcaster(*this)
- {
-     // read-only parameters
-     const std::string tag_family = declare_parameter("family", "36h11", descr("tag family", true));
-diff --git a/src/conversion.cpp b/src/conversion.cpp
-index b9b30a8..16a8d66 100644
---- a/src/conversion.cpp
-+++ b/src/conversion.cpp
-@@ -4,7 +4,7 @@
- #include <geometry_msgs/msg/quaternion.hpp>
- #include <geometry_msgs/msg/vector3.hpp>
- #include <opencv2/core/mat.hpp>
--#include <tf2/convert.h>
-+#include <tf2/convert.hpp>
- 
- template<>
- void tf2::convert(const Eigen::Quaterniond& eigen_quat, geometry_msgs::msg::Quaternion& msg_quat)
-@@ -56,7 +56,7 @@ tf2::toMsg(const std::pair<cv::Mat_<double>, cv::Mat_<double>>& pose)
- 
-     // convert compact rotation vector to angle-axis to quaternion
-     const Eigen::Map<const Eigen::Vector3d> rvec(reinterpret_cast<double*>(pose.second.data));
--    const Eigen::Quaterniond q({rvec.norm(), rvec.normalized()});
-+    const Eigen::Quaterniond q(Eigen::AngleAxisd(rvec.norm(), rvec.normalized()));
- 
-     geometry_msgs::msg::Transform t;
-     tf2::convert(pose.first, t.translation);
-diff --git a/src/pose_estimation.cpp b/src/pose_estimation.cpp
-index 35a9e11..3fb8446 100644
---- a/src/pose_estimation.cpp
-+++ b/src/pose_estimation.cpp
-@@ -3,7 +3,7 @@
- #include <apriltag/apriltag_pose.h>
- #include <apriltag/common/homography.h>
- #include <opencv2/calib3d.hpp>
--#include <tf2/convert.h>
-+#include <tf2/convert.hpp>
- 
- 
- geometry_msgs::msg::Transform
