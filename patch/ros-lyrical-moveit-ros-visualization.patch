@@ -280,3 +280,12 @@ index 8a58e56eb..711637fa3 100644
  target_include_directories(moveit_trajectory_rviz_plugin
                             PRIVATE "${OGRE_PREFIX_DIR}/include")
  
+diff --git a/ConfigExtras.cmake b/ConfigExtras.cmake
+index ddda760..3b7b969 100644
+--- a/ConfigExtras.cmake
++++ b/ConfigExtras.cmake
+@@ -1,3 +1,3 @@
+ # Extras module needed for dependencies to find boost components
+ 
+-find_package(Boost REQUIRED thread date_time system filesystem)
++find_package(Boost REQUIRED thread date_time filesystem)
