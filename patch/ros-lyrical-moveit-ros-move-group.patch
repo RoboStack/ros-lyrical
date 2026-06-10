@@ -102,3 +102,15 @@ index 86bca8785d..e29a8aa778 100644
    EXPORT moveit_ros_move_groupTargets
    LIBRARY DESTINATION lib
    ARCHIVE DESTINATION lib
+diff --git a/ConfigExtras.cmake b/ConfigExtras.cmake
+index 30817cf..66d025a 100644
+--- a/ConfigExtras.cmake
++++ b/ConfigExtras.cmake
+@@ -3,7 +3,6 @@ find_package(
+ find_package(
+   Boost
+   REQUIRED
+-  system
+   filesystem
+   date_time
+   program_options
