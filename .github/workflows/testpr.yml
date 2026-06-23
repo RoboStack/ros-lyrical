@@ -113,13 +113,7 @@ jobs:
     - name: Build recipes
       shell: bash -l {0}
       run: |
-        # --continue-on-failure: keep building packages that don't depend on a
-        # failed one instead of stopping at the first failure. Everything that
-        # builds lands in the output dir and is saved by the "Save build cache"
-        # step (if: always()), so a later run skips them via --skip-existing
-        # instead of rebuilding the whole world. rattler-build still exits
-        # non-zero if any package failed, so the check stays red.
-        pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing --continue-on-failure
+        pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
 
     - name: See packages that will be saved in cache
       shell: bash -l {0}
