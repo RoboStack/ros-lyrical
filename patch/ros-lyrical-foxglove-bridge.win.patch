@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8ee07c2..ca4acc5 100644
+index 7426013..72e281d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -61,7 +61,7 @@ endif()
@@ -11,3 +11,105 @@ index 8ee07c2..ca4acc5 100644
    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
      target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Werror -Wold-style-cast -Wfloat-equal -Wmost -Wunused-exception-parameter)
    else()
+@@ -122,6 +122,75 @@ FetchContent_Declare(
+   URL_HASH SHA256=${FOXGLOVE_SDK_SHA}
+ )
+ FetchContent_MakeAvailable(foxglove_sdk)
++if(MSVC)
++  file(READ
++    "${foxglove_sdk_SOURCE_DIR}/include/foxglove/parameter.hpp"
++    _foxglove_parameter_hpp
++  )
++  string(REPLACE "\r\n" "\n" _foxglove_parameter_hpp "${_foxglove_parameter_hpp}")
++  string(REPLACE
++[=[
++  [[nodiscard]] bool isArray() const noexcept {
++    if (!this->isArray<ParameterValueView>()) {
++      return false;
++    }
++    try {
++      const auto& arr = this->get<ParameterValueView::Array>();
++      return std::all_of(arr.begin(), arr.end(), [](const ParameterValueView& elem) noexcept {
++        return elem.is<T>();
++      });
++    } catch (...) {
++      return false;
++    }
++  }
++]=]
++[=[
++  [[nodiscard]] bool isArray() const noexcept {
++    auto value = this->value();
++    if (!value.has_value() || !value->is<ParameterValueView::Array>()) {
++      return false;
++    }
++    try {
++      const auto& arr = value->get<ParameterValueView::Array>();
++      return std::all_of(arr.begin(), arr.end(), [](const ParameterValueView& elem) noexcept {
++        return elem.is<T>();
++      });
++    } catch (...) {
++      return false;
++    }
++  }
++]=]
++    _foxglove_parameter_hpp
++    "${_foxglove_parameter_hpp}"
++  )
++  string(REPLACE
++[=[
++  [[nodiscard]] bool isDict() const noexcept {
++    if (!this->isDict<ParameterValueView>()) {
++      return false;
++    }
++    try {
++      const auto& dict = this->get<ParameterValueView::Dict>();
++      return std::all_of(
++]=]
++[=[
++  [[nodiscard]] bool isDict() const noexcept {
++    auto value = this->value();
++    if (!value.has_value() || !value->is<ParameterValueView::Dict>()) {
++      return false;
++    }
++    try {
++      const auto& dict = value->get<ParameterValueView::Dict>();
++      return std::all_of(
++]=]
++    _foxglove_parameter_hpp
++    "${_foxglove_parameter_hpp}"
++  )
++  file(WRITE
++    "${foxglove_sdk_SOURCE_DIR}/include/foxglove/parameter.hpp"
++    "${_foxglove_parameter_hpp}"
++  )
++endif()
+ 
+ # The dist's CMake package config defines IMPORTED targets for the prebuilt C libraries
+ # (foxglove-static, foxglove-shared) and the foxglove_sdk_add_cpp_library() helper, which
+@@ -136,6 +205,16 @@ if (FOXGLOVE_BRIDGE_REMOTE_ACCESS)
+ else()
+   foxglove_sdk_add_cpp_library(foxglove_cpp_shared TYPE SHARED REMOTE_ACCESS OFF)
+ endif()
++if(WIN32)
++  target_link_libraries(foxglove_cpp_shared PRIVATE
++    Ws2_32.lib
++    Userenv.lib
++    Ntdll.lib
++    Crypt32.lib
++    Secur32.lib
++    Ncrypt.lib
++  )
++endif()
+ set_target_properties(foxglove_cpp_shared PROPERTIES
+   BUILD_WITH_INSTALL_RPATH TRUE
+ )
+diff --git a/src/ros2_foxglove_bridge.cpp b/src/ros2_foxglove_bridge.cpp
+index 601db6c..cc4e4f5 100644
+--- a/src/ros2_foxglove_bridge.cpp
++++ b/src/ros2_foxglove_bridge.cpp
+@@ -1,3 +1,4 @@
++#define _CRT_SECURE_NO_WARNINGS
+ #include <filesystem>
+ #include <fstream>
+ #include <type_traits>
