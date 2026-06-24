@@ -21,9 +21,6 @@ mutex_package:
     - vtk 9.6.2.*
 
 packages_skip_by_deps:
-  # Same rosdistro no-version issue; keep selected explicitly below via the
-  # manually maintained additional recipe entry.
-  - ur_client_library
   - if: not linux
     then:
       - pendulum_control
