@@ -86,6 +86,16 @@ index ca30488f7..b6f5f2ad4 100644
    rsl
    ruckig
    sensor_msgs
+diff --git a/ConfigExtras.cmake b/ConfigExtras.cmake
+index 8475da4..9daa704 100644
+--- a/ConfigExtras.cmake
++++ b/ConfigExtras.cmake
+@@ -10,5 +10,4 @@ find_package(
+   program_options
+   regex
+   serialization
+-  system
+   thread)
 diff --git a/collision_detection/CMakeLists.txt b/collision_detection/CMakeLists.txt
 index e3f8fd212..403c2af04 100644
 --- a/collision_detection/CMakeLists.txt

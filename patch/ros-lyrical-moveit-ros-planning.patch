@@ -33,6 +33,18 @@ index 9b4136d01..3c1cfdcd8 100644
    EXPORT moveit_ros_planningTargets
    LIBRARY DESTINATION lib
    ARCHIVE DESTINATION lib
+diff --git a/ConfigExtras.cmake b/ConfigExtras.cmake
+index 3a527d9..b101f9b 100644
+--- a/ConfigExtras.cmake
++++ b/ConfigExtras.cmake
+@@ -3,7 +3,6 @@ find_package(
+ find_package(
+   Boost
+   REQUIRED
+-  system
+   filesystem
+   date_time
+   program_options
 diff --git a/collision_plugin_loader/CMakeLists.txt b/collision_plugin_loader/CMakeLists.txt
 index bc34ed5ec..577f6dcd2 100644
 --- a/collision_plugin_loader/CMakeLists.txt

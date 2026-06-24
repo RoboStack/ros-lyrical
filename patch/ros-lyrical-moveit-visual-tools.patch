@@ -1,7 +1,16 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 2e08aa6..99f7010 100644
+index 2e08aa6..49bdf1e 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
+@@ -5,7 +5,7 @@ find_package(moveit_common REQUIRED)
+ moveit_package()
+ 
+ # Load  all dependencies required for this package
+-find_package(Boost REQUIRED system)
++find_package(Boost REQUIRED COMPONENTS filesystem)
+ find_package(Eigen3 REQUIRED)
+ find_package(geometry_msgs REQUIRED)
+ find_package(graph_msgs REQUIRED)
 @@ -33,6 +33,23 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
    tf2_ros
    trajectory_msgs
@@ -10,7 +19,7 @@ index 2e08aa6..99f7010 100644
 +)
 +
 +set(THIS_PACKAGE_INCLUDE_TARGET_DEPENDS
-+  ${Boost_LIBRARIES}
++  Boost::filesystem
 +  ${geometry_msgs_TARGETS}
 +  ${graph_msgs_TARGETS}
 +  moveit_core::moveit_core
