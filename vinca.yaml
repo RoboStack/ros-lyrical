@@ -72,6 +72,7 @@ packages_select_by_deps:
   # Requested in https://www.linkedin.com/feed/update/urn:li:activity:7346559234177703938/
   - moveit-chomp-optimizer-adapter
   - moveit-ros-control-interface
+  - pick_ik
 
   - ros2_control
   - ros2_controllers
