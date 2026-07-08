@@ -21,6 +21,7 @@ mutex_package:
     - vtk 9.6.2.*
 
 packages_skip_by_deps:
+
   - if: not linux
     then:
       - pendulum_control
@@ -29,6 +30,7 @@ packages_skip_by_deps:
       - tlsf_cpp
 
 packages_remove_from_deps:
+
   - if: not linux
     then:
       - pendulum_control
@@ -37,210 +39,176 @@ packages_remove_from_deps:
       - tlsf_cpp
 
 skip_existing:
-  # - output
   - https://prefix.dev/robostack-lyrical/
 
 packages_select_by_deps:
-  - ament_cmake_core
+  - ackermann-msgs
+  - ament_cmake_black
   - ament_cmake_catch2
   - ament_cmake_clang_tidy
+  - ament_cmake_core
   - ament_cmake_mypy
+  - apriltag_detector
+  - asio_cmake_module
+  - autoware_cmake
+  - autoware_common_msgs
+  - autoware_component_interface_specs
+  - autoware_control_msgs
+  - autoware_geography_utils
+  - autoware_global_parameter_loader
+  - autoware_internal_msgs
+  - autoware_interpolation
+  - autoware_kalman_filter
+  - autoware_localization_msgs
+  - autoware_map_msgs
+  - autoware_node
+  - autoware_object_recognition_utils
+  - autoware_perception_msgs
+  - autoware_planning_msgs
+  - autoware_point_types
+  - autoware_sensing_msgs
+  - autoware_signal_processing
+  - autoware_system_msgs
+  - autoware_utils
+  - autoware_v2x_msgs
+  - autoware_vehicle_info_utils
+  - autoware_vehicle_msgs
+  - battery_state_broadcaster
+  - behaviortree_cpp
+  - better_launch
+  - can_msgs
+  - cm_executors
+  - data_tamer_cpp  # Requested in https://github.com/RoboStack/ros-humble/issues/325
+  - desktop
+  - desktop_full
+  - dev_tools
+  - diagnostic-remote-logging
+  - diagnostics
+  - flex_sync
+  - foxglove_bridge
+  - foxglove_msgs
+  - gripper_controllers
+  - gtsam
+  - gz_ros2_control
+  - gz_ros2_control_demos
+  - lanelet2
+  - magic_enum
+  - moveit
+  - moveit-chomp-optimizer-adapter  # Requested in https://www.linkedin.com/feed/update/urn:li:activity:7346559234177703938/
+  - moveit-planners-chomp
+  - moveit-ros-control-interface
+  - moveit-ros-trajectory-cache
+  - moveit-servo
+  - moveit-visual-tools
+  - nav2_bringup
+  - navigation2
+  - nmea-navsat-driver
+  - perception
+  - persist-parameter-server
+  - polygon_msgs
+  - proxsuite
+  - py-trees
+  - py-trees-ros
+  - py-trees-ros-interfaces
+  - py-trees-ros-viewer
+  - rmw_zenoh_cpp  # requested in https://github.com/RoboStack/ros-humble/issues/252
+  - robot
+  - robot-localization
+  - ros2_control
+  - ros2_controllers
+  - ros2_fmt_logger
+  - ros2_socketcan_msgs
+  - ros_base
+  - ros_environment
+  - ros_gz
+  - ros_workspace
+  - rosbridge_suite
   - rosidl_buffer
   - rosidl_buffer_backend
   - rosidl_buffer_backend_registry
   - rosidl_buffer_py
-
-  - ros_base
-  - ros_environment
-  - ros_workspace
-  - dev_tools
-  - diagnostics
-  - teleop
-  - robot
-  - perception
-  - navigation2
-  - simulation
-
-  - desktop
-  - desktop_full
-
-  - moveit
-  - moveit-planners-chomp
-  - moveit-servo
-  - moveit-visual-tools
-  - moveit-ros-trajectory-cache
-  - moveit-chomp-optimizer-adapter  # Requested in https://www.linkedin.com/feed/update/urn:li:activity:7346559234177703938/
-  - moveit-ros-control-interface
-
-  - ros2_control
-  - ros2_controllers
-  - gz_ros2_control
-  - gz_ros2_control_demos
-
   - rviz_visual_tools
-
+  - sbg_driver
+  - simulation
+  - slam_toolbox
+  - teleop
+  - turtlebot3
+  - twist_mux  # requested in https://github.com/RoboStack/ros-humble/issues/249
+  - twist_stamper  # Requested in https://github.com/RoboStack/ros-rolling/issues/12
+  - ublox
   - ur
   - ur_client_library
   - ur_simulation_gz
-
-  - ros_gz
-  - slam_toolbox
-  - turtlebot3
-
-  - ackermann-msgs
-  - sbg_driver
-
-  - twist_mux  # requested in https://github.com/RoboStack/ros-humble/issues/249
-
-  - rmw_zenoh_cpp  # requested in https://github.com/RoboStack/ros-humble/issues/252
-
-  - flex_sync
-  - gripper_controllers
-
-  - rosbridge_suite
-
-  - foxglove_bridge
-  - foxglove_msgs
-
-  - lanelet2
-
-  - ublox
-
-  - can_msgs
-  - ros2_socketcan_msgs
-
-  - nav2_bringup
-
-  - autoware_internal_msgs
-  - autoware_common_msgs
-  - autoware_control_msgs
-  - autoware_localization_msgs
-  - autoware_map_msgs
-  - autoware_perception_msgs
-  - autoware_planning_msgs
-  - autoware_sensing_msgs
-  - autoware_system_msgs
-  - autoware_v2x_msgs
-  - autoware_vehicle_msgs
-  - autoware_cmake
-  - autoware_utils
-  - autoware_component_interface_specs
-  - autoware_geography_utils
-  - autoware_global_parameter_loader
-  - autoware_interpolation
-  - autoware_kalman_filter
-  - autoware_node
-  - autoware_object_recognition_utils
-  - autoware_point_types
-  - autoware_signal_processing
-  - autoware_vehicle_info_utils
-
-  - apriltag_detector
-
-  - ament_cmake_black
-
-  - behaviortree_cpp
-
-  - gtsam
-  - data_tamer_cpp  # Requested in https://github.com/RoboStack/ros-humble/issues/325
-
-  - proxsuite
-
-  - asio_cmake_module
-  - battery_state_broadcaster
-  - polygon_msgs
-  - ros2_fmt_logger
-
-  - magic_enum
-
-  - better_launch
-  - cm_executors
-  - py-trees
-  - py-trees-ros-interfaces
-  - py-trees-ros
-  - py-trees-ros-viewer
-
-  - nmea-navsat-driver
-  - diagnostic-remote-logging
-  - robot-localization
-
-  - persist-parameter-server
-
-  - twist_stamper  # Requested in https://github.com/RoboStack/ros-rolling/issues/12
-
   - urdf_tutorial
 
   # These packages are only built on Linux as they depend on Linux-specific API
   - if: linux
     then:
+      - libcamera
       - nobleo_socketcan_bridge  # Depends on socketcan
       - ros2_socketcan  # Depends on socketcan
-      - usb_cam  # Depends on v4l
-
-      - libcamera
-
       - rosgraph_monitor
+      - usb_cam  # Depends on v4l
 
   # These packages are currently only build on Linux,
   # as trying to build them in the past on macos or Windows resulted in errors
   - if: linux
     then:
-      - py_binding_tools
-      - livox_ros_driver2
-      - camera_ros  # Depends on libcamera that is only available on linux
-      - v4l2_camera  # Depends on v4l that is only available on linux
-      - swri_serial_util  # Serial communication only implemented for linux
       - apriltag_ros  # Depends on camera_ros
+      - camera_ros  # Depends on libcamera that is only available on linux
+      - livox_ros_driver2
+      - py_binding_tools
+      - swri_serial_util  # Serial communication only implemented for linux
+      - v4l2_camera  # Depends on v4l that is only available on linux
 
   # These packages are currently not build on Windows, but they be with some work
   - if: not win
     then:
-      - plotjuggler-ros
-      - foxglove_compressed_video_transport
-      - rplidar_ros
-      - velodyne
-      - moveit-py
-      - moveit-ros-perception
-      - moveit-ros-occupancy-map-monitor
-      - moveit-runtime
-      - pinocchio
-      - serial_driver
-      - swri_console  # Until sync of: https://github.com/ros/rosdistro/pull/49750
-      - ffmpeg_image_transport  # TODO on windows: fix iconv link issue
+      - apriltag_detector_mit
+      - apriltag_detector_umich
       - apriltag_draw
       - apriltag_tools
-      - apriltag_detector_umich
-      - apriltag_detector_mit
-      - dual-laser-merger
-      - pointcloud-to-laserscan
-      - laser-segmentation
-      - rqt_tf_tree
-      - rviz_satellite
-      - odom_to_tf_ros2
-      - ouster_ros  # TODO on windows: cannot open pcl_io.lib
-      - moveit-hybrid-planning  # Windows error: error C3861: '__builtin_unreachable': identifier not found
-      - autoware_motion_utils  # Windows error: error C2765: 'function': an explicit specialization of a function template cannot have any default arguments
-      - autoware_trajectory  # depends on autoware_motion_utils
-      - autoware_pose_initializer  # depends on autoware_motion_utils
-      - autoware_core_control  # depends on autoware_motion_utils
-      - autoware_ekf_localizer  # Windows error: error C2338: static_assert failed: 'First argument to logging macros must be an rclcpp::Logger'
-      - autoware_core_localization  # depends on autoware_ekf_localizer
-      - autoware_lanlet2_utils  # Windows errors: C3546 (no parameter packs to expand), C2678 (no operator '|' for transform_view)
-      - autoware_osqp_interface
-      - autoware_qp_interface
       - autoware_core
+      - autoware_core_control  # depends on autoware_motion_utils
+      - autoware_core_localization  # depends on autoware_ekf_localizer
+      - autoware_ekf_localizer  # Windows error: error C2338: static_assert failed: 'First argument to logging macros must be an rclcpp::Logger'
+      - autoware_lanlet2_utils  # Windows errors: C3546 (no parameter packs to expand), C2678 (no operator '|' for transform_view)
+      - autoware_motion_utils  # Windows error: error C2765: 'function': an explicit specialization of a function template cannot have any default arguments
+      - autoware_osqp_interface
+      - autoware_pose_initializer  # depends on autoware_motion_utils
+      - autoware_qp_interface
+      - autoware_trajectory  # depends on autoware_motion_utils
+      - dual-laser-merger
+      - ffmpeg_image_transport  # TODO on windows: fix iconv link issue
+      - foxglove_compressed_video_transport
       - grid_map  # rviz linking problems on Windows, see https://github.com/RoboStack/ros-jazzy/pull/79#issuecomment-2993499990
-      - rslidar_sdk
-      # mocap4r2 packages
+      - laser-segmentation
       - mocap4r2_control
       - mocap4r2_control_msgs
-      - rqt_mocap4r2_control
       - mocap4r2_dummy_driver
       - mocap4r2_marker_publisher
       - mocap4r2_marker_viz
       - mocap4r2_marker_viz_srvs
       - mocap4r2_robot_gt
       - mocap4r2_robot_gt_msgs
+      - moveit-hybrid-planning  # Windows error: error C3861: '__builtin_unreachable': identifier not found
+      - moveit-py
+      - moveit-ros-occupancy-map-monitor
+      - moveit-ros-perception
+      - moveit-runtime
+      - odom_to_tf_ros2
+      - ouster_ros  # TODO on windows: cannot open pcl_io.lib
+      - pinocchio
+      - plotjuggler-ros
+      - pointcloud-to-laserscan
+      - rplidar_ros
+      - rqt_mocap4r2_control
+      - rqt_tf_tree
+      - rslidar_sdk
+      - rviz_satellite
+      - serial_driver
+      - swri_console  # Until sync of: https://github.com/ros/rosdistro/pull/49750
+      - velodyne
 
 patch_dir: patch
 rosdistro_snapshot: rosdistro_snapshot.yaml
