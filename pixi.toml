@@ -38,7 +38,7 @@ check-patches = { cmd = "python check_patches_clean_apply.py", depends-on = ["ge
 create_snapshot = { cmd = "vinca-snapshot -d lyrical -o rosdistro_snapshot.yaml" }
 upload = "rattler-build upload prefix -c robostack-lyrical --generate-attestation"
 build_continue_on_failure = { cmd = "rattler-build build --recipe-dir ./recipes -m ./conda_build_config.yaml -c robostack-lyrical -c https://repo.prefix.dev/conda-forge --continue-on-failure --skip-existing", depends-on = ["generate-recipes"] }
-sort = "sh -lc 'vinca-sort-vinca-lists $@ vinca.yaml && vinca-sort-yaml-keys $@ pkg_additional_info.yaml robostack.yaml rosdistro_additional_recipes.yaml' --"
+sort = { cmd = "vinca-sort-vinca-lists {{ check }} vinca.yaml && vinca-sort-yaml-keys {{ check }} pkg_additional_info.yaml robostack.yaml rosdistro_additional_recipes.yaml", args = [{ arg = "check", default = "" }] }
 
 [tasks.build]
 cmd = "rattler-build build --recipe-dir ./recipes -m ./conda_build_config.yaml -c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge --skip-existing"
