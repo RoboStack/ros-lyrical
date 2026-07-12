@@ -1,0 +1,47 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a220b3a..ae44a55 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -19,10 +19,10 @@ find_package(rviz_ogre_vendor REQUIRED)
+ add_definitions(-DBOOST_MATH_DISABLE_FLOAT128)
+ 
+ # Qt Stuff
+-find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
+-set(QT_LIBRARIES Qt5::Widgets)
++find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
++set(QT_LIBRARIES Qt6::Widgets)
+ macro(qt_wrap_ui)
+-	qt5_wrap_ui(${ARGN})
++	qt6_wrap_ui(${ARGN})
+ endmacro()
+ 
+ set(CMAKE_INCLUDE_CURRENT_DIR ON)
+diff --git a/motion_planning_tasks/src/remote_task_model.cpp b/motion_planning_tasks/src/remote_task_model.cpp
+index d28cfd6..8926cba 100644
+--- a/motion_planning_tasks/src/remote_task_model.cpp
++++ b/motion_planning_tasks/src/remote_task_model.cpp
+@@ -526,7 +526,7 @@ QVariant RemoteSolutionModel::data(const QModelIndex& index, int role) const {
+ 					return item.creation_rank;
+ 				case 1:
+ 					if (std::isinf(item.cost))
+-						return tr(u8"∞");
++						return tr("∞");
+ 					if (std::isnan(item.cost))
+ 						return QVariant();
+ 					return QLocale().toString(item.cost, 'f', 4);
+diff --git a/motion_planning_tasks/src/task_list_model.cpp b/motion_planning_tasks/src/task_list_model.cpp
+index 3cd6466..7c471d5 100644
+--- a/motion_planning_tasks/src/task_list_model.cpp
++++ b/motion_planning_tasks/src/task_list_model.cpp
+@@ -61,9 +61,9 @@ QVariant TaskListModel::horizontalHeader(int column, int role) {
+ 				case 0:
+ 					return tr("name");
+ 				case 1:
+-					return tr(u8"✓");
++					return tr("✓");
+ 				case 2:
+-					return tr(u8"✗");
++					return tr("✗");
+ 				case 3:
+ 					return tr("time");
+ 			}
