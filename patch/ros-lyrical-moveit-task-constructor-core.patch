@@ -1,0 +1,78 @@
+diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
+index 26c86ac..d5cd670 100644
+--- a/python/bindings/CMakeLists.txt
++++ b/python/bindings/CMakeLists.txt
+@@ -17,6 +17,7 @@ pybind11_add_module(pymoveit_mtc
+ )
+ target_include_directories(pymoveit_mtc PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+ target_link_libraries(pymoveit_mtc PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_stages ${PROJECT_NAME}_python_tools)
++set_target_properties(pymoveit_mtc PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+ 
+ # install libs
+ install(TARGETS ${PROJECT_NAME}_python_tools
+diff --git a/src/cost_terms.cpp b/src/cost_terms.cpp
+index 9ddb94f..9896d36 100644
+--- a/src/cost_terms.cpp
++++ b/src/cost_terms.cpp
+@@ -298,8 +298,8 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
+ 	} };
+ 
+ 	auto collision_comment = [=](const auto& distance) {
+-		return fmt::format(PREFIX + "allegedly valid solution collides between '{}' and '{}'", distance.link_names[0],
+-		                   distance.link_names[1]);
++		return fmt::format(fmt::runtime(PREFIX + "allegedly valid solution collides between '{}' and '{}'"),
++		                   distance.link_names[0], distance.link_names[1]);
+ 	};
+ 
+ 	double distance{ 0.0 };
+@@ -313,10 +313,10 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
+ 		}
+ 		distance = distance_data.distance;
+ 		if (!cumulative)
+-			comment = fmt::format(PREFIX + "distance {} between '{}' and '{}'", distance, distance_data.link_names[0],
+-			                      distance_data.link_names[1]);
++			comment = fmt::format(fmt::runtime(PREFIX + "distance {} between '{}' and '{}'"), distance,
++			                      distance_data.link_names[0], distance_data.link_names[1]);
+ 		else
+-			comment = fmt::format(PREFIX + "cumulative distance {}", distance);
++			comment = fmt::format(fmt::runtime(PREFIX + "cumulative distance {}"), distance);
+ 	} else {  // check trajectory
+ 		for (size_t i = 0; i < s.trajectory()->getWayPointCount(); ++i) {
+ 			auto distance_data = check_distance(state, s.trajectory()->getWayPoint(i));
+@@ -327,7 +327,7 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
+ 			distance += distance_data.distance;
+ 		}
+ 		distance /= s.trajectory()->getWayPointCount();
+-		comment = fmt::format(PREFIX + "average{} distance: {}", (cumulative ? " cumulative" : ""), distance);
++		comment = fmt::format(fmt::runtime(PREFIX + "average{} distance: {}"), (cumulative ? " cumulative" : ""), distance);
+ 	}
+ 
+ 	return distance_to_cost(distance);
+diff --git a/src/properties.cpp b/src/properties.cpp
+index 8c001de..6fd0217 100644
+--- a/src/properties.cpp
++++ b/src/properties.cpp
+@@ -38,6 +38,7 @@
+ 
+ #include <moveit/task_constructor/properties.h>
+ #include <moveit/task_constructor/fmt_p.h>
++#include <boost/core/demangle.hpp>
+ #include <functional>
+ #include <rclcpp/logging.hpp>
+ #include <rclcpp/clock.hpp>
+diff --git a/src/stage.cpp b/src/stage.cpp
+index b64ce0a..a9eb8a0 100644
+--- a/src/stage.cpp
++++ b/src/stage.cpp
+@@ -909,8 +909,9 @@ bool Connecting::compatible(const InterfaceState& from_state, const InterfaceSta
+ 	const planning_scene::PlanningSceneConstPtr& from = from_state.scene();
+ 	const planning_scene::PlanningSceneConstPtr& to = to_state.scene();
+ 
+-	auto false_with_debug = [](auto... args) {
+-		RCLCPP_DEBUG_STREAM(rclcpp::get_logger("Connecting"), fmt::format(args...));
++	auto false_with_debug = [](fmt::string_view format_str, auto&&... args) {
++		RCLCPP_DEBUG_STREAM(rclcpp::get_logger("Connecting"),
++		                    fmt::vformat(format_str, fmt::make_format_args(args...)));
+ 		return false;
+ 	};
+ 
