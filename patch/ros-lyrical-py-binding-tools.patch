@@ -1,0 +1,41 @@
+From 954461c74ba6c3c7298c628e1ef5b8daaed694fc Mon Sep 17 00:00:00 2001
+From: Tobias Fischer <info@tobiasfischer.info>
+Date: Tue, 14 Jul 2026 07:31:29 +1000
+Subject: [PATCH] Rename module to module_ for C++20 compatibility
+
+This has been changed in pybind11 a while ago as far as I know
+---
+ include/py_binding_tools/ros_msg_typecasters.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/py_binding_tools/ros_msg_typecasters.h b/include/py_binding_tools/ros_msg_typecasters.h
+index 30c5edc..b85fd21 100644
+--- a/include/py_binding_tools/ros_msg_typecasters.h
++++ b/include/py_binding_tools/ros_msg_typecasters.h
+@@ -102,7 +102,7 @@ struct type_caster<rclcpp::Time>
+   // convert from rclcpp::Time to rclpy::Time
+   static handle cast(const rclcpp::Time& src, return_value_policy /* policy */, handle /* parent */)
+   {
+-    object Time = module::import("rclpy.time").attr("Time");
++    object Time = module_::import("rclpy.time").attr("Time");
+     object ClockType = Time().attr("clock_type").attr("__class__");
+ 
+     return Time(arg("nanoseconds") = src.nanoseconds(),
+@@ -131,7 +131,7 @@ struct RosMsgTypeCaster
+     object cls = py_binding_tools::createMessageClass(rosidl_generator_traits::name<T>());
+ 
+     // deserialize into python object
+-    module rclpy = module::import("rclpy.serialization");
++    module_ rclpy = module_::import("rclpy.serialization");
+     object msg = rclpy.attr("deserialize_message")(buf, cls);
+ 
+     return msg.release();
+@@ -145,7 +145,7 @@ struct RosMsgTypeCaster
+       return false;
+ 
+     // serialize src into python buffer
+-    module rclpy = module::import("rclpy.serialization");
++    module_ rclpy = module_::import("rclpy.serialization");
+     bytes buf = rclpy.attr("serialize_message")(src);
+ 
+     // deserialize into C++ object
