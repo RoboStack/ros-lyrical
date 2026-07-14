@@ -36,6 +36,20 @@ index 26c86ac..d5cd670 100644
  
  # install libs
  install(TARGETS ${PROJECT_NAME}_python_tools
+diff --git a/src/container.cpp b/src/container.cpp
+index febc00f..fded044 100644
+--- a/src/container.cpp
++++ b/src/container.cpp
+@@ -57,8 +57,7 @@ namespace moveit {
+ namespace task_constructor {
+ 
+ // for debugging of how children interfaces evolve over time
+-__attribute__((unused))  // silent unused-function warning
+-static void
++[[maybe_unused]] static void
+ printChildrenInterfaces(const ContainerBasePrivate& container, bool success, const Stage& creator,
+                         std::ostream& os = std::cerr) {
+ 	static unsigned int id = 0;
 diff --git a/src/cost_terms.cpp b/src/cost_terms.cpp
 index 9ddb94f..9896d36 100644
 --- a/src/cost_terms.cpp
