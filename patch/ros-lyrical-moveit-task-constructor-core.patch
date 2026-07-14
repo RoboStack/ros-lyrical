@@ -1,3 +1,29 @@
+diff --git a/include/moveit/task_constructor/introspection.h b/include/moveit/task_constructor/introspection.h
+index cf4dfb7..b7e26d5 100644
+--- a/include/moveit/task_constructor/introspection.h
++++ b/include/moveit/task_constructor/introspection.h
+@@ -111,7 +111,7 @@ private:
+ 	/// retrieve or set id of given stage
+ 	uint32_t stageId(const moveit::task_constructor::Stage* const s);
+ 	/// retrieve solution with given id
+-	const SolutionBase* solutionFromId(uint id) const;
++	const SolutionBase* solutionFromId(uint32_t id) const;
+ };
+ }  // namespace task_constructor
+ }  // namespace moveit
+diff --git a/include/moveit/task_constructor/properties.h b/include/moveit/task_constructor/properties.h
+index e217ad6..708a2fb 100644
+--- a/include/moveit/task_constructor/properties.h
++++ b/include/moveit/task_constructor/properties.h
+@@ -90,7 +90,7 @@ public:
+ 	/// exception thrown when trying to set a value not matching the declared type
+ 	class type_error;
+ 
+-	using SourceFlags = uint;
++	using SourceFlags = uint32_t;
+ 	/// function callback used to initialize property value from another PropertyMap
+ 	using InitializerFunction = std::function<boost::any(const PropertyMap&)>;
+ 
 diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
 index 26c86ac..d5cd670 100644
 --- a/python/bindings/CMakeLists.txt
@@ -48,6 +74,19 @@ index 9ddb94f..9896d36 100644
  	}
  
  	return distance_to_cost(distance);
+diff --git a/src/introspection.cpp b/src/introspection.cpp
+index d938f95..85292d9 100644
+--- a/src/introspection.cpp
++++ b/src/introspection.cpp
+@@ -214,7 +214,7 @@ void Introspection::publishAllSolutions(bool wait) {
+ 	};
+ }
+ 
+-const SolutionBase* Introspection::solutionFromId(uint id) const {
++const SolutionBase* Introspection::solutionFromId(uint32_t id) const {
+ 	auto it = impl->id_solution_bimap_.left.find(id);
+ 	if (it == impl->id_solution_bimap_.left.end())
+ 		return nullptr;
 diff --git a/src/properties.cpp b/src/properties.cpp
 index 8c001de..6fd0217 100644
 --- a/src/properties.cpp
@@ -60,6 +99,28 @@ index 8c001de..6fd0217 100644
  #include <functional>
  #include <rclcpp/logging.hpp>
  #include <rclcpp/clock.hpp>
+diff --git a/src/solvers/pipeline_planner.cpp b/src/solvers/pipeline_planner.cpp
+index 9e30131..18e6fb9 100644
+--- a/src/solvers/pipeline_planner.cpp
++++ b/src/solvers/pipeline_planner.cpp
+@@ -59,7 +59,7 @@ PipelinePlanner::PipelinePlanner(
+   , stopping_criterion_callback_(stopping_criterion_callback)
+   , solution_selection_function_(solution_selection_function) {
+ 	// Declare properties of the MotionPlanRequest
+-	properties().declare<uint>("num_planning_attempts", 1u, "number of planning attempts");
++	properties().declare<uint32_t>("num_planning_attempts", 1u, "number of planning attempts");
+ 	properties().declare<moveit_msgs::msg::WorkspaceParameters>(
+ 	    "workspace_parameters", moveit_msgs::msg::WorkspaceParameters(), "allowed workspace of mobile base?");
+ 
+@@ -182,7 +182,7 @@ PlannerInterface::Result PipelinePlanner::plan(const planning_scene::PlanningSce
+ 		request.planner_id = planner_id;
+ 		request.allowed_planning_time = timeout;
+ 		request.start_state.is_diff = true;  // we don't specify an extra start state
+-		request.num_planning_attempts = properties().get<uint>("num_planning_attempts");
++		request.num_planning_attempts = properties().get<uint32_t>("num_planning_attempts");
+ 		request.max_velocity_scaling_factor = properties().get<double>("max_velocity_scaling_factor");
+ 		request.max_acceleration_scaling_factor = properties().get<double>("max_acceleration_scaling_factor");
+ 		request.workspace_parameters = properties().get<moveit_msgs::msg::WorkspaceParameters>("workspace_parameters");
 diff --git a/src/stage.cpp b/src/stage.cpp
 index b64ce0a..a9eb8a0 100644
 --- a/src/stage.cpp
