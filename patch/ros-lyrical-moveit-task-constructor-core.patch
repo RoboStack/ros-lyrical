@@ -92,6 +92,17 @@ diff --git a/src/introspection.cpp b/src/introspection.cpp
 index d938f95..85292d9 100644
 --- a/src/introspection.cpp
 +++ b/src/introspection.cpp
+@@ -49,6 +49,10 @@
+ #include <sstream>
+ #include <boost/bimap.hpp>
+ 
++#ifdef _WIN32
++#include <winsock.h>
++#endif
++
+ namespace ros {
+ namespace names {
+ bool isValidCharInName(char c);  // unfortunately this is not declared in ros/names.h
 @@ -214,7 +214,7 @@ void Introspection::publishAllSolutions(bool wait) {
  	};
  }
