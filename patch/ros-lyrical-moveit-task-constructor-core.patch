@@ -89,21 +89,53 @@ index 9ddb94f..9896d36 100644
  
  	return distance_to_cost(distance);
 diff --git a/src/introspection.cpp b/src/introspection.cpp
-index d938f95..85292d9 100644
+index d938f95..35d502a 100644
 --- a/src/introspection.cpp
 +++ b/src/introspection.cpp
-@@ -49,6 +49,10 @@
- #include <sstream>
+@@ -50,6 +50,14 @@
  #include <boost/bimap.hpp>
+ #include <rcutils/isalnum_no_locale.h>
  
 +#ifdef _WIN32
-+#include <winsock.h>
++	#include <winsock2.h>
++	#include <process.h>
++	#pragma comment(lib, "ws2_32.lib")
++#else
++	#include <unistd.h>
 +#endif
 +
- namespace ros {
- namespace names {
- bool isValidCharInName(char c);  // unfortunately this is not declared in ros/names.h
-@@ -214,7 +214,7 @@ void Introspection::publishAllSolutions(bool wait) {
+ static auto LOGGER = rclcpp::get_logger("introspection");
+ 
+ namespace moveit {
+@@ -60,12 +68,26 @@ std::string getTaskId(const TaskPrivate* task) {
+ 	static const std::string ALLOWED = "_/";
+ 	std::ostringstream oss;
+ 	char our_hostname[256] = { 0 };
++	#ifdef _WIN32
++	{
++		static bool wsa_initialised = false;
++		if (wsa_initialised) {
++			WSADATA wsaData;
++			WSAStartup(MAKEWORD(2, 2), &wsaData);
++			wsa_initialised = true;
++		}
++	}
++	#endif
+ 	gethostname(our_hostname, sizeof(our_hostname) - 1);
+ 	// Replace all invalid ROS-name chars with an underscore
+ 	std::replace_if(
+ 	    our_hostname, our_hostname + strlen(our_hostname),
+ 	    [](const char ch) { return !rcutils_isalnum_no_locale(ch) && ALLOWED.find(ch) == std::string::npos; }, '_');
+-	oss << our_hostname << "_" << getpid() << "_" << reinterpret_cast<std::size_t>(task);
++	#ifdef _WIN32
++		oss << our_hostname << "_" << _getpid() << "_" << reinterpret_cast<std::size_t>(task);
++	# else
++		oss << our_hostname << "_" << getpid() << "_" << reinterpret_cast<std::size_t>(task);
++	#endif
+ 	return oss.str();
+ }
+ }  // namespace
+@@ -214,7 +236,7 @@ void Introspection::publishAllSolutions(bool wait) {
  	};
  }
  
