@@ -45,3 +45,82 @@ index 3cd6466..7c471d5 100644
  				case 3:
  					return tr("time");
  			}
+diff --git a/motion_planning_tasks/src/CMakeLists.txt b/motion_planning_tasks/src/CMakeLists.txt
+--- a/motion_planning_tasks/src/CMakeLists.txt
++++ b/motion_planning_tasks/src/CMakeLists.txt
+@@ -6,6 +6,8 @@
+ 	global_settings.ui
+ )
+ 
++qt6_add_resources(QRC_SOURCES resources.qrc)
++
+ add_library(${MOVEIT_LIB_NAME} SHARED
+ 	factory_model.cpp
+ 	icons.cpp
+@@ -22,7 +24,7 @@
+ 
+ 	${UIC_FILES}
+ 
+-	resources.qrc
++	${QRC_SOURCES}
+ )
+ 
+ set_target_properties(${MOVEIT_LIB_NAME} PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
+diff --git a/motion_planning_tasks/utils/flat_merge_proxy_model.h b/motion_planning_tasks/utils/flat_merge_proxy_model.h
+--- a/motion_planning_tasks/utils/flat_merge_proxy_model.h
++++ b/motion_planning_tasks/utils/flat_merge_proxy_model.h
+@@ -38,6 +38,16 @@
+ 
+ #include <QAbstractItemModel>
+ #include <QStringList>
++#if defined(_WIN32)
++#if defined(motion_planning_tasks_utils_EXPORTS)
++#define MOVEIT_RVIZ_UTILS_EXPORT __declspec(dllexport)
++#else
++#define MOVEIT_RVIZ_UTILS_EXPORT __declspec(dllimport)
++#endif
++#else
++#define MOVEIT_RVIZ_UTILS_EXPORT
++#endif
++
+ 
+ namespace moveit_rviz_plugin {
+ namespace utils {
+@@ -49,7 +59,7 @@
+  *  Removing top-level items will remove the whole embedded model if all top-level items from
+  *  this model are to be removed. Otherwise, removal is forwarded to the embedded model.
+  */
+-class FlatMergeProxyModel : public QAbstractItemModel
++class MOVEIT_RVIZ_UTILS_EXPORT FlatMergeProxyModel : public QAbstractItemModel
+ {
+ 	Q_OBJECT
+ 	Q_DECLARE_PRIVATE(FlatMergeProxyModel)
+diff --git a/motion_planning_tasks/utils/tree_merge_proxy_model.h b/motion_planning_tasks/utils/tree_merge_proxy_model.h
+--- a/motion_planning_tasks/utils/tree_merge_proxy_model.h
++++ b/motion_planning_tasks/utils/tree_merge_proxy_model.h
+@@ -38,6 +38,16 @@
+ 
+ #include <QAbstractItemModel>
+ #include <QStringList>
++#if defined(_WIN32)
++#if defined(motion_planning_tasks_utils_EXPORTS)
++#define MOVEIT_RVIZ_UTILS_EXPORT __declspec(dllexport)
++#else
++#define MOVEIT_RVIZ_UTILS_EXPORT __declspec(dllimport)
++#endif
++#else
++#define MOVEIT_RVIZ_UTILS_EXPORT
++#endif
++
+ 
+ namespace moveit_rviz_plugin {
+ namespace utils {
+@@ -48,7 +58,7 @@
+  *  Each embedded model becomes a top-level item (with a given name)
+  *  and all the model's top-level items will appear as its children.
+  */
+-class TreeMergeProxyModel : public QAbstractItemModel
++class MOVEIT_RVIZ_UTILS_EXPORT TreeMergeProxyModel : public QAbstractItemModel
+ {
+ 	Q_OBJECT
+ 	Q_DECLARE_PRIVATE(TreeMergeProxyModel)
