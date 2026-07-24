@@ -24,18 +24,19 @@ index e217ad6..708a2fb 100644
  	/// function callback used to initialize property value from another PropertyMap
  	using InitializerFunction = std::function<boost::any(const PropertyMap&)>;
  
-diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
-index 26c86ac..d5cd670 100644
---- a/python/bindings/CMakeLists.txt
-+++ b/python/bindings/CMakeLists.txt
-@@ -17,6 +17,7 @@ pybind11_add_module(pymoveit_mtc
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 82e9875..147aa7b 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -38,7 +38,7 @@ add_library(${PROJECT_NAME} SHARED
+ 	solvers/multi_planner.cpp
  )
- target_include_directories(pymoveit_mtc PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
- target_link_libraries(pymoveit_mtc PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_stages ${PROJECT_NAME}_python_tools)
-+set_target_properties(pymoveit_mtc PROPERTIES CXX_SCAN_FOR_MODULES OFF)
- 
- # install libs
- install(TARGETS ${PROJECT_NAME}_python_tools
+ target_link_libraries(${PROJECT_NAME}
+-	fmt
++	fmt::fmt
+ 	${moveit_core_TARGETS}
+ 	${moveit_ros_planning_TARGETS}
+ 	${moveit_ros_planning_interface_TARGETS}
 diff --git a/src/container.cpp b/src/container.cpp
 index febc00f..fded044 100644
 --- a/src/container.cpp
@@ -235,3 +236,56 @@ index 1c0553c..39bfa92 100644
  	auto cb = [&called](const SolutionBase& /* s */) {
  		++called;
  		return true;
+diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
+--- a/python/bindings/CMakeLists.txt
++++ b/python/bindings/CMakeLists.txt
+@@ -2,8 +2,15 @@
+ add_library(${PROJECT_NAME}_python_tools SHARED
+ 	${INCLUDES}/properties.h
+ 	src/properties.cpp
+ )
++# Force our vendored (smart_holder) pybind11 to be found before any pybind11
++# pulled in transitively via py_binding_tools, which links against the plain
++# upstream pybind11 package. Mixing the two copies in one translation unit
++# causes duplicate-definition errors, since smart_holder.h only exists in
++# the vendored fork.
++target_include_directories(${PROJECT_NAME}_python_tools BEFORE PUBLIC
++	${CMAKE_CURRENT_SOURCE_DIR}/../pybind11/include)
+ target_link_libraries(${PROJECT_NAME}_python_tools PUBLIC ${PROJECT_NAME}
+ 	pybind11::pybind11 py_binding_tools::py_binding_tools)
+ # Use minimum-size optimization for pybind11 bindings
+ target_link_libraries(${PROJECT_NAME}_python_tools PUBLIC pybind11::opt_size)
+@@ -15,7 +15,9 @@
+ 	src/stages.cpp
+ 	src/module.cpp
+ )
++target_include_directories(pymoveit_mtc BEFORE PUBLIC
++	${CMAKE_CURRENT_SOURCE_DIR}/../pybind11/include)
+ target_include_directories(pymoveit_mtc PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+ target_link_libraries(pymoveit_mtc PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_stages ${PROJECT_NAME}_python_tools)
+ 
+ # install libs
+diff --git a/python/bindings/src/properties.cpp b/python/bindings/src/properties.cpp
+--- a/python/bindings/src/properties.cpp
++++ b/python/bindings/src/properties.cpp
+@@ -158,6 +158,8 @@
+ 	return REGISTRY_SINGLETON.insert(type_index, ros_msg_name, to, from);
+ }
+ 
++#if !defined(_MSC_VER)
+ __attribute__((visibility("default"))) // export this symbol as visible in the shared library
++#endif
+ void export_properties(py::module& m) {
+ 	// clang-format off
+diff --git a/python/bindings/src/solvers.cpp b/python/bindings/src/solvers.cpp
+--- a/python/bindings/src/solvers.cpp
++++ b/python/bindings/src/solvers.cpp
+@@ -73,7 +73,7 @@
+ 				pipelinePlanner = core.PipelinePlanner(node, 'ompl', 'PRMkConfigDefault')
+ 				pipelinePlanner.num_planning_attempts = 10
+ 			)")
+-	    .property<uint>("num_planning_attempts", "int: Number of planning attempts")
++	    .property<uint32_t>("num_planning_attempts", "int: Number of planning attempts")
+ 	    .property<moveit_msgs::msg::WorkspaceParameters>(
+ 	        "workspace_parameters",
+ 	        ":moveit_msgs:`WorkspaceParameters`: Specifies workspace box to be used for Cartesian sampling")
