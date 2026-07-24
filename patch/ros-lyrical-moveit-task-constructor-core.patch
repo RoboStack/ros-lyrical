@@ -194,3 +194,44 @@ index b64ce0a..a9eb8a0 100644
  		return false;
  	};
  
+diff --git a/src/stages/generate_place_pose.cpp b/src/stages/generate_place_pose.cpp
+index 76b9559..042882d 100644
+--- a/src/stages/generate_place_pose.cpp
++++ b/src/stages/generate_place_pose.cpp
+@@ -109,11 +109,11 @@ void GeneratePlacePose::compute() {
+ 	scene->getTransforms().transformPose(pose_msg.header.frame_id, target_pose, target_pose);
+ 
+ 	// spawn the nominal target object pose, considering flip about z and rotations about z-axis
+-	auto spawner = [&s, &scene, &ik_frame, this](const Eigen::Isometry3d& nominal, uint z_flips, uint z_rotations = 10) {
+-		for (uint flip = 0; flip <= z_flips; ++flip) {
++	auto spawner = [&s, &scene, &ik_frame, this](const Eigen::Isometry3d& nominal, uint32_t z_flips, uint32_t z_rotations = 10) {
++		for (uint32_t flip = 0; flip <= z_flips; ++flip) {
+ 			// flip about object's x-axis
+ 			Eigen::Isometry3d object = nominal * Eigen::AngleAxisd(flip * M_PI, Eigen::Vector3d::UnitX());
+-			for (uint i = 0; i < z_rotations; ++i) {
++			for (uint32_t i = 0; i < z_rotations; ++i) {
+ 				// rotate object at target pose about world's z-axis
+ 				Eigen::Vector3d pos = object.translation();
+ 				object.pretranslate(-pos)
+@@ -139,7 +139,7 @@ void GeneratePlacePose::compute() {
+ 		}
+ 	};
+ 
+-	uint z_flips = props.get<bool>("allow_z_flip") ? 1 : 0;
++	uint32_t z_flips = props.get<bool>("allow_z_flip") ? 1 : 0;
+ 	if (object && object->getShapes().size() == 1) {
+ 		switch (object->getShapes()[0]->type) {
+ 			case shapes::CYLINDER:
+diff --git a/test/test_stage.cpp b/test/test_stage.cpp
+index 1c0553c..39bfa92 100644
+--- a/test/test_stage.cpp
++++ b/test/test_stage.cpp
+@@ -36,7 +36,7 @@ TEST(Stage, registerCallbacks) {
+ 	StandaloneGeneratorMockup g{ PredefinedCosts::constant(0.0) };
+ 	g.init(getModel());
+ 
+-	uint called = 0;
++	uint32_t called = 0;
+ 	auto cb = [&called](const SolutionBase& /* s */) {
+ 		++called;
+ 		return true;
