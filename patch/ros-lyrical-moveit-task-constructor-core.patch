@@ -255,7 +255,7 @@ diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
  	pybind11::pybind11 py_binding_tools::py_binding_tools)
  # Use minimum-size optimization for pybind11 bindings
  target_link_libraries(${PROJECT_NAME}_python_tools PUBLIC pybind11::opt_size)
-@@ -15,7 +15,9 @@
+@@ -15,7 +15,13 @@
  	src/stages.cpp
  	src/module.cpp
  )
@@ -263,7 +263,11 @@ diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
 +	${CMAKE_CURRENT_SOURCE_DIR}/../pybind11/include)
  target_include_directories(pymoveit_mtc PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
  target_link_libraries(pymoveit_mtc PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_stages ${PROJECT_NAME}_python_tools)
- 
++# CMake's C++20 module dependency scanner misparses pybind11::module-typed
++# locals in headers pulled in transitively (py_binding_tools) as module
++# control-lines; this target doesn't use C++20 modules, so just disable it.
++set_target_properties(pymoveit_mtc PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+
  # install libs
 diff --git a/python/bindings/src/properties.cpp b/python/bindings/src/properties.cpp
 --- a/python/bindings/src/properties.cpp
