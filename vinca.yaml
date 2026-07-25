@@ -91,8 +91,11 @@ packages_select_by_deps:
   - gtsam
   - gz_ros2_control
   - gz_ros2_control_demos
+  - joy_teleop
+  - key_teleop
   - lanelet2
   - magic_enum
+  - mouse_teleop
   - moveit
   - moveit-chomp-optimizer-adapter  # Requested in https://www.linkedin.com/feed/update/urn:li:activity:7346559234177703938/
   - moveit-planners-chomp
@@ -133,6 +136,7 @@ packages_select_by_deps:
   - simulation
   - slam_toolbox
   - teleop
+  - teleop-tools
   - turtlebot3
   - twist_mux  # requested in https://github.com/RoboStack/ros-humble/issues/249
   - twist_stamper  # Requested in https://github.com/RoboStack/ros-rolling/issues/12
