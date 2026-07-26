@@ -115,7 +115,7 @@ index d938f95..35d502a 100644
 +	#ifdef _WIN32
 +	{
 +		static bool wsa_initialised = false;
-+		if (wsa_initialised) {
++		if (!wsa_initialised) {
 +			WSADATA wsaData;
 +			WSAStartup(MAKEWORD(2, 2), &wsaData);
 +			wsa_initialised = true;
