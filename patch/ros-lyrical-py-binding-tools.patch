@@ -30,7 +30,7 @@ index e940609..a743203 100644
    DESTINATION include/${PROJECT_NAME}
  )
  
-+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION include)
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION include/${PROJECT_NAME})
 +
  _ament_cmake_python_register_environment_hook()
  
