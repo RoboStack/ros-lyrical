@@ -26,7 +26,7 @@ git = "*"
 
 [pypi-dependencies]
 # This is typically the latest commit on main branch
-vinca = { git = "https://github.com/RoboStack/vinca.git", rev = "ee9f94d55137a49aba76ae15047947c171ed4605" }
+vinca = { git = "https://github.com/RoboStack/vinca.git", rev = "4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e" }
 # Uncomment this line to work with a local vinca for faster iteration, but remember to comment it back
 # (and regenerate the pixi.lock) once you push the modified commit to the repo
 # vinca = { path = "../vinca", editable = true }

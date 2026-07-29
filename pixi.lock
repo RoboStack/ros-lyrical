@@ -69,7 +69,7 @@ environments:
       - conda: https://repo.prefix.dev/conda-forge/osx-64/rhash-1.4.6-h6e16a3a_1.conda
       - conda: https://repo.prefix.dev/conda-forge/osx-64/tk-8.6.13-hb794df6_3.conda
       - conda: https://repo.prefix.dev/conda-forge/osx-64/zstd-1.5.7-h3eecb57_6.conda
-      - pypi: git+https://github.com/RoboStack/vinca.git?rev=ee9f94d55137a49aba76ae15047947c171ed4605#ee9f94d55137a49aba76ae15047947c171ed4605
+      - pypi: git+https://github.com/RoboStack/vinca.git?rev=4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e#4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e
       - pypi: https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl
@@ -130,7 +130,7 @@ environments:
       - conda: https://repo.prefix.dev/conda-forge/osx-arm64/rhash-1.4.6-h5505292_1.conda
       - conda: https://repo.prefix.dev/conda-forge/osx-arm64/tk-8.6.13-hd3d0363_3.conda
       - conda: https://repo.prefix.dev/conda-forge/osx-arm64/zstd-1.5.7-hbf9d68e_6.conda
-      - pypi: git+https://github.com/RoboStack/vinca.git?rev=ee9f94d55137a49aba76ae15047947c171ed4605#ee9f94d55137a49aba76ae15047947c171ed4605
+      - pypi: git+https://github.com/RoboStack/vinca.git?rev=4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e#4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e
       - pypi: https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl
@@ -199,7 +199,7 @@ environments:
       - conda: https://repo.prefix.dev/conda-forge/noarch/python_abi-3.14-8_cp314.conda
       - conda: https://repo.prefix.dev/conda-forge/noarch/setuptools-81.0.0-pyh332efcf_0.conda
       - conda: https://repo.prefix.dev/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
-      - pypi: git+https://github.com/RoboStack/vinca.git?rev=ee9f94d55137a49aba76ae15047947c171ed4605#ee9f94d55137a49aba76ae15047947c171ed4605
+      - pypi: git+https://github.com/RoboStack/vinca.git?rev=4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e#4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e
       - pypi: https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl
@@ -268,7 +268,7 @@ environments:
       - conda: https://repo.prefix.dev/conda-forge/noarch/python_abi-3.14-8_cp314.conda
       - conda: https://repo.prefix.dev/conda-forge/noarch/setuptools-81.0.0-pyh332efcf_0.conda
       - conda: https://repo.prefix.dev/conda-forge/noarch/tzdata-2026c-h151e31d_0.conda
-      - pypi: git+https://github.com/RoboStack/vinca.git?rev=ee9f94d55137a49aba76ae15047947c171ed4605#ee9f94d55137a49aba76ae15047947c171ed4605
+      - pypi: git+https://github.com/RoboStack/vinca.git?rev=4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e#4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e
       - pypi: https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl
@@ -329,7 +329,7 @@ environments:
       - conda: https://repo.prefix.dev/conda-forge/win-64/vc14_runtime-14.51.36231-h1b9f54f_39.conda
       - conda: https://repo.prefix.dev/conda-forge/win-64/vcomp14-14.51.36231-h1b9f54f_39.conda
       - conda: https://repo.prefix.dev/conda-forge/win-64/zstd-1.5.7-h534d264_6.conda
-      - pypi: git+https://github.com/RoboStack/vinca.git?rev=ee9f94d55137a49aba76ae15047947c171ed4605#ee9f94d55137a49aba76ae15047947c171ed4605
+      - pypi: git+https://github.com/RoboStack/vinca.git?rev=4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e#4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e
       - pypi: https://files.pythonhosted.org/packages/0b/a7/71ac2cff56fec219ed242bb11b8efb69fcc4bec75db06fb7bfe35de520e6/certifi-2026.7.22-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/10/bd/c038d7cc38edc1aa5bf91ab8068b63d4308c66c4c8bb3cbba7dfbc049f9c/pyparsing-3.3.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/12/b3/231ffd4ab1fc9d679809f356cebee130ac7daa00d6d6f3206dd4fd137e9e/distro-1.9.0-py3-none-any.whl
@@ -2817,7 +2817,7 @@ packages:
     - zstd >=1.5.7,<1.6.0a0
   size: 388453
   timestamp: 1764777142545
-- pypi: git+https://github.com/RoboStack/vinca.git?rev=ee9f94d55137a49aba76ae15047947c171ed4605#ee9f94d55137a49aba76ae15047947c171ed4605
+- pypi: git+https://github.com/RoboStack/vinca.git?rev=4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e#4a2f33b8dbbcb49cc6b98012dac1648e4fbc3a5e
   name: vinca
   version: 0.2.0
   requires_dist:
