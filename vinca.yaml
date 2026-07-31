@@ -109,6 +109,8 @@ packages_select_by_deps:
   - nmea-navsat-driver
   - perception
   - persist-parameter-server
+  - point_cloud_transport_plugins
+  - point_cloud_transport_py
   - polygon_msgs
   - proxsuite
   - py-trees
