@@ -42,6 +42,18 @@ pcl_conversions:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "libboost-devel", "eigen-abi-devel"]
 pcl_ros:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "libboost-devel"]
+easynav_bonxai_maps_manager:
+  # Avoid Eigen header contamination: ensure Eigen3 is resolved from conda (not /usr/include/eigen3).
+  # PCL's CMake can request Eigen3 3.3+; without this pin the build may fall back to a system Eigen.
+  add_host: ["eigen-abi-devel"]
+navmap_ros:
+  # Same Eigen-via-PCL contamination issue as easynav_bonxai_maps_manager.
+  add_host: ["eigen-abi-devel"]
+easynav_octomap_maps_manager:
+  # "octomap" isn't auto-resolved from rosdep for this package (same gap as
+  # geometric_shapes below); without it CMake fails to find octomapConfig.cmake.
+  add_host: ["octomap"]
+  add_run: ["octomap"]
 rviz_rendering:
   add_host: ["glew"]
 behaviortree_cpp:
