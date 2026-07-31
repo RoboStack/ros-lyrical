@@ -1,0 +1,52 @@
+diff --git a/include/zstd_point_cloud_transport/zstd_publisher.hpp b/include/zstd_point_cloud_transport/zstd_publisher.hpp
+index 0e545c3..4ef6ca2 100644
+--- a/include/zstd_point_cloud_transport/zstd_publisher.hpp
++++ b/include/zstd_point_cloud_transport/zstd_publisher.hpp
+@@ -55,6 +55,8 @@ class ZstdPublisher
+ public:
+   ZstdPublisher();
+ 
++  ~ZstdPublisher() override;
++
+   void declareParameters(const std::string & base_topic) override;
+ 
+   std::string getDataType() const override;
+diff --git a/include/zstd_point_cloud_transport/zstd_subscriber.hpp b/include/zstd_point_cloud_transport/zstd_subscriber.hpp
+index b5828d3..bac0a2c 100644
+--- a/include/zstd_point_cloud_transport/zstd_subscriber.hpp
++++ b/include/zstd_point_cloud_transport/zstd_subscriber.hpp
+@@ -51,7 +51,7 @@ class ZstdSubscriber
+ public:
+   ZstdSubscriber();
+ 
+-  std::string getTransportName() const override;
++  ~ZstdSubscriber() override;
+ 
+   void declareParameters() override;
+ 
+diff --git a/src/zstd_publisher.cpp b/src/zstd_publisher.cpp
+index da1e3f5..1126c56 100644
+--- a/src/zstd_publisher.cpp
++++ b/src/zstd_publisher.cpp
+@@ -41,6 +41,8 @@
+ namespace zstd_point_cloud_transport
+ {
+ 
++ZstdPublisher::~ZstdPublisher() = default;
++
+ ZstdPublisher::ZstdPublisher()
+ {
+   this->zstd_context_ = ZSTD_createCCtx();
+diff --git a/src/zstd_subscriber.cpp b/src/zstd_subscriber.cpp
+index ec95a78..f1af2ad 100644
+--- a/src/zstd_subscriber.cpp
++++ b/src/zstd_subscriber.cpp
+@@ -42,6 +42,8 @@
+ 
+ namespace zstd_point_cloud_transport
+ {
++
++ZstdSubscriber::~ZstdSubscriber() = default;
+ ZstdSubscriber::ZstdSubscriber()
+ {
+   this->zstd_context_ = ZSTD_createDCtx();
