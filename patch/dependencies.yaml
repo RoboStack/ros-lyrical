@@ -175,7 +175,10 @@ rqt_image_overlay:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
 slam_toolbox:
   add_build: ["${{ 'qt6-main' if (build_platform != target_platform) }}"]
-  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "blas-devel", "ceres-solver * cpu*"]
+  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "blas-devel", "ceres-solver * cpu*", "eigen <5", "qt6-main"]
+  add_run: ["qt6-main"]
+  remove_host: ["qt-main"]
+  remove_run: ["qt-main"]
 vision_msgs_rviz_plugins:
   add_build: ["${{ 'qt6-main' if (build_platform != target_platform) }}"]
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
