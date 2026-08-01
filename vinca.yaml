@@ -115,6 +115,7 @@ packages_select_by_deps:
   - perception
   - persist-parameter-server
   - pick_ik
+  - point_cloud_transport_py
   - polygon_msgs
   - proxsuite
   - py-trees
