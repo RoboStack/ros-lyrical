@@ -1,0 +1,18 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b7d36de..44e1164 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -530,8 +530,12 @@ IF(WITH_G2O)
+ ENDIF(WITH_G2O)
+ 
+ IF(WITH_GTSAM)
+-    # Force config mode to ignore PCL's findGTSAM.cmake file
++    # GTSAM's config searches for Eigen. Prefer Eigen's config so RTAB-Map's
++    # legacy FindEigen3 module does not try to parse Eigen 5 headers.
++    SET(_RTABMAP_CMAKE_FIND_PACKAGE_PREFER_CONFIG ${CMAKE_FIND_PACKAGE_PREFER_CONFIG})
++    SET(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+     FIND_PACKAGE(GTSAM CONFIG QUIET)
++    SET(CMAKE_FIND_PACKAGE_PREFER_CONFIG ${_RTABMAP_CMAKE_FIND_PACKAGE_PREFER_CONFIG})
+ ENDIF(WITH_GTSAM)
+ 
+ IF(WITH_MRPT)
