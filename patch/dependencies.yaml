@@ -81,6 +81,9 @@ mrpt2:
   add_host:  ["assimp", "octomap", "tinyxml2", "libboost-devel", "jsoncpp", "gtest", "libboost-python-devel", "libdc1394", "xorg-libxcomposite", "libftdi", "ros-lyrical-octomap"]
   add_run:   ["assimp", "octomap", "tinyxml2", "libboost-devel", "jsoncpp", "gtest", "libboost-python-devel", "libdc1394", "xorg-libxcomposite", "libftdi", "ros-lyrical-octomap"]
   add_build: ["${{ cdt('libxcomposite-devel') if linux }}"]
+mola_launcher:
+  add_host: ["ros-lyrical-mrpt-libtclap"]
+  add_run: ["ros-lyrical-mrpt-libtclap"]
 mp2p_icp:
   add_host: ["ros-lyrical-mola-common", "ros-lyrical-mola-imu-preintegration", "ros-lyrical-mrpt-libbase", "ros-lyrical-mrpt-libgui", "ros-lyrical-mrpt-libtclap", "ros-lyrical-mrpt-libmaps", "ros-lyrical-mrpt-libobs", "ros-lyrical-mrpt-libposes", "tbb"]
   add_run: ["ros-lyrical-mola-common", "ros-lyrical-mola-imu-preintegration", "ros-lyrical-mrpt-libbase", "ros-lyrical-mrpt-libgui", "ros-lyrical-mrpt-libtclap", "ros-lyrical-mrpt-libmaps", "ros-lyrical-mrpt-libobs", "ros-lyrical-mrpt-libposes", "tbb"]
