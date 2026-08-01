@@ -2,6 +2,8 @@ numpy:
   - 2
 assimp:
   - 6.0.5
+asio:
+  - '1.29'
 # Boost 1.90 migration: conda-forge's global pin is still 1.88, but the
 # boost-python / geometry stack (eigenpy 3.13, pinocchio, ...) has already
 # moved to 1.90, so we pin ahead to build the whole distro against 1.90.
