@@ -1161,6 +1161,8 @@ tinyxml:
   robostack: [tinyxml]
 tinyxml2:
   robostack: [tinyxml2]
+tl_expected:
+  robostack: [cpp-expected]
 udev:
   robostack:
     linux: [libusb, libudev]
