@@ -115,6 +115,7 @@ packages_select_by_deps:
   - perception
   - persist-parameter-server
   - pick_ik
+  - point_cloud_transport_py
   - polygon_msgs
   - proxsuite
   - py-trees
@@ -172,7 +173,6 @@ packages_select_by_deps:
       - apriltag_ros  # Depends on camera_ros
       - camera_ros  # Depends on libcamera that is only available on linux
       - livox_ros_driver2
-      - point_cloud_transport_plugins  # zstd plugin has unresolved symbols on macOS
       - py_binding_tools
       - swri_serial_util  # Serial communication only implemented for linux
       - v4l2_camera  # Depends on v4l that is only available on linux
@@ -216,6 +216,7 @@ packages_select_by_deps:
       - ouster_ros  # TODO on windows: cannot open pcl_io.lib
       - pinocchio
       - plotjuggler-ros
+      - point_cloud_transport_plugins  # Not yet supported on Windows
       - pointcloud-to-laserscan
       - rplidar_ros
       - rqt_mocap4r2_control
