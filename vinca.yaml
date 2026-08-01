@@ -98,6 +98,7 @@ packages_select_by_deps:
   - key_teleop
   - lanelet2
   - magic_enum
+  - mavros
   - mouse_teleop
   - moveit
   - moveit-chomp-optimizer-adapter  # Requested in https://www.linkedin.com/feed/update/urn:li:activity:7346559234177703938/
