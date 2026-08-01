@@ -11,9 +11,8 @@ libc = { family="glibc", version="2.17" }
 
 [dependencies]
 python = ">=3.14.0,<3.15"
-# Include the latest rattler-build fixes w.r.t. to patches handling
-# rattler-build regression, pinning to 0.57
-rattler-build = "<0.58.0"
+# Include the latest rattler-build fixes with respect to patch handling.
+rattler-build = ">=0.72.2"
 cmake = "<4.0"
 setuptools = "<82.0"
 rattler-index = ">=0.27.16"
