@@ -60,7 +60,6 @@ packages_select_by_deps:
   - autoware_geography_utils
   - autoware_global_parameter_loader
   - autoware_internal_debug_msgs
-  - autoware_internal_localization_msgs
   - autoware_internal_metric_msgs
   - autoware_internal_msgs
   - autoware_internal_perception_msgs
@@ -211,6 +210,7 @@ packages_select_by_deps:
       - autoware_core_control  # depends on autoware_motion_utils
       - autoware_core_localization  # depends on autoware_ekf_localizer
       - autoware_ekf_localizer  # Windows error: error C2338: static_assert failed: 'First argument to logging macros must be an rclcpp::Logger'
+      - autoware_internal_localization_msgs  # Generated Python type support exceeds MSVC path handling
       - autoware_lanlet2_utils  # Windows errors: C3546 (no parameter packs to expand), C2678 (no operator '|' for transform_view)
       - autoware_motion_utils  # Windows error: error C2765: 'function': an explicit specialization of a function template cannot have any default arguments
       - autoware_osqp_interface
