@@ -197,6 +197,7 @@ packages_select_by_deps:
       - livox_ros_driver2
       - mavros
       - py_binding_tools
+      - rmf_demos
       - swri_serial_util  # Serial communication only implemented for linux
       - v4l2_camera  # Depends on v4l that is only available on linux
 
