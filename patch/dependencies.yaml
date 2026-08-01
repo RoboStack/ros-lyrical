@@ -251,6 +251,8 @@ octomap_rviz_plugins:
   add_host: ["octomap"]
 zenoh_cpp_vendor:
   add_host: ["libzenohc", "libzenohcxx"]
+rmf_building_map_tools:
+  add_host: ["ros-lyrical-rmf-site-map-msgs"]
 rmw_zenoh_cpp:
   add_host: ["libzenohc", "libzenohcxx"]
 autoware_utils_pcl:
