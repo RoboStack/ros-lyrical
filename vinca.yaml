@@ -76,6 +76,8 @@ packages_select_by_deps:
   - battery_state_broadcaster
   - behaviortree_cpp
   - better_launch
+  - bond_core
+  - bondcpp
   - can_msgs
   - cm_executors
   - data_tamer_cpp  # Requested in https://github.com/RoboStack/ros-humble/issues/325
@@ -91,6 +93,7 @@ packages_select_by_deps:
   - gtsam
   - gz_ros2_control
   - gz_ros2_control_demos
+  - imu_tools
   - joy_teleop
   - key_teleop
   - lanelet2
@@ -105,6 +108,8 @@ packages_select_by_deps:
   - moveit-task-constructor-demo
   - moveit-visual-tools
   - nav2_bringup
+  - nav2_minimal_tb3_sim
+  - nav2_minimal_tb4_sim
   - navigation2
   - nmea-navsat-driver
   - perception
@@ -116,6 +121,7 @@ packages_select_by_deps:
   - py-trees-ros
   - py-trees-ros-interfaces
   - py-trees-ros-viewer
+  - py_trees_ros_tutorials
   - rmw_zenoh_cpp  # requested in https://github.com/RoboStack/ros-humble/issues/252
   - robot
   - robot-localization
@@ -132,6 +138,8 @@ packages_select_by_deps:
   - rosidl_buffer_backend
   - rosidl_buffer_backend_registry
   - rosidl_buffer_py
+  - rqt_robot_monitor
+  - rqt_runtime_monitor
   - rviz_visual_tools
   - sbg_driver
   - simulation
@@ -139,6 +147,7 @@ packages_select_by_deps:
   - teleop
   - teleop-tools
   - turtlebot3
+  - turtlebot3_simulations
   - twist_mux  # requested in https://github.com/RoboStack/ros-humble/issues/249
   - twist_stamper  # Requested in https://github.com/RoboStack/ros-rolling/issues/12
   - ublox
@@ -163,6 +172,7 @@ packages_select_by_deps:
       - apriltag_ros  # Depends on camera_ros
       - camera_ros  # Depends on libcamera that is only available on linux
       - livox_ros_driver2
+      - point_cloud_transport_plugins  # zstd plugin has unresolved symbols on macOS
       - py_binding_tools
       - swri_serial_util  # Serial communication only implemented for linux
       - v4l2_camera  # Depends on v4l that is only available on linux
@@ -214,6 +224,7 @@ packages_select_by_deps:
       - rviz_satellite
       - serial_driver
       - swri_console  # Until sync of: https://github.com/ros/rosdistro/pull/49750
+      - trac_ik
       - velodyne
 
 patch_dir: patch
