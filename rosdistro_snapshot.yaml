@@ -1068,9 +1068,9 @@ domain_coordinator:
   url: https://github.com/ros2-gbp/ament_cmake_ros-release.git
   version: 0.15.8
 draco_point_cloud_transport:
-  tag: release/lyrical/draco_point_cloud_transport/6.1.0-3
+  tag: release/lyrical/draco_point_cloud_transport/6.2.0-1
   url: https://github.com/ros2-gbp/point_cloud_transport_plugins-release.git
-  version: 6.1.0
+  version: 6.2.0
 dual_arm_panda_moveit_config:
   tag: release/lyrical/dual_arm_panda_moveit_config/3.1.1-3
   url: https://github.com/ros2-gbp/moveit_resources-release.git
@@ -3564,9 +3564,9 @@ pluginlib:
   url: https://github.com/ros2-gbp/pluginlib-release.git
   version: 5.8.4
 point_cloud_interfaces:
-  tag: release/lyrical/point_cloud_interfaces/6.1.0-3
+  tag: release/lyrical/point_cloud_interfaces/6.2.0-1
   url: https://github.com/ros2-gbp/point_cloud_transport_plugins-release.git
-  version: 6.1.0
+  version: 6.2.0
 point_cloud_msg_wrapper:
   tag: release/lyrical/point_cloud_msg_wrapper/1.0.7-6
   url: https://github.com/ros2-gbp/point_cloud_msg_wrapper-release.git
@@ -3576,9 +3576,9 @@ point_cloud_transport:
   url: https://github.com/ros2-gbp/point_cloud_transport-release.git
   version: 5.4.2
 point_cloud_transport_plugins:
-  tag: release/lyrical/point_cloud_transport_plugins/6.1.0-3
+  tag: release/lyrical/point_cloud_transport_plugins/6.2.0-1
   url: https://github.com/ros2-gbp/point_cloud_transport_plugins-release.git
-  version: 6.1.0
+  version: 6.2.0
 point_cloud_transport_py:
   tag: release/lyrical/point_cloud_transport_py/5.4.2-1
   url: https://github.com/ros2-gbp/point_cloud_transport-release.git
@@ -6060,9 +6060,9 @@ zenoh_security_tools:
   url: https://github.com/ros2-gbp/rmw_zenoh-release.git
   version: 0.10.4
 zlib_point_cloud_transport:
-  tag: release/lyrical/zlib_point_cloud_transport/6.1.0-3
+  tag: release/lyrical/zlib_point_cloud_transport/6.2.0-1
   url: https://github.com/ros2-gbp/point_cloud_transport_plugins-release.git
-  version: 6.1.0
+  version: 6.2.0
 zmqpp_vendor:
   tag: release/lyrical/zmqpp_vendor/0.0.2-5
   url: https://github.com/ros2-gbp/zmqpp_vendor-release.git
@@ -6076,6 +6076,6 @@ zstd_image_transport:
   url: https://github.com/ros2-gbp/image_transport_plugins-release.git
   version: 6.2.5
 zstd_point_cloud_transport:
-  tag: release/lyrical/zstd_point_cloud_transport/6.1.0-3
+  tag: release/lyrical/zstd_point_cloud_transport/6.2.0-1
   url: https://github.com/ros2-gbp/point_cloud_transport_plugins-release.git
-  version: 6.1.0
+  version: 6.2.0
