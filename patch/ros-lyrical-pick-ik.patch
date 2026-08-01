@@ -1,0 +1,110 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e0c448b..e4dbba0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -17,7 +17,7 @@ find_package(rclcpp REQUIRED)
+ find_package(rsl REQUIRED)
+ find_package(tf2_geometry_msgs REQUIRED)
+ find_package(tf2_kdl REQUIRED)
+-find_package(tl_expected REQUIRED)
++find_package(tl-expected REQUIRED)
+ 
+ generate_parameter_library(
+   pick_ik_parameters
+@@ -41,7 +41,7 @@ target_link_libraries(pick_ik_plugin
+     moveit_core::moveit_robot_model
+     tf2_geometry_msgs::tf2_geometry_msgs
+     tf2_kdl::tf2_kdl
+-    tl_expected::tl_expected
++    tl::expected
+     rsl::rsl
+   PRIVATE
+     fmt::fmt
+@@ -84,6 +84,6 @@ ament_export_dependencies(
+   rsl
+   tf2_geometry_msgs
+   tf2_kdl
+-  tl_expected
++  tl-expected
+ )
+ ament_package()
+diff --git a/include/pick_ik/forward_kinematics.hpp b/include/pick_ik/forward_kinematics.hpp
+index 834f5b7..f6c2426 100644
+--- a/include/pick_ik/forward_kinematics.hpp
++++ b/include/pick_ik/forward_kinematics.hpp
+@@ -3,7 +3,7 @@
+ #include <memory>
+ #include <moveit/robot_model/joint_model.h>
+ #include <moveit/robot_model/robot_model.h>
+-#include <tf2/LinearMath/Vector3.h>
++#include <tf2/LinearMath/Vector3.hpp>
+ #include <vector>
+ 
+ namespace pick_ik {
+diff --git a/include/pick_ik/robot.hpp b/include/pick_ik/robot.hpp
+index 5c92c5e..d34511c 100644
+--- a/include/pick_ik/robot.hpp
++++ b/include/pick_ik/robot.hpp
+@@ -1,6 +1,6 @@
+ #pragma once
+ 
+-#include <tl_expected/expected.hpp>
++#include <tl/expected.hpp>
+ 
+ #include <Eigen/Geometry>
+ #include <moveit/robot_model/joint_model.h>
+diff --git a/package.xml b/package.xml
+index 5704712..69a2f51 100644
+--- a/package.xml
++++ b/package.xml
+@@ -17,9 +17,10 @@
+   <depend>range-v3</depend>
+   <depend>rclcpp</depend>
+   <depend>rsl</depend>
++  <depend>tf2</depend>
+   <depend>tf2_geometry_msgs</depend>
+   <depend>tf2_kdl</depend>
+-  <depend>tl_expected</depend>
++  <depend>libexpected-dev</depend>
+ 
+   <test_depend>moveit_resources_panda_moveit_config</test_depend>
+ 
+diff --git a/src/forward_kinematics.cpp b/src/forward_kinematics.cpp
+index fb03ed1..db773fd 100644
+--- a/src/forward_kinematics.cpp
++++ b/src/forward_kinematics.cpp
+@@ -5,7 +5,7 @@
+ #include <iterator>
+ #include <memory>
+ #include <moveit/robot_model/robot_model.h>
+-#include <tf2/LinearMath/Vector3.h>
++#include <tf2/LinearMath/Vector3.hpp>
+ #include <vector>
+ 
+ namespace pick_ik {
+diff --git a/src/pick_ik_plugin.cpp b/src/pick_ik_plugin.cpp
+index d586092..ea8c170 100644
+--- a/src/pick_ik_plugin.cpp
++++ b/src/pick_ik_plugin.cpp
+@@ -4,7 +4,7 @@
+ #include <pick_ik/ik_memetic.hpp>
+ #include <pick_ik/robot.hpp>
+ 
+-#include <pick_ik_parameters.hpp>
++#include <pick_ik/pick_ik_parameters.hpp>
+ #include <pluginlib/class_list_macros.hpp>
+ #include <rclcpp/rclcpp.hpp>
+ 
+diff --git a/src/robot.cpp b/src/robot.cpp
+index 7581746..437921b 100644
+--- a/src/robot.cpp
++++ b/src/robot.cpp
+@@ -3,7 +3,7 @@
+ #include <rsl/random.hpp>
+ #include <tf2_eigen/tf2_eigen.hpp>
+ #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
+-#include <tl_expected/expected.hpp>
++#include <tl/expected.hpp>
+ 
+ #include <Eigen/Geometry>
+ #include <cfloat>
