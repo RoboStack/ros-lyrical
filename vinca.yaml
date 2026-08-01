@@ -109,7 +109,6 @@ packages_select_by_deps:
   - nmea-navsat-driver
   - perception
   - persist-parameter-server
-  - point_cloud_transport_plugins
   - point_cloud_transport_py
   - polygon_msgs
   - proxsuite
@@ -207,6 +206,7 @@ packages_select_by_deps:
       - ouster_ros  # TODO on windows: cannot open pcl_io.lib
       - pinocchio
       - plotjuggler-ros
+      - point_cloud_transport_plugins
       - pointcloud-to-laserscan
       - rplidar_ros
       - rqt_mocap4r2_control
