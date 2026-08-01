@@ -131,6 +131,8 @@ pybind11_json_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR"
 pybind11_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR"
+rmf_battery:
+  additional_cmake_args: "-DCMAKE_CXX_FLAGS=-I$PREFIX/include/eigen3"
 rmf_traffic:
   additional_cmake_args: "-DCMAKE_CXX_FLAGS=-includecassert"
 robot_state_publisher:
