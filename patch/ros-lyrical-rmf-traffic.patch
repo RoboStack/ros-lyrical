@@ -1,0 +1,52 @@
+diff --git a/include/rmf_traffic/Trajectory.hpp b/include/rmf_traffic/Trajectory.hpp
+index 0cea4ae..a3c1cbe 100644
+--- a/include/rmf_traffic/Trajectory.hpp
++++ b/include/rmf_traffic/Trajectory.hpp
+@@ -23,7 +23,7 @@
+ 
+ #include <rmf_utils/impl_ptr.hpp>
+ 
+-#include <Eigen/Geometry>
++#include <eigen3/Eigen/Geometry>
+ 
+ #include <memory>
+ #include <vector>
+diff --git a/include/rmf_traffic/agv/Graph.hpp b/include/rmf_traffic/agv/Graph.hpp
+index 978d66f..ae7f57f 100644
+--- a/include/rmf_traffic/agv/Graph.hpp
++++ b/include/rmf_traffic/agv/Graph.hpp
+@@ -20,7 +20,7 @@
+ 
+ #include <rmf_traffic/Time.hpp>
+ 
+-#include <Eigen/Geometry>
++#include <eigen3/Eigen/Geometry>
+ 
+ #include <rmf_utils/impl_ptr.hpp>
+ #include <rmf_utils/clone_ptr.hpp>
+diff --git a/include/rmf_traffic/blockade/Writer.hpp b/include/rmf_traffic/blockade/Writer.hpp
+index afe0498..a26a49a 100644
+--- a/include/rmf_traffic/blockade/Writer.hpp
++++ b/include/rmf_traffic/blockade/Writer.hpp
+@@ -19,7 +19,7 @@
+ #define RMF_TRAFFIC__BLOCKADE__WRITER_HPP
+ 
+ #include <vector>
+-#include <Eigen/Geometry>
++#include <eigen3/Eigen/Geometry>
+ 
+ #include <rmf_traffic/Time.hpp>
+ #include <rmf_traffic/blockade/Status.hpp>
+diff --git a/include/rmf_traffic/geometry/Space.hpp b/include/rmf_traffic/geometry/Space.hpp
+index e81055c..940ed39 100644
+--- a/include/rmf_traffic/geometry/Space.hpp
++++ b/include/rmf_traffic/geometry/Space.hpp
+@@ -20,7 +20,7 @@
+ 
+ #include <rmf_traffic/geometry/Shape.hpp>
+ 
+-#include <Eigen/Geometry>
++#include <eigen3/Eigen/Geometry>
+ 
+ #include <rmf_utils/impl_ptr.hpp>
+ 
