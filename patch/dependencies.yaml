@@ -88,6 +88,8 @@ popf:
   add_host: ["perl"]
 rtabmap:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "ceres-solver", "libdc1394", "libusb", "vtk"]
+  remove_host: ["ros-lyrical-libg2o"]
+  remove_run: ["ros-lyrical-libg2o"]
 backward_ros:
   add_host: ["${{ 'binutils' if linux }}", "${{ 'elfutils' if linux }}", "ros-lyrical-ament-cmake-libraries"]
 nav2_smac_planner:
