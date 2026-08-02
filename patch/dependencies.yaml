@@ -1,9 +1,5 @@
 ament_package:
   add_host: ['importlib_resources']
-# Keep the full-rebuild scheduler from testing this metapackage before its
-# runtime-only linter dependencies have been rebuilt for the new mutex.
-ament_lint_common:
-  add_host: ["ros-lyrical-ament-cmake-copyright", "ros-lyrical-ament-cmake-cppcheck", "ros-lyrical-ament-cmake-cpplint", "ros-lyrical-ament-cmake-flake8", "ros-lyrical-ament-cmake-lint-cmake", "ros-lyrical-ament-cmake-pep257", "ros-lyrical-ament-cmake-uncrustify", "ros-lyrical-ament-cmake-xmllint"]
 foxglove_bridge:
   add_host: ["ros-lyrical-ament-cmake"]
 ros_ign_interfaces:

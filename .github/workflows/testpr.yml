@@ -115,6 +115,19 @@ jobs:
     - name: Build recipes
       shell: bash -l {0}
       run: |
+        if [[ "${IGNORE_CACHE_AND_DO_FULL_REBUILD}" == "true" ]]; then
+          # Runtime-only dependencies are not part of rattler-build's build
+          # ordering. Build in tolerant passes so those packages are present
+          # under the new mutex before the final strict pass. Resetting only
+          # the Git source cache also works around intermittent incomplete tag
+          # objects when many packages share one ROS release repository.
+          for pass in 1 2 3; do
+            echo "Full rebuild pass ${pass}"
+            rm -rf ${{ matrix.folder_cache }}/../src_cache/git
+            pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --continue-on-failure --skip-existing && break
+          done
+          rm -rf ${{ matrix.folder_cache }}/../src_cache/git
+        fi
         pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
 
     - name: See packages that will be saved in cache
