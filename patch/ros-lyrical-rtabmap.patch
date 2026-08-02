@@ -16,3 +16,13 @@ index b7d36de..44e1164 100644
  ENDIF(WITH_GTSAM)
  
  IF(WITH_MRPT)
+@@ -578,7 +582,7 @@ ENDIF(WITH_POINTMATCHER)
+ IF(libpointmatcher_FOUND OR GTSAM_FOUND)
+-    find_package(Boost COMPONENTS thread filesystem system program_options date_time REQUIRED)
++    find_package(Boost COMPONENTS thread filesystem program_options date_time REQUIRED)
+     IF(Boost_MINOR_VERSION GREATER 47)
+-        find_package(Boost COMPONENTS thread filesystem system program_options date_time chrono timer serialization REQUIRED)
++        find_package(Boost COMPONENTS thread filesystem program_options date_time chrono timer serialization REQUIRED)
+     ENDIF(Boost_MINOR_VERSION GREATER 47)
+     IF(WIN32)
+         MESSAGE(STATUS "Boost_LIBRARY_DIRS=${Boost_LIBRARY_DIRS}")
