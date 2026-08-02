@@ -127,7 +127,7 @@ jobs:
           for pass in 1 2 3; do
             echo "Full rebuild pass ${pass}"
             rm -rf ${{ matrix.folder_cache }}/../src_cache/git
-            pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --continue-on-failure --skip-existing && break
+            pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --continue-on-failure --skip-existing
           done
           rm -rf ${{ matrix.folder_cache }}/../src_cache/git
         fi
