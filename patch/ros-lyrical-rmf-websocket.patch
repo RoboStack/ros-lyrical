@@ -1,0 +1,15 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9f81556..784b3cd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.5)
+ 
+ project(rmf_websocket)
+ 
++# websocketpp 0.8.2 requires Asio APIs that Boost 1.90 removed. The recipe
++# provides a compatible standalone Asio release.
++add_compile_definitions(ASIO_STANDALONE)
++
+ if(NOT CMAKE_CXX_STANDARD)
+   set(CMAKE_CXX_STANDARD 17)
+ endif()

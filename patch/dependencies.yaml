@@ -46,6 +46,8 @@ rviz_rendering:
   add_host: ["glew"]
 rmf_visualization_schedule:
   add_host: ["asio"]
+rmf_websocket:
+  add_host: ["asio", "websocketpp"]
 behaviortree_cpp:
   add_host: ["libboost-devel", "cppzmq", "zeromq", "sqlite"]
   add_run: ["libboost"]
