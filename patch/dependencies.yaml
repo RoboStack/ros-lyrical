@@ -44,6 +44,8 @@ pcl_ros:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "libboost-devel"]
 rviz_rendering:
   add_host: ["glew"]
+rmf_visualization_schedule:
+  add_host: ["asio"]
 behaviortree_cpp:
   add_host: ["libboost-devel", "cppzmq", "zeromq", "sqlite"]
   add_run: ["libboost"]
