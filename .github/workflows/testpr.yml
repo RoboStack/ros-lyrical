@@ -78,7 +78,7 @@ jobs:
         mkdir -p recipes
         pixi run -v vinca --platform ${{ matrix.platform }} -m -n
         if [[ "${IGNORE_CACHE_AND_DO_FULL_REBUILD}" == "true" ]]; then
-          python use_github_source_archives.py
+          pixi run python use_github_source_archives.py
         fi
 
     - name: Check patches
