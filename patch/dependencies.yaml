@@ -90,32 +90,32 @@ mp2p_icp:
 # XSens support is disabled in these split MRPT builds. Avoid pulling libudev
 # (and a systemd build requiring a newer glibc than the ROS sysroot) into them.
 mrpt_libbase:
-  add_host: ["${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   remove_host: ["libudev"]
 mrpt_libhwdrivers:
-  add_host: ["${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   remove_host: ["libudev"]
 mrpt_libgui:
-  add_host: ["${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   remove_host: ["libudev"]
 mrpt_libmaps:
-  add_host: ["octomap", "${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["octomap", "${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   add_run: ["octomap"]
   remove_host: ["libudev"]
 mrpt_libmath:
-  add_host: ["${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   remove_host: ["libudev"]
 mrpt_libobs:
-  add_host: ["${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   remove_host: ["libudev"]
 mrpt_libopengl:
-  add_host: ["${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   remove_host: ["libudev"]
 mrpt_libposes:
-  add_host: ["${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   remove_host: ["libudev"]
 mrpt_libslam:
-  add_host: ["${{ 'libsystemd0 <258' if linux }}"]
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
   remove_host: ["libudev"]
 ros1_rosbag_storage_vendor:
   add_host: ["ros-noetic-roscpp", "ros-noetic-roslz4", "ros-noetic-rostest"]
