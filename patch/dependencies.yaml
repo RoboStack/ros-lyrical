@@ -155,6 +155,9 @@ force_torque_sensor_broadcaster:
   add_host: ["typeguard", "jinja2"]
 ros_gz_sim:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "ros-lyrical-gz-sensors-vendor"]
+ament_cmake_ros:
+  # Break the test-only runtime cycle so a new mutex migration can bootstrap.
+  remove_run: ["ros-lyrical-rmw-test-fixture-implementation"]
 geometric_shapes:
   add_host: ["libboost-devel", "octomap"]
 ros_image_to_qimage:
