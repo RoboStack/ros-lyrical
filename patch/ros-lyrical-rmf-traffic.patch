@@ -1,52 +1,37 @@
-diff --git a/include/rmf_traffic/Trajectory.hpp b/include/rmf_traffic/Trajectory.hpp
-index 0cea4ae..a3c1cbe 100644
---- a/include/rmf_traffic/Trajectory.hpp
-+++ b/include/rmf_traffic/Trajectory.hpp
-@@ -23,7 +23,7 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ad05ac1..e2c1e87 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -96,6 +96,7 @@ endif()
  
- #include <rmf_utils/impl_ptr.hpp>
+ target_link_libraries(rmf_traffic
+   PUBLIC
++    Eigen3::Eigen
+     rmf_utils::rmf_utils
+     Threads::Threads
+   PRIVATE
+diff --git a/src/rmf_traffic/blockade/geometry.cpp b/src/rmf_traffic/blockade/geometry.cpp
+index 049351e..d69a999 100644
+--- a/src/rmf_traffic/blockade/geometry.cpp
++++ b/src/rmf_traffic/blockade/geometry.cpp
+@@ -17,6 +17,7 @@
  
--#include <Eigen/Geometry>
-+#include <eigen3/Eigen/Geometry>
+ #include "geometry.hpp"
  
- #include <memory>
- #include <vector>
-diff --git a/include/rmf_traffic/agv/Graph.hpp b/include/rmf_traffic/agv/Graph.hpp
-index 978d66f..ae7f57f 100644
---- a/include/rmf_traffic/agv/Graph.hpp
-+++ b/include/rmf_traffic/agv/Graph.hpp
-@@ -20,7 +20,7 @@
++#include <cassert>
+ #include <cmath>
  
- #include <rmf_traffic/Time.hpp>
+ namespace rmf_traffic {
+diff --git a/thirdparty/fcl/include/fcl/math/motion/taylor_model/taylor_model-inl.h b/thirdparty/fcl/include/fcl/math/motion/taylor_model/taylor_model-inl.h
+index 861f72d..a239104 100644
+--- a/thirdparty/fcl/include/fcl/math/motion/taylor_model/taylor_model-inl.h
++++ b/thirdparty/fcl/include/fcl/math/motion/taylor_model/taylor_model-inl.h
+@@ -41,6 +41,8 @@
+ #ifndef FCL_CCD_TAYLOR_MODEL_INL_H
+ #define FCL_CCD_TAYLOR_MODEL_INL_H
  
--#include <Eigen/Geometry>
-+#include <eigen3/Eigen/Geometry>
++#include <cassert>
++
+ #include "fcl/math/motion/taylor_model/taylor_model.h"
  
- #include <rmf_utils/impl_ptr.hpp>
- #include <rmf_utils/clone_ptr.hpp>
-diff --git a/include/rmf_traffic/blockade/Writer.hpp b/include/rmf_traffic/blockade/Writer.hpp
-index afe0498..a26a49a 100644
---- a/include/rmf_traffic/blockade/Writer.hpp
-+++ b/include/rmf_traffic/blockade/Writer.hpp
-@@ -19,7 +19,7 @@
- #define RMF_TRAFFIC__BLOCKADE__WRITER_HPP
- 
- #include <vector>
--#include <Eigen/Geometry>
-+#include <eigen3/Eigen/Geometry>
- 
- #include <rmf_traffic/Time.hpp>
- #include <rmf_traffic/blockade/Status.hpp>
-diff --git a/include/rmf_traffic/geometry/Space.hpp b/include/rmf_traffic/geometry/Space.hpp
-index e81055c..940ed39 100644
---- a/include/rmf_traffic/geometry/Space.hpp
-+++ b/include/rmf_traffic/geometry/Space.hpp
-@@ -20,7 +20,7 @@
- 
- #include <rmf_traffic/geometry/Shape.hpp>
- 
--#include <Eigen/Geometry>
-+#include <eigen3/Eigen/Geometry>
- 
- #include <rmf_utils/impl_ptr.hpp>
- 
+ namespace fcl
