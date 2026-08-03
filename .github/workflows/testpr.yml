@@ -131,6 +131,18 @@ jobs:
           done
           rm -rf ${{ matrix.folder_cache }}/../src_cache/git
         fi
+
+        # Bootstrap packages that are hidden behind runtime-only dependency
+        # cycles before asking rattler-build to solve the complete recipe set.
+        for recipe in \
+          ros-lyrical-test-msgs \
+          ros-lyrical-rcl-action \
+          ros-lyrical-rcl-lifecycle \
+          ros-lyrical-rclpy \
+          ros-lyrical-zstd-image-transport; do
+          pixi run rattler-build build --recipe "recipes/${recipe}/recipe.yaml" --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
+        done
+
         pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
 
     - name: See packages that will be saved in cache
