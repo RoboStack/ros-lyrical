@@ -26,12 +26,13 @@ index b7d36de..44e1164 100644
      ENDIF(Boost_MINOR_VERSION GREATER 47)
      IF(WIN32)
          MESSAGE(STATUS "Boost_LIBRARY_DIRS=${Boost_LIBRARY_DIRS}")
-@@ -112,5 +116,8 @@ if(MSVC)
+@@ -112,5 +116,9 @@ if(MSVC)
      endif()
    endif()
    add_compile_options("/bigobj")
-+  # CoInitialize() is used by Windows GUI entry points without including the
-+  # COM declaration header explicitly.
++  # GUI entry points use CoInitialize(). Force the COM declarations while
++  # ensuring the modern Winsock header precedes windows.h in every source.
++  add_compile_options("/FIwinsock2.h")
 +  add_compile_options("/FIobjbase.h")
  endif()
  
