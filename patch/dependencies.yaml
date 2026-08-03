@@ -46,6 +46,9 @@ rviz_rendering:
   add_host: ["glew"]
 rmf_visualization_schedule:
   add_host: ["asio"]
+rmf_fleet_adapter:
+  add_host: ["eigen"]
+  add_run: ["eigen"]
 rmf_websocket:
   add_host: ["asio", "websocketpp"]
   add_run: ["asio", "websocketpp"]
