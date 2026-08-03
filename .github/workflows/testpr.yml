@@ -8,7 +8,7 @@ env:
   # Change to 'true' to enable the cache upload as artifacts
   SAVE_CACHE_AS_ARTIFACT: 'true'
   # Change to 'true' to ignore cache and force a full rebuild, but please restore to 'false' before merging
-  IGNORE_CACHE_AND_DO_FULL_REBUILD: 'true'
+  IGNORE_CACHE_AND_DO_FULL_REBUILD: 'false'
 
 jobs:
   build:
@@ -77,9 +77,9 @@ jobs:
       run: |
         mkdir -p recipes
         pixi run -v vinca --platform ${{ matrix.platform }} -m -n
-        if [[ "${IGNORE_CACHE_AND_DO_FULL_REBUILD}" == "true" ]]; then
-          pixi run python use_github_source_archives.py
-        fi
+        # Avoid concurrent Git clone cache corruption when many ROS packages
+        # share the same release repository.
+        pixi run python use_github_source_archives.py
 
     - name: Check patches
       shell: bash -l {0}
