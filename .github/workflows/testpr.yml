@@ -138,14 +138,20 @@ jobs:
         # Bootstrap packages that are hidden behind runtime-only dependency
         # cycles before asking rattler-build to solve the complete recipe set.
         for recipe in \
+          ros2-distro-mutex \
           ros-lyrical-rosidl-default-generators \
           ros-lyrical-type-description-interfaces \
           ros-lyrical-test-msgs \
           ros-lyrical-tracetools \
           ros-lyrical-rcl \
+          ros-lyrical-rmw-fastrtps-cpp \
+          ros-lyrical-rmw-fastrtps-dynamic-cpp \
+          ros-lyrical-rmw-zenoh-cpp \
+          ros-lyrical-rmw-implementation \
           ros-lyrical-rcl-action \
           ros-lyrical-rcl-lifecycle \
-          ros-lyrical-rmw-implementation \
+          ros-lyrical-rclcpp \
+          ros-lyrical-rclcpp-lifecycle \
           ros-lyrical-rclpy \
           ros-lyrical-sensor-msgs \
           ros-lyrical-image-transport \

@@ -290,6 +290,11 @@ autoware_behavior_velocity_planner_common:
   add_host: ["cpp-expected"]
 autoware_behavior_velocity_stop_line_module:
   add_host: ["cpp-expected"]
+rcl:
+  # rmw_implementation is a test-only host dependency here, but it depends on
+  # concrete RMW backends. Removing it breaks the mutex-migration bootstrap
+  # cycle while retaining the runtime dependency.
+  remove_host: ["ros-lyrical-rmw-implementation"]
 rclpy:
   add_host: ["typing_extensions"]
   add_run: ["typing_extensions"]
