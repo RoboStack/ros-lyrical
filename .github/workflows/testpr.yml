@@ -84,7 +84,10 @@ jobs:
     - name: Check patches
       shell: bash -l {0}
       run: |
-        pixi run check-patches
+        # Recipes were already generated for the matrix platform and their Git
+        # sources converted to archives. Do not use the Pixi task here because
+        # its generate-recipes dependency would overwrite both changes.
+        pixi run python check_patches_clean_apply.py
 
     - name: Restore build cache
       id: cache-restore
@@ -135,10 +138,14 @@ jobs:
         # Bootstrap packages that are hidden behind runtime-only dependency
         # cycles before asking rattler-build to solve the complete recipe set.
         for recipe in \
+          ros-lyrical-rosidl-default-generators \
+          ros-lyrical-type-description-interfaces \
           ros-lyrical-test-msgs \
+          ros-lyrical-tracetools \
           ros-lyrical-rcl-action \
           ros-lyrical-rcl-lifecycle \
           ros-lyrical-rclpy \
+          ros-lyrical-image-transport \
           ros-lyrical-zstd-image-transport; do
           pixi run rattler-build build --recipe "recipes/${recipe}/recipe.yaml" --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
         done

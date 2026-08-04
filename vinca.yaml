@@ -31,6 +31,12 @@ packages_skip_by_deps:
 
 packages_remove_from_deps:
 
+  # Use the conda-forge iceoryx 2.0.6 packages instead of rebuilding the ROS
+  # release copies.
+  - iceoryx_binding_c
+  - iceoryx_hoofs
+  - iceoryx_posh
+
   - if: not linux
     then:
       - pendulum_control
