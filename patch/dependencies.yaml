@@ -44,6 +44,14 @@ pcl_ros:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "libboost-devel"]
 rviz_rendering:
   add_host: ["glew"]
+rmf_visualization_schedule:
+  add_host: ["asio"]
+rmf_fleet_adapter:
+  add_host: ["eigen-abi-devel"]
+  remove_host: ["eigen"]
+rmf_websocket:
+  add_host: ["asio", "websocketpp"]
+  add_run: ["asio", "websocketpp"]
 behaviortree_cpp:
   add_host: ["libboost-devel", "cppzmq", "zeromq", "sqlite"]
   add_run: ["libboost"]
@@ -101,6 +109,9 @@ nav2_mppi_controller:
   add_build: ["${{ 'clang <19' if osx }}"]
 ompl:
   add_host: ["ompl"]
+pybind11_json_vendor:
+  add_host: ["pybind11_json"]
+  add_run: ["pybind11_json"]
 pybind11_vendor:
   add_host: ["pybind11"]
   add_run: ["pybind11"]
@@ -264,6 +275,10 @@ octomap_rviz_plugins:
   add_host: ["octomap"]
 zenoh_cpp_vendor:
   add_host: ["libzenohc", "libzenohcxx"]
+rmf_building_map_tools:
+  add_host: ["ros-lyrical-rmf-site-map-msgs"]
+  add_run: ["gz-fuel-tools"]
+  remove_run: ["ros-lyrical-gz-fuel-tools-vendor"]
 rmw_zenoh_cpp:
   add_host: ["libzenohc", "libzenohcxx"]
 autoware_utils_pcl:
