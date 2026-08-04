@@ -142,9 +142,12 @@ jobs:
           ros-lyrical-type-description-interfaces \
           ros-lyrical-test-msgs \
           ros-lyrical-tracetools \
+          ros-lyrical-rcl \
           ros-lyrical-rcl-action \
           ros-lyrical-rcl-lifecycle \
+          ros-lyrical-rmw-implementation \
           ros-lyrical-rclpy \
+          ros-lyrical-sensor-msgs \
           ros-lyrical-image-transport \
           ros-lyrical-zstd-image-transport; do
           pixi run rattler-build build --recipe "recipes/${recipe}/recipe.yaml" --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
