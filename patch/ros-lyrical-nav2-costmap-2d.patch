@@ -1,0 +1,35 @@
+diff --git a/include/nav2_costmap_2d/layered_costmap.hpp b/include/nav2_costmap_2d/layered_costmap.hpp
+index 335c079..330d1a2 100644
+--- a/include/nav2_costmap_2d/layered_costmap.hpp
++++ b/include/nav2_costmap_2d/layered_costmap.hpp
+@@ -190,7 +190,7 @@ public:
+   /** @brief Returns the latest footprint stored with setFootprint(). */
+   const std::vector<geometry_msgs::msg::Point> & getFootprint()
+   {
+-    return *footprint_.load();
++    return *std::atomic_load(&footprint_);
+   }
+ 
+   /** @brief Returns the inscribed radius of the robot. */
+@@ -231,7 +231,7 @@ private:
+   bool initialized_;
+   bool size_locked_;
+   std::atomic<double> circumscribed_radius_, inscribed_radius_;
+-  std::atomic<std::shared_ptr<std::vector<geometry_msgs::msg::Point>>> footprint_;
++  std::shared_ptr<std::vector<geometry_msgs::msg::Point>> footprint_;
+ };
+ 
+ }  // namespace nav2_costmap_2d
+diff --git a/src/layered_costmap.cpp b/src/layered_costmap.cpp
+index 6ad6d88..2ed537e 100644
+--- a/src/layered_costmap.cpp
++++ b/src/layered_costmap.cpp
+@@ -301,7 +301,7 @@ void LayeredCostmap::setFootprint(const std::vector<geometry_msgs::msg::Point> &
+     footprint_spec);
+   // use atomic store here since footprint is used by various planners/controllers
+   // and not otherwise locked
+-  footprint_.store(
++  std::atomic_store(&footprint_,
+     std::make_shared<std::vector<geometry_msgs::msg::Point>>(footprint_spec));
+   inscribed_radius_.store(std::get<0>(inside_outside));
+   circumscribed_radius_.store(std::get<1>(inside_outside));
