@@ -112,6 +112,8 @@ jobs:
         # nav2-util was cached before its exported angles dependency was
         # propagated; force replacement without discarding the full rebuild.
         rm -rf ${{ matrix.folder_cache }}/ros-lyrical-nav2-util-* 2>/dev/null || true
+        rm -rf ${{ matrix.folder_cache }}/ros-lyrical-nav2-route-* 2>/dev/null || true
+        rm -rf ${{ matrix.folder_cache }}/ros-lyrical-nav2-ros-common-* 2>/dev/null || true
         mkdir -p ${{ matrix.folder_cache }}
         pixi run rattler-index fs ${{ matrix.folder_cache }}/.. --force
 
