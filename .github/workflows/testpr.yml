@@ -121,6 +121,7 @@ jobs:
     - name: Build recipes
       shell: bash -l {0}
       run: |
+        set -e
         if [[ "${IGNORE_CACHE_AND_DO_FULL_REBUILD}" == "true" ]]; then
           # Runtime-only dependencies are not part of rattler-build's build
           # ordering. Build in tolerant passes so those packages are present
