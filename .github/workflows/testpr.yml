@@ -139,9 +139,20 @@ jobs:
         # cycles before asking rattler-build to solve the complete recipe set.
         for recipe in \
           ros2-distro-mutex \
+          ros-lyrical-ament-package \
+          ros-lyrical-ament-lint \
+          ros-lyrical-ament-flake8 \
+          ros-lyrical-ament-pep257 \
           ros-lyrical-ament-copyright \
+          ros-lyrical-ament-xmllint \
+          ros-lyrical-ament-pycodestyle \
+          ros-lyrical-ament-cppcheck \
+          ros-lyrical-ament-cpplint \
+          ros-lyrical-ament-uncrustify \
           ros-lyrical-ament-cmake-core \
+          ros-lyrical-ament-cmake-python \
           ros-lyrical-ament-cmake-test \
+          ros-lyrical-ament-lint-cmake \
           ros-lyrical-ament-cmake-lint-cmake \
           ros-lyrical-ament-cmake-copyright \
           ros-lyrical-ament-cmake-cppcheck \
@@ -157,6 +168,8 @@ jobs:
           ros-lyrical-tracetools \
           ros-lyrical-rmw-fastrtps-cpp \
           ros-lyrical-rmw-implementation \
+          ros-lyrical-rmw-test-fixture \
+          ros-lyrical-rmw-test-fixture-implementation \
           ros-lyrical-rcl \
           ros-lyrical-rcl-action \
           ros-lyrical-rcl-lifecycle \
