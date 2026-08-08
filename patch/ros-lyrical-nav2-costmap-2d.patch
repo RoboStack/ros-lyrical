@@ -1,35 +1,46 @@
+diff --git a/include/nav2_costmap_2d/footprint_subscriber.hpp b/include/nav2_costmap_2d/footprint_subscriber.hpp
+index ef14eb6..e1255c2 100644
+--- a/include/nav2_costmap_2d/footprint_subscriber.hpp
++++ b/include/nav2_costmap_2d/footprint_subscriber.hpp
+@@ -95,3 +95,3 @@ protected:
+   std::atomic_bool footprint_received_{false};
+-  std::atomic<geometry_msgs::msg::PolygonStamped::ConstSharedPtr> footprint_;
++  geometry_msgs::msg::PolygonStamped::ConstSharedPtr footprint_;
+   nav2::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr footprint_sub_;
 diff --git a/include/nav2_costmap_2d/layered_costmap.hpp b/include/nav2_costmap_2d/layered_costmap.hpp
-index 335c079..330d1a2 100644
+index 6c59c16..89a5491 100644
 --- a/include/nav2_costmap_2d/layered_costmap.hpp
 +++ b/include/nav2_costmap_2d/layered_costmap.hpp
-@@ -190,7 +190,7 @@ public:
-   /** @brief Returns the latest footprint stored with setFootprint(). */
-   const std::vector<geometry_msgs::msg::Point> & getFootprint()
+@@ -192,3 +192,3 @@ public:
    {
 -    return *footprint_.load();
 +    return *std::atomic_load(&footprint_);
    }
- 
-   /** @brief Returns the inscribed radius of the robot. */
-@@ -231,7 +231,7 @@ private:
-   bool initialized_;
-   bool size_locked_;
+@@ -233,3 +233,3 @@ private:
    std::atomic<double> circumscribed_radius_, inscribed_radius_;
 -  std::atomic<std::shared_ptr<std::vector<geometry_msgs::msg::Point>>> footprint_;
 +  std::shared_ptr<std::vector<geometry_msgs::msg::Point>> footprint_;
  };
+diff --git a/src/footprint_subscriber.cpp b/src/footprint_subscriber.cpp
+index d1eedef..95b03a2 100644
+--- a/src/footprint_subscriber.cpp
++++ b/src/footprint_subscriber.cpp
+@@ -33,3 +33,3 @@ FootprintSubscriber::getFootprintRaw(
  
- }  // namespace nav2_costmap_2d
+-  auto current_footprint = footprint_.load();
++  auto current_footprint = std::atomic_load(&footprint_);
+   if (!current_footprint) {
+@@ -79,3 +79,3 @@ FootprintSubscriber::footprint_callback(
+ {
+-  footprint_.store(msg);
++  std::atomic_store(&footprint_, msg);
+   if (!footprint_received_.load()) {
 diff --git a/src/layered_costmap.cpp b/src/layered_costmap.cpp
-index 6ad6d88..2ed537e 100644
+index cd42f85..b74559a 100644
 --- a/src/layered_costmap.cpp
 +++ b/src/layered_costmap.cpp
-@@ -301,7 +301,7 @@ void LayeredCostmap::setFootprint(const std::vector<geometry_msgs::msg::Point> &
-     footprint_spec);
-   // use atomic store here since footprint is used by various planners/controllers
+@@ -303,3 +303,3 @@ void LayeredCostmap::setFootprint(const std::vector<geometry_msgs::msg::Point> &
    // and not otherwise locked
 -  footprint_.store(
 +  std::atomic_store(&footprint_,
      std::make_shared<std::vector<geometry_msgs::msg::Point>>(footprint_spec));
-   inscribed_radius_.store(std::get<0>(inside_outside));
-   circumscribed_radius_.store(std::get<1>(inside_outside));
