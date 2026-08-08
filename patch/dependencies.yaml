@@ -100,6 +100,9 @@ nav2_smac_planner:
   add_host: ["${{ 'llvm-openmp' if osx }}", "ompl", "libode"]
 nav2_util:
   add_host: ["libboost-devel"]
+  # nav2_util exports angles from its CMake config, so downstream consumers
+  # need it in the runtime environment as well.
+  add_run: ["ros-lyrical-angles"]
 nav2_constrained_smoother:
   add_host: ["${{ 'openblas' if win }}", "ceres-solver * cpu*"]
 nav2_mppi_controller:
