@@ -166,6 +166,7 @@ jobs:
           ros-lyrical-ament-cmake-uncrustify \
           ros-lyrical-ament-cmake-xmllint \
           ros-lyrical-ament-lint-common \
+          ros-lyrical-service-msgs \
           ros-lyrical-rosidl-default-generators \
           ros-lyrical-type-description-interfaces \
           ros-lyrical-test-msgs \
@@ -179,6 +180,7 @@ jobs:
           ros-lyrical-rcl-action \
           ros-lyrical-rcl-lifecycle \
           ros-lyrical-rclcpp \
+          ros-lyrical-rclcpp-components \
           ros-lyrical-rclcpp-lifecycle \
           ros-lyrical-rclpy \
           ros-lyrical-sensor-msgs \
