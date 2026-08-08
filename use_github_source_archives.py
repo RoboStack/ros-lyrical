@@ -20,6 +20,11 @@ converted = 0
 for recipe in RECIPES.rglob("recipe.yaml"):
     text = recipe.read_text(encoding="utf-8")
 
+    # rslidar_sdk requires the rs_driver Git submodule, which GitHub source
+    # archives intentionally omit. Keep this one as a recursive Git checkout.
+    if recipe.parent.name == "ros-lyrical-rslidar-sdk":
+        continue
+
     def replace(match: re.Match[str]) -> str:
         global converted
         converted += 1
