@@ -139,6 +139,18 @@ jobs:
         # cycles before asking rattler-build to solve the complete recipe set.
         for recipe in \
           ros2-distro-mutex \
+          ros-lyrical-ament-copyright \
+          ros-lyrical-ament-cmake-core \
+          ros-lyrical-ament-cmake-test \
+          ros-lyrical-ament-cmake-lint-cmake \
+          ros-lyrical-ament-cmake-copyright \
+          ros-lyrical-ament-cmake-cppcheck \
+          ros-lyrical-ament-cmake-cpplint \
+          ros-lyrical-ament-cmake-flake8 \
+          ros-lyrical-ament-cmake-pep257 \
+          ros-lyrical-ament-cmake-uncrustify \
+          ros-lyrical-ament-cmake-xmllint \
+          ros-lyrical-ament-lint-common \
           ros-lyrical-rosidl-default-generators \
           ros-lyrical-type-description-interfaces \
           ros-lyrical-test-msgs \

@@ -292,6 +292,11 @@ autoware_behavior_velocity_planner_common:
   add_host: ["cpp-expected"]
 autoware_behavior_velocity_stop_line_module:
   add_host: ["cpp-expected"]
+rmf_task_sequence:
+  # The vendor package's ament config does not load the imported validator
+  # target. Make the conda-forge CMake package directly available.
+  add_host: ["json_schema_validator"]
+  add_run: ["json_schema_validator"]
 rmw_implementation:
   # These backends are only used by the disabled test suite. Keeping them all
   # as host dependencies creates a bootstrap cycle during mutex migrations;
