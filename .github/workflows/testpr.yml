@@ -122,73 +122,23 @@ jobs:
       shell: bash -l {0}
       run: |
         set -e
+        # rattler-build orders build and host dependencies, but runtime-only
+        # dependencies do not create build-graph edges. A mutex migration makes
+        # old runtime packages unusable, so run tolerant passes to populate the
+        # new mutex generation before the final strict validation. This is more
+        # robust than maintaining a platform-dependent manual bootstrap list.
+        pass_count=2
         if [[ "${IGNORE_CACHE_AND_DO_FULL_REBUILD}" == "true" ]]; then
-          # Runtime-only dependencies are not part of rattler-build's build
-          # ordering. Build in tolerant passes so those packages are present
-          # under the new mutex before the final strict pass. Resetting only
-          # the Git source cache also works around intermittent incomplete tag
-          # objects when many packages share one ROS release repository.
-          for pass in 1 2 3 4; do
-            echo "Full rebuild pass ${pass}"
-            rm -rf ${{ matrix.folder_cache }}/../src_cache/git
-            pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --continue-on-failure --skip-existing
-          done
-          rm -rf ${{ matrix.folder_cache }}/../src_cache/git
+          pass_count=4
         fi
 
-        # Bootstrap packages that are hidden behind runtime-only dependency
-        # cycles before asking rattler-build to solve the complete recipe set.
-        for recipe in \
-          ros2-distro-mutex \
-          ros-lyrical-ros-environment \
-          ros-lyrical-ros-workspace \
-          ros-lyrical-ament-package \
-          ros-lyrical-ament-lint \
-          ros-lyrical-ament-flake8 \
-          ros-lyrical-ament-pep257 \
-          ros-lyrical-ament-copyright \
-          ros-lyrical-ament-xmllint \
-          ros-lyrical-ament-pycodestyle \
-          ros-lyrical-ament-cppcheck \
-          ros-lyrical-ament-cpplint \
-          ros-lyrical-uncrustify-vendor \
-          ros-lyrical-ament-uncrustify \
-          ros-lyrical-ament-cmake-core \
-          ros-lyrical-ament-cmake-python \
-          ros-lyrical-ament-cmake-test \
-          ros-lyrical-ament-lint-cmake \
-          ros-lyrical-ament-cmake-lint-cmake \
-          ros-lyrical-ament-cmake-copyright \
-          ros-lyrical-ament-cmake-cppcheck \
-          ros-lyrical-ament-cmake-cpplint \
-          ros-lyrical-ament-cmake-flake8 \
-          ros-lyrical-ament-cmake-pep257 \
-          ros-lyrical-ament-cmake-uncrustify \
-          ros-lyrical-ament-cmake-xmllint \
-          ros-lyrical-ament-lint-common \
-          ros-lyrical-service-msgs \
-          ros-lyrical-rosidl-default-generators \
-          ros-lyrical-type-description-interfaces \
-          ros-lyrical-test-msgs \
-          ros-lyrical-tracetools \
-          ros-lyrical-rmw-fastrtps-cpp \
-          ros-lyrical-rmw-implementation \
-          ros-lyrical-libstatistics-collector \
-          ros-lyrical-rmw-test-fixture \
-          ros-lyrical-rmw-test-fixture-implementation \
-          ros-lyrical-rcl \
-          ros-lyrical-rcl-action \
-          ros-lyrical-rcl-lifecycle \
-          ros-lyrical-rclcpp \
-          ros-lyrical-rclcpp-components \
-          ros-lyrical-rclcpp-lifecycle \
-          ros-lyrical-rclpy \
-          ros-lyrical-sensor-msgs \
-          ros-lyrical-image-transport \
-          ros-lyrical-zstd-image-transport; do
-          pixi run rattler-build build --recipe "recipes/${recipe}/recipe.yaml" --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
+        for pass in $(seq 1 "${pass_count}"); do
+          echo "Dependency-tolerant build pass ${pass}/${pass_count}"
+          rm -rf ${{ matrix.folder_cache }}/../src_cache/git
+          pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --continue-on-failure --skip-existing || true
         done
 
+        rm -rf ${{ matrix.folder_cache }}/../src_cache/git
         pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
 
     - name: See packages that will be saved in cache
