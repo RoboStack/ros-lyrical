@@ -1,13 +1,35 @@
+diff --git a/include/nav2_ros_common/node_utils.hpp b/include/nav2_ros_common/node_utils.hpp
+index 333c598..b029d52 100644
+--- a/include/nav2_ros_common/node_utils.hpp
++++ b/include/nav2_ros_common/node_utils.hpp
+@@ -35,7 +35,7 @@
+   #include <pthread.h>
+   #include <mach/mach.h>
+   #include <mach/thread_policy.h>
+-#else
++#elif !defined(_WIN32)
+   #include <sched.h>
+   #include <errno.h>
+ #endif
+@@ -377,6 +377,8 @@ inline void setSoftRealTimePriority()
+       std::to_string(result);
+     throw std::runtime_error(errmsg);
+   }
++#elif defined(_WIN32)
++  throw std::runtime_error("Soft real-time prioritization is not supported on Windows");
+ #else
+   // Linux: True real-time scheduling (requires privileges)
+   sched_param sch;
 diff --git a/include/nav2_ros_common/validate_messages.hpp b/include/nav2_ros_common/validate_messages.hpp
-index b8b9d2f..cd31f9a 100644
+index 7fd21e3..2f6050c 100644
 --- a/include/nav2_ros_common/validate_messages.hpp
 +++ b/include/nav2_ros_common/validate_messages.hpp
-@@ -82,10 +82,10 @@ bool validateMsg(const geometry_msgs::msg::Quaternion & msg)
+@@ -82,10 +82,10 @@ bool validateMsg(const std::array<double, N> & msg)
    return true;
  }
  
 -const int NSEC_PER_SEC = 1e9;  // 1 second = 1e9 nanosecond
-+constexpr int NANOSECONDS_PER_SECOND = 1e9;
++constexpr int NANOSECONDS_PER_SECOND = 1e9
  bool validateMsg(const builtin_interfaces::msg::Time & msg)
  {
 -  if (msg.nanosec >= NSEC_PER_SEC) {
