@@ -505,6 +505,8 @@ libqt6opengl6t64:
     linux: [qt6-main, libopengl-devel, libgl-devel]
     osx: [qt6-main]
     win64: [qt6-main]
+libqt6statemachine6:
+  robostack: [qt6-scxml]
 libqt6svg6:
   robostack:
     linux: [qt6-main, libopengl-devel, libgl-devel]
@@ -1094,6 +1096,8 @@ qt6-base-dev:
     linux: [qt6-main, libopengl-devel, libgl-devel]
     osx: [qt6-main]
     win64: [qt6-main]
+qt6-scxml-dev:
+  robostack: [qt6-scxml]
 qtbase5-dev:
   robostack:
     linux: [qt-main, libopengl-devel, libgl-devel]
