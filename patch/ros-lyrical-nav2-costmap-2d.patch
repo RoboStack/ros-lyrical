@@ -1,46 +1,66 @@
 diff --git a/include/nav2_costmap_2d/footprint_subscriber.hpp b/include/nav2_costmap_2d/footprint_subscriber.hpp
-index ef14eb6..e1255c2 100644
+index ef14eb6..f5e000d 100644
 --- a/include/nav2_costmap_2d/footprint_subscriber.hpp
 +++ b/include/nav2_costmap_2d/footprint_subscriber.hpp
-@@ -95,3 +95,3 @@ protected:
+@@ -95,3 +95,7 @@ protected:
    std::atomic_bool footprint_received_{false};
--  std::atomic<geometry_msgs::msg::PolygonStamped::ConstSharedPtr> footprint_;
++#ifdef __cpp_lib_atomic_shared_ptr
+   std::atomic<geometry_msgs::msg::PolygonStamped::ConstSharedPtr> footprint_;
++#else
 +  geometry_msgs::msg::PolygonStamped::ConstSharedPtr footprint_;
++#endif
    nav2::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr footprint_sub_;
 diff --git a/include/nav2_costmap_2d/layered_costmap.hpp b/include/nav2_costmap_2d/layered_costmap.hpp
-index 6c59c16..89a5491 100644
+index 6c59c16..65515ad 100644
 --- a/include/nav2_costmap_2d/layered_costmap.hpp
 +++ b/include/nav2_costmap_2d/layered_costmap.hpp
-@@ -192,3 +192,3 @@ public:
+@@ -192,3 +192,7 @@ public:
    {
--    return *footprint_.load();
++#ifdef __cpp_lib_atomic_shared_ptr
+     return *footprint_.load();
++#else
 +    return *std::atomic_load(&footprint_);
++#endif
    }
-@@ -233,3 +233,3 @@ private:
+@@ -233,3 +237,7 @@ private:
    std::atomic<double> circumscribed_radius_, inscribed_radius_;
--  std::atomic<std::shared_ptr<std::vector<geometry_msgs::msg::Point>>> footprint_;
++#ifdef __cpp_lib_atomic_shared_ptr
+   std::atomic<std::shared_ptr<std::vector<geometry_msgs::msg::Point>>> footprint_;
++#else
 +  std::shared_ptr<std::vector<geometry_msgs::msg::Point>> footprint_;
++#endif
  };
 diff --git a/src/footprint_subscriber.cpp b/src/footprint_subscriber.cpp
-index d1eedef..95b03a2 100644
+index d1eedef..1168cc9 100644
 --- a/src/footprint_subscriber.cpp
 +++ b/src/footprint_subscriber.cpp
-@@ -33,3 +33,3 @@ FootprintSubscriber::getFootprintRaw(
+@@ -33,3 +33,7 @@ FootprintSubscriber::getFootprintRaw(
  
--  auto current_footprint = footprint_.load();
++#ifdef __cpp_lib_atomic_shared_ptr
+   auto current_footprint = footprint_.load();
++#else
 +  auto current_footprint = std::atomic_load(&footprint_);
++#endif
    if (!current_footprint) {
-@@ -79,3 +79,3 @@ FootprintSubscriber::footprint_callback(
+@@ -79,3 +83,7 @@ FootprintSubscriber::footprint_callback(
  {
--  footprint_.store(msg);
++#ifdef __cpp_lib_atomic_shared_ptr
+   footprint_.store(msg);
++#else
 +  std::atomic_store(&footprint_, msg);
++#endif
    if (!footprint_received_.load()) {
 diff --git a/src/layered_costmap.cpp b/src/layered_costmap.cpp
-index cd42f85..b74559a 100644
+index cd42f85..99248ae 100644
 --- a/src/layered_costmap.cpp
 +++ b/src/layered_costmap.cpp
-@@ -303,3 +303,3 @@ void LayeredCostmap::setFootprint(const std::vector<geometry_msgs::msg::Point> &
+@@ -303,4 +303,8 @@ void LayeredCostmap::setFootprint(const std::vector<geometry_msgs::msg::Point> &
    // and not otherwise locked
 -  footprint_.store(
++#ifdef __cpp_lib_atomic_shared_ptr
++  footprint_.store(std::make_shared<std::vector<geometry_msgs::msg::Point>>(footprint_spec));
++#else
 +  std::atomic_store(&footprint_,
      std::make_shared<std::vector<geometry_msgs::msg::Point>>(footprint_spec));
++#endif
+   inscribed_radius_.store(std::get<0>(inside_outside));
