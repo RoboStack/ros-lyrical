@@ -839,6 +839,10 @@ controller_manager_msgs:
   tag: release/lyrical/controller_manager_msgs/6.7.1-1
   url: https://github.com/ros2-gbp/ros2_control-release.git
   version: 6.7.1
+costmap_queue:
+  tag: release/lyrical/costmap_queue/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
 cras_bag_tools:
   tag: release/lyrical/cras_bag_tools/3.0.2-3
   url: https://github.com/ros2-gbp/cras_ros_utils-release.git
@@ -1091,6 +1095,22 @@ dummy_sensors:
   tag: release/lyrical/dummy_sensors/0.37.8-3
   url: https://github.com/ros2-gbp/demos-release.git
   version: 0.37.8
+dwb_core:
+  tag: release/lyrical/dwb_core/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+dwb_critics:
+  tag: release/lyrical/dwb_critics/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+dwb_msgs:
+  tag: release/lyrical/dwb_msgs/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+dwb_plugins:
+  tag: release/lyrical/dwb_plugins/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
 dynamixel_hardware:
   tag: release/lyrical/dynamixel_hardware/0.6.0-3
   url: https://github.com/ros2-gbp/dynamixel_hardware-release.git
@@ -3107,6 +3127,70 @@ nao_sensor_msgs:
   tag: release/lyrical/nao_sensor_msgs/1.0.0-4
   url: https://github.com/ros2-gbp/nao_interfaces-release.git
   version: 1.0.0
+nav2_amcl:
+  tag: release/lyrical/nav2_amcl/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_behavior_tree:
+  tag: release/lyrical/nav2_behavior_tree/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_behaviors:
+  tag: release/lyrical/nav2_behaviors/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_bringup:
+  tag: release/lyrical/nav2_bringup/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_bt_navigator:
+  tag: release/lyrical/nav2_bt_navigator/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_collision_monitor:
+  tag: release/lyrical/nav2_collision_monitor/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_common:
+  tag: release/lyrical/nav2_common/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_constrained_smoother:
+  tag: release/lyrical/nav2_constrained_smoother/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_controller:
+  tag: release/lyrical/nav2_controller/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_core:
+  tag: release/lyrical/nav2_core/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_costmap_2d:
+  tag: release/lyrical/nav2_costmap_2d/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_dwb_controller:
+  tag: release/lyrical/nav2_dwb_controller/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_graceful_controller:
+  tag: release/lyrical/nav2_graceful_controller/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_lifecycle_manager:
+  tag: release/lyrical/nav2_lifecycle_manager/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_loopback_sim:
+  tag: release/lyrical/nav2_loopback_sim/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_map_server:
+  tag: release/lyrical/nav2_map_server/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
 nav2_minimal_tb3_sim:
   tag: release/lyrical/nav2_minimal_tb3_sim/1.2.0-3
   url: https://github.com/ros2-gbp/nav2_minimal_turtlebot_simulation-release.git
@@ -3119,10 +3203,94 @@ nav2_minimal_tb4_sim:
   tag: release/lyrical/nav2_minimal_tb4_sim/1.2.0-3
   url: https://github.com/ros2-gbp/nav2_minimal_turtlebot_simulation-release.git
   version: 1.2.0
+nav2_mppi_controller:
+  tag: release/lyrical/nav2_mppi_controller/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_msgs:
+  tag: release/lyrical/nav2_msgs/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_navfn_planner:
+  tag: release/lyrical/nav2_navfn_planner/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_planner:
+  tag: release/lyrical/nav2_planner/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_regulated_pure_pursuit_controller:
+  tag: release/lyrical/nav2_regulated_pure_pursuit_controller/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_ros_common:
+  tag: release/lyrical/nav2_ros_common/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_rotation_shim_controller:
+  tag: release/lyrical/nav2_rotation_shim_controller/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_route:
+  tag: release/lyrical/nav2_route/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_rviz_plugins:
+  tag: release/lyrical/nav2_rviz_plugins/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_simple_commander:
+  tag: release/lyrical/nav2_simple_commander/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_smac_planner:
+  tag: release/lyrical/nav2_smac_planner/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_smoother:
+  tag: release/lyrical/nav2_smoother/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_system_tests:
+  tag: release/lyrical/nav2_system_tests/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_theta_star_planner:
+  tag: release/lyrical/nav2_theta_star_planner/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_util:
+  tag: release/lyrical/nav2_util/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_velocity_smoother:
+  tag: release/lyrical/nav2_velocity_smoother/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_voxel_grid:
+  tag: release/lyrical/nav2_voxel_grid/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav2_waypoint_follower:
+  tag: release/lyrical/nav2_waypoint_follower/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav_2d_msgs:
+  tag: release/lyrical/nav_2d_msgs/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+nav_2d_utils:
+  tag: release/lyrical/nav_2d_utils/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
 nav_msgs:
   tag: release/lyrical/nav_msgs/5.9.2-3
   url: https://github.com/ros2-gbp/common_interfaces-release.git
   version: 5.9.2
+navigation2:
+  tag: release/lyrical/navigation2/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
 neobotix_usboard_msgs:
   tag: release/lyrical/neobotix_usboard_msgs/4.0.0-5
   url: https://github.com/ros2-gbp/astuff_sensor_msgs-release.git
@@ -3331,6 +3499,22 @@ openeb_vendor:
   tag: release/lyrical/openeb_vendor/2.0.3-1
   url: https://github.com/ros2-gbp/openeb_vendor-release.git
   version: 2.0.3
+opennav_docking:
+  tag: release/lyrical/opennav_docking/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+opennav_docking_bt:
+  tag: release/lyrical/opennav_docking_bt/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+opennav_docking_core:
+  tag: release/lyrical/opennav_docking_core/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
+opennav_following:
+  tag: release/lyrical/opennav_following/1.5.0-1
+  url: https://github.com/ros2-gbp/navigation2-release.git
+  version: 1.5.0
 openni2_camera:
   tag: release/lyrical/openni2_camera/2.3.0-3
   url: https://github.com/ros2-gbp/openni2_camera-release.git
@@ -5151,6 +5335,10 @@ simulation_interfaces:
   tag: release/lyrical/simulation_interfaces/2.1.0-3
   url: https://github.com/ros2-gbp/simulation_interfaces-release.git
   version: 2.1.0
+slam_toolbox:
+  tag: release/lyrical/slam_toolbox/2.10.0-2
+  url: https://github.com/SteveMacenski/slam_toolbox-release.git
+  version: 2.10.0
 slg_msgs:
   tag: release/lyrical/slg_msgs/3.9.1-3
   url: https://github.com/ros2-gbp/slg_msgs-release.git
