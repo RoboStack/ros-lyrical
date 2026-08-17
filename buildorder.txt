@@ -1,0 +1,2 @@
+ros-lyrical-libg2o
+ros-lyrical-rtabmap
