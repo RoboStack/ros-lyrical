@@ -148,6 +148,7 @@ packages_select_by_deps:
   - rmw_zenoh_cpp  # requested in https://github.com/RoboStack/ros-humble/issues/252
   - robot
   - robot-localization
+  - rtabmap
   - ros2_control
   - ros2_controllers
   - ros2_fmt_logger

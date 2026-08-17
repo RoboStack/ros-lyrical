@@ -1,0 +1,50 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b7d36de..44e1164 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -530,8 +530,12 @@ IF(WITH_G2O)
+ ENDIF(WITH_G2O)
+ 
+ IF(WITH_GTSAM)
+-    # Force config mode to ignore PCL's findGTSAM.cmake file
++    # GTSAM's config searches for Eigen. Prefer Eigen's config so RTAB-Map's
++    # legacy FindEigen3 module does not try to parse Eigen 5 headers.
++    SET(_RTABMAP_CMAKE_FIND_PACKAGE_PREFER_CONFIG ${CMAKE_FIND_PACKAGE_PREFER_CONFIG})
++    SET(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
+     FIND_PACKAGE(GTSAM CONFIG QUIET)
++    SET(CMAKE_FIND_PACKAGE_PREFER_CONFIG ${_RTABMAP_CMAKE_FIND_PACKAGE_PREFER_CONFIG})
+ ENDIF(WITH_GTSAM)
+ 
+ IF(WITH_MRPT)
+@@ -578,7 +582,7 @@ ENDIF(WITH_POINTMATCHER)
+ IF(libpointmatcher_FOUND OR GTSAM_FOUND)
+-    find_package(Boost COMPONENTS thread filesystem system program_options date_time REQUIRED)
++    find_package(Boost COMPONENTS thread filesystem program_options date_time REQUIRED)
+     IF(Boost_MINOR_VERSION GREATER 47)
+-        find_package(Boost COMPONENTS thread filesystem system program_options date_time chrono timer serialization REQUIRED)
++        find_package(Boost COMPONENTS thread filesystem program_options date_time chrono timer serialization REQUIRED)
+     ENDIF(Boost_MINOR_VERSION GREATER 47)
+     IF(WIN32)
+         MESSAGE(STATUS "Boost_LIBRARY_DIRS=${Boost_LIBRARY_DIRS}")
+@@ -112,5 +116,9 @@ if(MSVC)
+     endif()
+   endif()
+   add_compile_options("/bigobj")
++  # GUI entry points use CoInitialize(). Force the COM declarations while
++  # ensuring the modern Winsock header precedes windows.h in every source.
++  add_compile_options("/FIwinsock2.h")
++  add_compile_options("/FIobjbase.h")
+ endif()
+ 
+ # Detect CPU arch and whether we are in 32 or 64 bit
+diff --git a/corelib/src/CMakeLists.txt b/corelib/src/CMakeLists.txt
+index b758ad0..3f29cba 100644
+--- a/corelib/src/CMakeLists.txt
++++ b/corelib/src/CMakeLists.txt
+@@ -855,0 +856,6 @@ ADD_LIBRARY(rtabmap::core ALIAS rtabmap_core)
++# GTSAM and this target both instantiate an identical inline TBB allocator
++# vector accessor on MSVC. Let the linker coalesce that duplicate definition.
++IF(MSVC)
++  TARGET_LINK_OPTIONS(rtabmap_core PRIVATE "/FORCE:MULTIPLE")
++ENDIF(MSVC)
++
