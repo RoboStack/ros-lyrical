@@ -87,6 +87,42 @@ mrpt2:
   add_host:  ["assimp", "octomap", "tinyxml2", "libboost-devel", "jsoncpp", "gtest", "libboost-python-devel", "libdc1394", "xorg-libxcomposite", "libftdi", "ros-lyrical-octomap"]
   add_run:   ["assimp", "octomap", "tinyxml2", "libboost-devel", "jsoncpp", "gtest", "libboost-python-devel", "libdc1394", "xorg-libxcomposite", "libftdi", "ros-lyrical-octomap"]
   add_build: ["${{ cdt('libxcomposite-devel') if linux }}"]
+mola_launcher:
+  add_host: ["ros-lyrical-mrpt-libtclap"]
+  add_run: ["ros-lyrical-mrpt-libtclap"]
+mp2p_icp:
+  add_host: ["ros-lyrical-mola-common", "ros-lyrical-mola-imu-preintegration", "ros-lyrical-mrpt-libbase", "ros-lyrical-mrpt-libgui", "ros-lyrical-mrpt-libtclap", "ros-lyrical-mrpt-libmaps", "ros-lyrical-mrpt-libobs", "ros-lyrical-mrpt-libposes", "tbb"]
+  add_run: ["ros-lyrical-mola-common", "ros-lyrical-mola-imu-preintegration", "ros-lyrical-mrpt-libbase", "ros-lyrical-mrpt-libgui", "ros-lyrical-mrpt-libtclap", "ros-lyrical-mrpt-libmaps", "ros-lyrical-mrpt-libobs", "ros-lyrical-mrpt-libposes", "tbb"]
+# XSens support is disabled in these split MRPT builds. Avoid pulling libudev
+# (and a systemd build requiring a newer glibc than the ROS sysroot) into them.
+mrpt_libbase:
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  remove_host: ["libudev"]
+mrpt_libhwdrivers:
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  remove_host: ["libudev"]
+mrpt_libgui:
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  remove_host: ["libudev"]
+mrpt_libmaps:
+  add_host: ["octomap", "${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  add_run: ["octomap"]
+  remove_host: ["libudev"]
+mrpt_libmath:
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  remove_host: ["libudev"]
+mrpt_libobs:
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  remove_host: ["libudev"]
+mrpt_libopengl:
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  remove_host: ["libudev"]
+mrpt_libposes:
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  remove_host: ["libudev"]
+mrpt_libslam:
+  add_host: ["${{ 'libsystemd0 <258' if linux }}", "${{ 'libudev1 <258' if linux }}"]
+  remove_host: ["libudev"]
 ros1_rosbag_storage_vendor:
   add_host: ["ros-noetic-roscpp", "ros-noetic-roslz4", "ros-noetic-rostest"]
   add_run: ["ros-noetic-roscpp", "ros-noetic-roslz4"]

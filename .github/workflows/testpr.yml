@@ -103,7 +103,11 @@ jobs:
     - name: Delete specific outdated cache entries
       shell: bash -l {0}
       run: |
-        # rm -rf ${{ matrix.folder_cache }}/ros-lyrical-pcl-conversions* 2>/dev/null || true
+        # Rebuild the split MRPT libraries on Linux so their run exports use
+        # the glibc-2.28-compatible libudev pin.
+        if [[ "${{ matrix.platform }}" == linux-* ]]; then
+          rm -rf ${{ matrix.folder_cache }}/ros-lyrical-mrpt-* 2>/dev/null || true
+        fi
         mkdir -p ${{ matrix.folder_cache }}
         pixi run rattler-index fs ${{ matrix.folder_cache }}/.. --force
 

@@ -197,6 +197,8 @@ packages_select_by_deps:
       - camera_ros  # Depends on libcamera that is only available on linux
       - livox_ros_driver2
       - mavros
+      - mola
+      - mrpt_libtclap
       - py_binding_tools
       - rmf_demos
       - swri_serial_util  # Serial communication only implemented for linux

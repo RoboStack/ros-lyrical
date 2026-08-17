@@ -1,0 +1,12 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1249e6e..1154834 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -50,6 +50,7 @@ ExternalProject_Add(
+     # Main settings:
+     -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
++    "-DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}"
+     # Disabled stuff:
+     -DDISABLE_JSONCPP=ON
+     -DMRPT_INSTALL_EXAMPLES=OFF
