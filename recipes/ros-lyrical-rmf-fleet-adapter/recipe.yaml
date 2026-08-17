@@ -1,0 +1,135 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/prefix-dev/recipe-format/main/schema.json
+
+package:
+  name: ros-lyrical-rmf-fleet-adapter
+  version: 2.12.0
+source:
+  git: https://github.com/ros2-gbp/rmf_ros2-release.git
+  tag: release/lyrical/rmf_fleet_adapter/2.12.0-3
+  target_directory: ros-lyrical-rmf-fleet-adapter/src/work
+  patches:
+    - patch/ros-lyrical-rmf-fleet-adapter.patch
+
+build:
+  script: ${{ '$RECIPE_DIR/build_ament_cmake.sh' if unix or wasm32 else '%RECIPE_DIR%\\bld_ament_cmake.bat' }}
+  number: 22
+  post_process:
+    - files:
+        - '*.pc'
+      regex: (?:-L|-I)?"?([^;\s]+/sysroot/)
+      replacement: $$(CONDA_BUILD_SYSROOT_S)
+    - files:
+        - '*.cmake'
+      regex: ([^;\s"]+/sysroot)
+      replacement: $$ENV{CONDA_BUILD_SYSROOT}
+    - files:
+        - '*.cmake'
+      regex: ([^;\s"]+/MacOSX\d*\.?\d*\.sdk)
+      replacement: $$ENV{CONDA_BUILD_SYSROOT}
+about:
+  license: Apache-2.0
+  summary: Fleet Adapter package for RMF fleets.
+extra:
+  recipe-maintainers:
+    - ros-forge
+
+requirements:
+  build:
+    - ${{ compiler('cxx') }}
+    - ${{ compiler('c') }}
+    - if: target_platform!='emscripten-wasm32'
+      then:
+        - ${{ stdlib('c') }}
+    - ninja
+    - python
+    - setuptools
+    - git
+    - git-lfs
+    - if: unix
+      then:
+        - patch
+        - make
+        - coreutils
+    - if: win
+      then:
+        - m2-patch
+    - if: osx
+      then:
+        - tapi
+    - if: build_platform != target_platform
+      then:
+        - pkg-config
+    - cmake
+    - cython
+    - if: build_platform != target_platform
+      then:
+        - python
+        - cross-python_${{ target_platform }}
+        - numpy
+  host:
+    - if: build_platform == target_platform
+      then:
+        - pkg-config
+    - eigen-abi-devel
+    - nlohmann_json
+    - numpy
+    - pip
+    - python
+    - ros-lyrical-ament-cmake
+    - ros-lyrical-ament-cmake-catch2
+    - ros-lyrical-ament-cmake-uncrustify
+    - ros-lyrical-backward-ros
+    - ros-lyrical-nlohmann-json-schema-validator-vendor
+    - ros-lyrical-rclcpp
+    - ros-lyrical-rclcpp-action
+    - ros-lyrical-rclcpp-components
+    - ros-lyrical-rmf-api-msgs
+    - ros-lyrical-rmf-battery
+    - ros-lyrical-rmf-building-map-msgs
+    - ros-lyrical-rmf-dispenser-msgs
+    - ros-lyrical-rmf-door-msgs
+    - ros-lyrical-rmf-fleet-msgs
+    - ros-lyrical-rmf-ingestor-msgs
+    - ros-lyrical-rmf-lift-msgs
+    - ros-lyrical-rmf-reservation-msgs
+    - ros-lyrical-rmf-task
+    - ros-lyrical-rmf-task-msgs
+    - ros-lyrical-rmf-task-ros2
+    - ros-lyrical-rmf-task-sequence
+    - ros-lyrical-rmf-traffic
+    - ros-lyrical-rmf-traffic-ros2
+    - ros-lyrical-rmf-utils
+    - ros-lyrical-rmf-websocket
+    - ros-lyrical-ros-environment
+    - ros-lyrical-ros-workspace
+    - ros-lyrical-std-msgs
+    - ros2-distro-mutex 0.18.* lyrical_*
+    - yaml-cpp
+  run:
+    - nlohmann_json
+    - python
+    - ros-lyrical-backward-ros
+    - ros-lyrical-nlohmann-json-schema-validator-vendor
+    - ros-lyrical-rclcpp
+    - ros-lyrical-rclcpp-action
+    - ros-lyrical-rclcpp-components
+    - ros-lyrical-rmf-api-msgs
+    - ros-lyrical-rmf-battery
+    - ros-lyrical-rmf-building-map-msgs
+    - ros-lyrical-rmf-dispenser-msgs
+    - ros-lyrical-rmf-door-msgs
+    - ros-lyrical-rmf-fleet-msgs
+    - ros-lyrical-rmf-ingestor-msgs
+    - ros-lyrical-rmf-lift-msgs
+    - ros-lyrical-rmf-reservation-msgs
+    - ros-lyrical-rmf-task
+    - ros-lyrical-rmf-task-msgs
+    - ros-lyrical-rmf-task-ros2
+    - ros-lyrical-rmf-task-sequence
+    - ros-lyrical-rmf-traffic
+    - ros-lyrical-rmf-traffic-ros2
+    - ros-lyrical-rmf-utils
+    - ros-lyrical-rmf-websocket
+    - ros-lyrical-ros-workspace
+    - ros-lyrical-std-msgs
+    - ros2-distro-mutex 0.18.* lyrical_*

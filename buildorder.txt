@@ -1,0 +1,14 @@
+ros-lyrical-rmf-task
+ros-lyrical-rmf-task-ros2
+ros-lyrical-rmf-visualization-schedule
+ros-lyrical-rmf-visualization-rviz2-plugins
+ros-lyrical-rmf-visualization-navgraphs
+ros-lyrical-libg2o
+ros-lyrical-rmf-task-sequence
+ros-lyrical-rmf-visualization
+ros-lyrical-rtabmap
+ros-lyrical-rmf-fleet-adapter
+ros-lyrical-rmf-fleet-adapter-python
+ros-lyrical-rmf-reservation-node
+ros-lyrical-rmf-demos-fleet-adapter
+ros-lyrical-rmf-demos

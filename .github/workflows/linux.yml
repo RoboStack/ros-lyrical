@@ -1,0 +1,104 @@
+jobs:
+  stage_0_job_0:
+    name: rmf-task rmf-task-ros2 rmf-visualization-schedule rmf-visualization-rviz2-plugins
+      rmf-visualization-navgraphs
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: Build ros-lyrical-rmf-task ros-lyrical-rmf-task-ros2 ros-lyrical-rmf-visualization-schedule
+        ros-lyrical-rmf-visualization-rviz2-plugins ros-lyrical-rmf-visualization-navgraphs
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-rmf-task ros-lyrical-rmf-task-ros2 ros-lyrical-rmf-visualization-schedule
+          ros-lyrical-rmf-visualization-rviz2-plugins ros-lyrical-rmf-visualization-navgraphs
+        BUILD_TARGET: ''
+      run: |
+        export CI=azure
+        export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
+        export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_0_job_1:
+    name: libg2o
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: Build ros-lyrical-libg2o
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-libg2o
+        BUILD_TARGET: ''
+      run: |
+        export CI=azure
+        export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
+        export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_2:
+    name: rmf-task-sequence rmf-visualization rtabmap rmf-fleet-adapter
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    - stage_0_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: Build ros-lyrical-rmf-task-sequence ros-lyrical-rmf-visualization ros-lyrical-rtabmap
+        ros-lyrical-rmf-fleet-adapter
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-rmf-task-sequence ros-lyrical-rmf-visualization
+          ros-lyrical-rtabmap ros-lyrical-rmf-fleet-adapter
+        BUILD_TARGET: ''
+      run: |
+        export CI=azure
+        export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
+        export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_3:
+    name: rmf-fleet-adapter-python rmf-reservation-node rmf-demos-fleet-adapter rmf-demos
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_2
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+    - name: Build ros-lyrical-rmf-fleet-adapter-python ros-lyrical-rmf-reservation-node
+        ros-lyrical-rmf-demos-fleet-adapter ros-lyrical-rmf-demos
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-rmf-fleet-adapter-python ros-lyrical-rmf-reservation-node
+          ros-lyrical-rmf-demos-fleet-adapter ros-lyrical-rmf-demos
+        BUILD_TARGET: ''
+      run: |
+        export CI=azure
+        export GIT_BRANCH=$BUILD_SOURCEBRANCHNAME
+        export FEEDSTOCK_NAME=$(basename ${BUILD_REPOSITORY_NAME})
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+name: build_linux64
+on:
+  push:
+    branches:
+    - buildbranch_linux

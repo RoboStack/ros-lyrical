@@ -1,0 +1,21 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0588eea..4be6f59 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -86,6 +86,7 @@ add_library(rmf_fleet_adapter SHARED
+ 
+ target_link_libraries(rmf_fleet_adapter
+   PUBLIC
++    Eigen3::Eigen
+     rclcpp::rclcpp
+     rclcpp_action::rclcpp_action
+     rmf_battery::rmf_battery
+@@ -492,7 +493,7 @@ rmf_api_generate_schema_headers(
+ # -----------------------------------------------------------------------------
+ 
+ ament_export_targets(export_rmf_fleet_adapter HAS_LIBRARY_TARGET)
+-ament_export_dependencies(${dep_pkgs})
++ament_export_dependencies(${dep_pkgs} Eigen3)
+ 
+ # Install the libraries
+ install(
