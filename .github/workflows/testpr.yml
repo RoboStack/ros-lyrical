@@ -75,8 +75,20 @@ jobs:
     - name: Generate recipes
       shell: bash -l {0}
       run: |
-        mkdir -p recipes
-        pixi run -v vinca --platform ${{ matrix.platform }} -m -n
+        set -e
+        for attempt in 1 2 3; do
+          rm -rf recipes
+          mkdir -p recipes
+          if pixi run -v vinca --platform ${{ matrix.platform }} -m -n; then
+            break
+          fi
+          if [[ "${attempt}" == "3" ]]; then
+            echo "Recipe generation failed after ${attempt} attempts" >&2
+            exit 1
+          fi
+          echo "Recipe generation attempt ${attempt} failed; retrying..." >&2
+          sleep 15
+        done
         # Avoid concurrent Git clone cache corruption when many ROS packages
         # share the same release repository.
         pixi run python use_github_source_archives.py
@@ -165,7 +177,18 @@ jobs:
     - name: Generate GitHub Actions workflows to catch post-PR problems
       shell: bash -l {0}
       run: |
-        pixi run vinca-gha --platform ${{ matrix.platform }} --trigger-branch dummy_build_branch_as_it_is_unused -d ./recipes
+        set -e
+        for attempt in 1 2 3; do
+          if pixi run vinca-gha --platform ${{ matrix.platform }} --trigger-branch dummy_build_branch_as_it_is_unused -d ./recipes; then
+            break
+          fi
+          if [[ "${attempt}" == "3" ]]; then
+            echo "Workflow generation failed after ${attempt} attempts" >&2
+            exit 1
+          fi
+          echo "Workflow generation attempt ${attempt} failed; retrying..." >&2
+          sleep 15
+        done
 
     - name: Upload build cache as artifact
       if: ${{ always() && env.SAVE_CACHE_AS_ARTIFACT == 'true' }}
