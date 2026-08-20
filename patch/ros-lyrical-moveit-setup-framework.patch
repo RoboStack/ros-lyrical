@@ -1,9 +1,9 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3e3d417fb..fc6d922c4 100644
+index f6b1ea7..144ef1f 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -11,9 +11,17 @@ find_package(ament_index_cpp REQUIRED)
- find_package(fmt REQUIRED)
+@@ -25,6 +25,16 @@ else()
+ endif()
  find_package(moveit_core REQUIRED)
  find_package(moveit_ros_planning REQUIRED)
 +# Find Qt before packages that transitively depend on it (rviz, visualization)
@@ -17,81 +17,9 @@ index 3e3d417fb..fc6d922c4 100644
 +  set(QT_WIDGETS Qt6::Widgets)
 +endif()
  find_package(moveit_ros_visualization REQUIRED)
--find_package(Qt5Core REQUIRED)
--find_package(Qt5Widgets REQUIRED)
  find_package(pluginlib REQUIRED)
  find_package(rclcpp REQUIRED)
- find_package(rviz_common REQUIRED)
-@@ -23,12 +31,21 @@ find_package(urdf REQUIRED)
- 
- set(CMAKE_INCLUDE_CURRENT_DIR ON)
- 
--qt5_wrap_cpp(
--  MOC_FILES
--  include/moveit_setup_framework/qt/helper_widgets.hpp
--  include/moveit_setup_framework/qt/setup_step_widget.hpp
--  include/moveit_setup_framework/qt/rviz_panel.hpp
--  include/moveit_setup_framework/qt/double_list_widget.hpp)
-+if(NOT Qt6_FOUND)
-+  qt5_wrap_cpp(
-+    MOC_FILES
-+    include/moveit_setup_framework/qt/helper_widgets.hpp
-+    include/moveit_setup_framework/qt/setup_step_widget.hpp
-+    include/moveit_setup_framework/qt/rviz_panel.hpp
-+    include/moveit_setup_framework/qt/double_list_widget.hpp)
-+else()
-+  qt6_wrap_cpp(
-+    MOC_FILES
-+    include/moveit_setup_framework/qt/helper_widgets.hpp
-+    include/moveit_setup_framework/qt/setup_step_widget.hpp
-+    include/moveit_setup_framework/qt/rviz_panel.hpp
-+    include/moveit_setup_framework/qt/double_list_widget.hpp)
-+endif()
- 
- add_library(
-   moveit_setup_framework
-@@ -43,30 +60,35 @@ add_library(
-   src/utilities.cpp
-   src/xml_syntax_highlighter.cpp
-   ${MOC_FILES})
-+
-+include(GenerateExportHeader)
-+generate_export_header(${PROJECT_NAME})
- target_include_directories(
-   moveit_setup_framework
-   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-          $<INSTALL_INTERFACE:include/moveit_setup_framework>)
--ament_target_dependencies(
-+target_link_libraries(
-   moveit_setup_framework
--  ament_index_cpp
--  moveit_core
--  moveit_ros_planning
--  moveit_ros_visualization
--  pluginlib
--  Qt5Core
--  Qt5Widgets
--  rclcpp
--  rviz_common
--  rviz_rendering
--  srdfdom
--  urdf)
-+  PUBLIC ament_index_cpp::ament_index_cpp
-+         fmt::fmt
-+         moveit_core::moveit_core
-+         moveit_ros_planning::moveit_ros_planning
-+         moveit_ros_visualization::moveit_ros_visualization
-+         pluginlib::pluginlib
-+         ${QT_CORE}
-+         ${QT_WIDGETS}
-+         rclcpp::rclcpp
-+         rviz_common::rviz_common
-+         rviz_rendering::rviz_rendering
-+         srdfdom::srdfdom
-+         urdf::urdf)
- 
- install(DIRECTORY include/ DESTINATION include/moveit_setup_framework)
- install(FILES moveit_setup_framework_plugins.xml
+@@ -77,6 +87,7 @@ install(FILES moveit_setup_framework_plugins.xml
          DESTINATION share/moveit_setup_framework)
  
  install(DIRECTORY templates DESTINATION share/moveit_setup_framework)
@@ -100,7 +28,7 @@ index 3e3d417fb..fc6d922c4 100644
  ament_export_targets(moveit_setup_frameworkTargets HAS_LIBRARY_TARGET)
  install(
 diff --git a/include/moveit_setup_framework/qt/setup_step_widget.hpp b/include/moveit_setup_framework/qt/setup_step_widget.hpp
-index f32e7b5ad..c6f472682 100644
+index f32e7b5..c6f4726 100644
 --- a/include/moveit_setup_framework/qt/setup_step_widget.hpp
 +++ b/include/moveit_setup_framework/qt/setup_step_widget.hpp
 @@ -40,12 +40,14 @@
@@ -119,29 +47,8 @@ index f32e7b5ad..c6f472682 100644
  {
    Q_OBJECT
  public:
-diff --git a/include/moveit_setup_framework/qt/xml_syntax_highlighter.hpp b/include/moveit_setup_framework/qt/xml_syntax_highlighter.hpp
-index 5a5fbdd29..aea5aa8cc 100644
---- a/include/moveit_setup_framework/qt/xml_syntax_highlighter.hpp
-+++ b/include/moveit_setup_framework/qt/xml_syntax_highlighter.hpp
-@@ -38,6 +38,7 @@
- 
- #include <QtGui/QSyntaxHighlighter>
- #include <QRegularExpression>
-+#include <QStringView>
- #include <map>
- 
- namespace moveit_setup
-@@ -63,7 +64,7 @@ private:
-   using Rules = std::map<int, Rule>;
-   Rules rules_;
- 
--  Rules::const_iterator highlight(Rules::const_iterator active, QStringRef text, int start, bool search_end, int& end);
-+  Rules::const_iterator highlight(Rules::const_iterator active, QStringView text, int start, bool search_end, int& end);
- };
- 
- }  // namespace moveit_setup
 diff --git a/include/moveit_setup_framework/templates.hpp b/include/moveit_setup_framework/templates.hpp
-index 1555eee16..b02d52024 100644
+index 1555eee..b02d520 100644
 --- a/include/moveit_setup_framework/templates.hpp
 +++ b/include/moveit_setup_framework/templates.hpp
 @@ -38,6 +38,8 @@
@@ -162,59 +69,3 @@ index 1555eee16..b02d52024 100644
  };
  
  }  // namespace moveit_setup
-diff --git a/include/moveit_setup_framework/utilities.hpp b/include/moveit_setup_framework/utilities.hpp
-index ace3237c6..b7ba031fd 100644
---- a/include/moveit_setup_framework/utilities.hpp
-+++ b/include/moveit_setup_framework/utilities.hpp
-@@ -37,7 +37,7 @@
- #pragma once
- 
- #include <ament_index_cpp/get_package_prefix.hpp>
--#include <ament_index_cpp/get_package_share_directory.hpp>
-+#include <ament_index_cpp/get_package_share_path.hpp>
- #include <filesystem>
- #include <string>
- #include <tinyxml2.h>
-@@ -52,7 +52,7 @@ inline std::filesystem::path getSharePath(const std::string& package_name)
- {
-   try
-   {
--    return std::filesystem::path(ament_index_cpp::get_package_share_directory(package_name));
-+    return ament_index_cpp::get_package_share_path(package_name);
-   }
-   catch (const std::runtime_error& e)
-   {
-diff --git a/src/urdf_config.cpp b/src/urdf_config.cpp
-index eab682326..5d17cec95 100644
---- a/src/urdf_config.cpp
-+++ b/src/urdf_config.cpp
-@@ -36,6 +36,7 @@
- #include <moveit_setup_framework/utilities.hpp>
- #include <moveit/rdf_loader/rdf_loader.hpp>
- #include <fmt/format.h>
-+#include <fmt/ranges.h>
- 
- namespace moveit_setup
- {
-diff --git a/src/xml_syntax_highlighter.cpp b/src/xml_syntax_highlighter.cpp
-index 1733943ce..53203b1ef 100644
---- a/src/xml_syntax_highlighter.cpp
-+++ b/src/xml_syntax_highlighter.cpp
-@@ -64,7 +64,7 @@ void XmlSyntaxHighlighter::addTag(const QString& tag, const QTextCharFormat& for
- }
- 
- XmlSyntaxHighlighter::Rules::const_iterator
--XmlSyntaxHighlighter::highlight(Rules::const_iterator active, QStringRef text, int start, bool search_end, int& end)
-+XmlSyntaxHighlighter::highlight(Rules::const_iterator active, QStringView text, int start, bool search_end, int& end)
- {
-   int offset = end;    // when passed, end indicates the end of the opening expression
-   auto next = active;  // return value: active rule at end of text
-@@ -121,7 +121,7 @@ void XmlSyntaxHighlighter::highlightBlock(const QString& text)
- {
-   Rules::const_iterator active = previousBlockState() < 0 ? rules_.end() : rules_.find(previousBlockState());
-   int unused = 0;
--  active = highlight(active, QStringRef(&text, 0, text.size()), 0, active != rules_.cend(), unused);
-+  active = highlight(active, QStringView{ text }, 0, active != rules_.cend(), unused);
-   setCurrentBlockState(active != rules_.cend() ? active->first : -1);
- }
- 
