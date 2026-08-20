@@ -140,6 +140,9 @@ jobs:
           echo "Dependency-tolerant build pass ${pass}/${pass_count}"
           rm -rf ${{ matrix.folder_cache }}/../src_cache/git
           pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --continue-on-failure --skip-existing || true
+          # Each rattler-build invocation resolves against channel repodata read
+          # at startup. Publish this pass's new artifacts before the next pass.
+          pixi run rattler-index fs ${{ matrix.folder_cache }}/.. --force
         done
 
         rm -rf ${{ matrix.folder_cache }}/../src_cache/git
