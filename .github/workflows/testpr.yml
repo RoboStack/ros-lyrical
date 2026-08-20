@@ -135,18 +135,17 @@ jobs:
         ls ${{ matrix.folder_cache }} || true
 
     - name: Build recipes
+      id: build-recipes
       shell: bash -l {0}
       run: |
         set -e
         # rattler-build orders build and host dependencies, but runtime-only
         # dependencies do not create build-graph edges. A mutex migration makes
         # old runtime packages unusable, so run tolerant passes to populate the
-        # new mutex generation before the final strict validation. This is more
-        # robust than maintaining a platform-dependent manual bootstrap list.
-        pass_count=2
-        if [[ "${IGNORE_CACHE_AND_DO_FULL_REBUILD}" == "true" ]]; then
-          pass_count=4
-        fi
+        # new mutex generation before the final strict validation. Four passes
+        # also let the build recover when an earlier failed run saved little or
+        # no usable cache.
+        pass_count=4
 
         for pass in $(seq 1 "${pass_count}"); do
           echo "Dependency-tolerant build pass ${pass}/${pass_count}"
@@ -168,7 +167,9 @@ jobs:
 
     - name: Save build cache
       uses: actions/cache/save@v5
-      if: always()
+      # Preserve useful partial builds, but do not let a recipe-generation or
+      # patch-check failure replace the restore prefix with an empty cache.
+      if: ${{ always() && (steps.build-recipes.outcome == 'success' || steps.build-recipes.outcome == 'failure') }}
       with:
         path: |
           ${{ matrix.folder_cache }}
