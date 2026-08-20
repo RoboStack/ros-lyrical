@@ -295,6 +295,17 @@ autoware_utils_pcl:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
 autoware_utils_debug:
   add_host: ["fmt"]
+autoware_osqp_interface:
+  # Autoware 1.7 still uses the OSQP 0.x C API.
+  add_host: ["ros-lyrical-osqp-vendor ==0.2.0"]
+  add_run: ["ros-lyrical-osqp-vendor ==0.2.0"]
+  remove_host: ["ros-lyrical-osqp-vendor"]
+  remove_run: ["ros-lyrical-osqp-vendor"]
+autoware_qp_interface:
+  add_host: ["ros-lyrical-osqp-vendor ==0.2.0"]
+  add_run: ["ros-lyrical-osqp-vendor ==0.2.0"]
+  remove_host: ["ros-lyrical-osqp-vendor"]
+  remove_run: ["ros-lyrical-osqp-vendor"]
 autoware_trajectory:
   add_host: ["fmt", "cpp-expected"]
 autoware_behavior_velocity_planner:
