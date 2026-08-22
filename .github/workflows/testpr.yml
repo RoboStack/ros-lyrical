@@ -168,11 +168,11 @@ jobs:
         # also let the build recover when an earlier failed run saved little or
         # no usable cache.
         pass_count=4
-        # Hosted macOS and Windows jobs have a hard six-hour limit. Two passes
-        # keep uncached builds within that limit while still publishing enough
-        # artifacts for the next cached run to converge.
+        # Hosted macOS and Windows jobs have a hard six-hour limit. Their
+        # partial-artifact checkpoint provides the bootstrap state, so use one
+        # tolerant pass followed by strict validation to stay within the limit.
         if [[ "${{ matrix.platform }}" == osx-* || "${{ matrix.platform }}" == "win-64" ]]; then
-          pass_count=2
+          pass_count=1
         fi
 
         for pass in $(seq 1 "${pass_count}"); do
