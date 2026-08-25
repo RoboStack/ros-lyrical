@@ -175,10 +175,13 @@ jobs:
         # no usable cache.
         pass_count=4
         # Hosted macOS and Windows jobs have a hard six-hour limit. Restore the
-        # latest build-24 artifact layer, then use one tolerant pass followed by
-        # strict validation so progress is checkpointed before that limit.
-        if [[ "${{ matrix.platform }}" == osx-* || "${{ matrix.platform }}" == "win-64" ]]; then
+        # latest build-24 artifact layer, then use one tolerant pass on macOS.
+        # A tolerant Windows scan alone exceeds six hours, so validate its
+        # mature checkpoint directly and save any additional strict progress.
+        if [[ "${{ matrix.platform }}" == osx-* ]]; then
           pass_count=1
+        elif [[ "${{ matrix.platform }}" == "win-64" ]]; then
+          pass_count=0
         fi
 
         for pass in $(seq 1 "${pass_count}"); do
