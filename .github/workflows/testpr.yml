@@ -174,11 +174,11 @@ jobs:
         # also let the build recover when an earlier failed run saved little or
         # no usable cache.
         pass_count=4
-        # Hosted macOS and Windows jobs have a hard six-hour limit. Their
-        # build-24 artifact checkpoints now contain the bootstrap layers, so
-        # two tolerant passes plus strict validation fit within the limit.
+        # Hosted macOS and Windows jobs have a hard six-hour limit. Restore the
+        # latest build-24 artifact layer, then use one tolerant pass followed by
+        # strict validation so progress is checkpointed before that limit.
         if [[ "${{ matrix.platform }}" == osx-* || "${{ matrix.platform }}" == "win-64" ]]; then
-          pass_count=2
+          pass_count=1
         fi
 
         for pass in $(seq 1 "${pass_count}"); do
