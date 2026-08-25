@@ -2,6 +2,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  actions: read
+  contents: read
+
 env:
   ROS_VERSION: 2
   PYTHONIOENCODING: utf-8
@@ -122,8 +126,20 @@ jobs:
         # its actions/cache entry, but always() still uploads its partial output
         # as an artifact. Recover the newest such checkpoint on the next run.
         prefix="cache-${{ matrix.platform }}-"
-        artifact_id=$(gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts?per_page=100" \
-          --jq '.artifacts | map(select(.expired == false and (.name | startswith("'"${prefix}"'")))) | sort_by(.created_at) | last | .id // empty')
+        artifact_id=""
+        # Query artifacts per workflow run rather than the repository-wide
+        # first page, which can omit this branch's checkpoint in a busy repo.
+        for run_id in $(gh api -X GET \
+          "repos/${GITHUB_REPOSITORY}/actions/workflows/testpr.yml/runs" \
+          -f branch="${GITHUB_HEAD_REF}" -f event="pull_request" -f per_page=20 \
+          --jq '.workflow_runs[].id'); do
+          [[ "${run_id}" == "${GITHUB_RUN_ID}" ]] && continue
+          artifact_id=$(gh api -X GET \
+            "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" \
+            -f name="${prefix}${run_id}" \
+            --jq '.artifacts | map(select(.expired == false)) | first | .id // empty')
+          [[ -n "${artifact_id}" ]] && break
+        done
         if [[ -n "${artifact_id}" ]]; then
           echo "Restoring partial-build artifact ${artifact_id}"
           gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > partial-cache.zip
