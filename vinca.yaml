@@ -187,6 +187,7 @@ packages_select_by_deps:
   - rosidl_buffer_backend_registry
   - rosidl_buffer_py
   - rosidl_generator_dds_idl
+  - rosidlcpp
   - rqt_robot_monitor
   - rqt_runtime_monitor
   - rtabmap
