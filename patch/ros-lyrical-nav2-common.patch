@@ -1,7 +1,7 @@
-diff --git a/nav2_common/cmake/nav2_package.cmake b/nav2_common/cmake/nav2_package.cmake
+diff --git a/cmake/nav2_package.cmake b/cmake/nav2_package.cmake
 index 3f4977193c..01ca1c3ed2 100644
---- a/nav2_common/cmake/nav2_package.cmake
-+++ b/nav2_common/cmake/nav2_package.cmake
+--- a/cmake/nav2_package.cmake
++++ b/cmake/nav2_package.cmake
 @@ -37,7 +37,7 @@ macro(nav2_package)
    endif()
  

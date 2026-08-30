@@ -49,9 +49,6 @@ rmf_visualization_schedule:
 rmf_fleet_adapter:
   add_host: ["eigen-abi-devel"]
   remove_host: ["eigen"]
-rmf_websocket:
-  add_host: ["asio", "websocketpp"]
-  add_run: ["asio", "websocketpp"]
 behaviortree_cpp:
   add_host: ["libboost-devel", "cppzmq", "zeromq", "sqlite"]
   add_run: ["libboost"]
@@ -98,13 +95,26 @@ backward_ros:
   add_host: ["${{ 'binutils' if linux }}", "${{ 'elfutils' if linux }}", "ros-lyrical-ament-cmake-libraries"]
 nav2_smac_planner:
   add_build: ["${{ 'llvm-openmp' if osx }}"]
-  add_host: ["${{ 'llvm-openmp' if osx }}", "ompl", "libode"]
+  # omplConfig.cmake exports Boost as a dependency.
+  add_host: ["${{ 'llvm-openmp' if osx }}", "ompl", "libode", "libboost-devel"]
+nav2_map_server:
+  # rosdep does not resolve libuuid on macOS, though conda-forge provides it.
+  add_host: ["libuuid"]
+  add_run: ["libuuid"]
+nav2_rviz_plugins:
+  # Qt 6 provides its StateMachine component through the qt6-scxml package.
+  add_host: ["qt6-scxml"]
+  add_run: ["qt6-scxml"]
+nav2_route:
+  # Both dependencies are exported by nav2_routeConfig.cmake.
+  add_run: ["nanoflann", "nlohmann_json"]
 nav2_util:
   add_host: ["libboost-devel"]
+  # nav2_util exports angles from its CMake config, so downstream consumers
+  # need it in the runtime environment as well.
+  add_run: ["ros-lyrical-angles"]
 nav2_constrained_smoother:
   add_host: ["${{ 'openblas' if win }}", "ceres-solver * cpu*"]
-nav2_mppi_controller:
-  add_build: ["${{ 'clang <19' if osx }}"]
 ompl:
   add_host: ["ompl"]
 pybind11_json_vendor:
@@ -164,6 +174,21 @@ force_torque_sensor_broadcaster:
   add_host: ["typeguard", "jinja2"]
 ros_gz_sim:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "ros-lyrical-gz-sensors-vendor"]
+ament_cmake_ros:
+  # Break the test-only runtime cycle so a new mutex migration can bootstrap.
+  remove_run: ["ros-lyrical-rmw-test-fixture-implementation"]
+cyclonedds:
+  # The posh CMake targets reference the iox-roudi executable shipped by the
+  # top-level iceoryx package, so the split devel packages alone are incomplete.
+  add_host: ["iceoryx", "libiceoryx-hoofs-devel", "libiceoryx-posh-devel"]
+  add_run: ["libiceoryx-hoofs", "libiceoryx-posh"]
+  remove_host: ["ros-lyrical-iceoryx-hoofs", "ros-lyrical-iceoryx-posh"]
+  remove_run: ["ros-lyrical-iceoryx-hoofs", "ros-lyrical-iceoryx-posh"]
+rmw_cyclonedds_cpp:
+  add_host: ["libiceoryx-binding-c-devel"]
+  add_run: ["libiceoryx-binding-c"]
+  remove_host: ["ros-lyrical-iceoryx-binding-c"]
+  remove_run: ["ros-lyrical-iceoryx-binding-c"]
 geometric_shapes:
   add_host: ["libboost-devel", "octomap"]
 ros_image_to_qimage:
@@ -172,7 +197,10 @@ rqt_image_overlay:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
 slam_toolbox:
   add_build: ["${{ 'qt6-main' if (build_platform != target_platform) }}"]
-  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "blas-devel", "ceres-solver * cpu*"]
+  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "blas-devel", "ceres-solver * cpu*", "qt6-main"]
+  add_run: ["qt6-main"]
+  remove_host: ["qt-main"]
+  remove_run: ["qt-main"]
 vision_msgs_rviz_plugins:
   add_build: ["${{ 'qt6-main' if (build_platform != target_platform) }}"]
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
@@ -267,6 +295,17 @@ autoware_utils_pcl:
   add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}"]
 autoware_utils_debug:
   add_host: ["fmt"]
+autoware_osqp_interface:
+  # Autoware 1.7 still uses the OSQP 0.x C API.
+  add_host: ["ros-lyrical-osqp-vendor ==0.2.0"]
+  add_run: ["ros-lyrical-osqp-vendor ==0.2.0"]
+  remove_host: ["ros-lyrical-osqp-vendor"]
+  remove_run: ["ros-lyrical-osqp-vendor"]
+autoware_qp_interface:
+  add_host: ["ros-lyrical-osqp-vendor ==0.2.0"]
+  add_run: ["ros-lyrical-osqp-vendor ==0.2.0"]
+  remove_host: ["ros-lyrical-osqp-vendor"]
+  remove_run: ["ros-lyrical-osqp-vendor"]
 autoware_trajectory:
   add_host: ["fmt", "cpp-expected"]
 autoware_behavior_velocity_planner:
@@ -275,6 +314,16 @@ autoware_behavior_velocity_planner_common:
   add_host: ["cpp-expected"]
 autoware_behavior_velocity_stop_line_module:
   add_host: ["cpp-expected"]
+rmf_task_sequence:
+  # The vendor package's ament config does not load the imported validator
+  # target. Make the conda-forge CMake package directly available.
+  add_host: ["json_schema_validator"]
+  add_run: ["json_schema_validator"]
+rmw_implementation:
+  # These backends are only used by the disabled test suite. Keeping them all
+  # as host dependencies creates a bootstrap cycle during mutex migrations;
+  # the default Fast DDS backend is sufficient to configure the package.
+  remove_host: ["ros-lyrical-rmw-connextdds", "ros-lyrical-rmw-cyclonedds-cpp", "ros-lyrical-rmw-fastrtps-dynamic-cpp", "ros-lyrical-rmw-zenoh-cpp"]
 rclpy:
   add_host: ["typing_extensions"]
   add_run: ["typing_extensions"]
@@ -296,7 +345,7 @@ grid_map_octomap:
   add_host: ["octomap"]
   add_run: ["octomap"]
 py_trees:
-  add_host: ["poetry-core"]
+  add_host: ["hatchling"]
 py_trees_js:
   add_host: ["poetry-core"]
 py_trees_ros:

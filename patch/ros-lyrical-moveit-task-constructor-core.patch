@@ -1,3 +1,35 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7b47abc..1b82b12 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,6 +12,8 @@ find_package(moveit_core REQUIRED)
+ find_package(moveit_ros_planning REQUIRED)
+ find_package(moveit_ros_planning_interface REQUIRED)
+ find_package(moveit_task_constructor_msgs REQUIRED)
++find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
++find_package(pybind11 REQUIRED)
+ find_package(py_binding_tools REQUIRED)
+ find_package(rclcpp REQUIRED)
+ find_package(rviz_marker_tools REQUIRED)
+diff --git a/include/moveit/python/task_constructor/properties.h b/include/moveit/python/task_constructor/properties.h
+index 46c0e97..70bf30e 100644
+--- a/include/moveit/python/task_constructor/properties.h
++++ b/include/moveit/python/task_constructor/properties.h
+@@ -1,14 +1,10 @@
+ #pragma once
+ 
+-#include <pybind11/smart_holder.h>
+ #include <py_binding_tools/ros_msg_typecasters.h>
+ #include <moveit/task_constructor/properties.h>
+ #include <boost/any.hpp>
+ #include <typeindex>
+ 
+-PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Property)
+-PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropertyMap)
+-
+ namespace moveit {
+ namespace python {
+ 
 diff --git a/include/moveit/task_constructor/introspection.h b/include/moveit/task_constructor/introspection.h
 index cf4dfb7..b7e26d5 100644
 --- a/include/moveit/task_constructor/introspection.h
@@ -24,257 +56,6 @@ index e217ad6..708a2fb 100644
  	/// function callback used to initialize property value from another PropertyMap
  	using InitializerFunction = std::function<boost::any(const PropertyMap&)>;
  
-diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 82e9875..147aa7b 100644
---- a/src/CMakeLists.txt
-+++ b/src/CMakeLists.txt
-@@ -38,7 +38,7 @@ add_library(${PROJECT_NAME} SHARED
- 	solvers/multi_planner.cpp
- )
- target_link_libraries(${PROJECT_NAME}
--	fmt
-+	fmt::fmt
- 	${moveit_core_TARGETS}
- 	${moveit_ros_planning_TARGETS}
- 	${moveit_ros_planning_interface_TARGETS}
-diff --git a/src/container.cpp b/src/container.cpp
-index febc00f..fded044 100644
---- a/src/container.cpp
-+++ b/src/container.cpp
-@@ -57,8 +57,7 @@ namespace moveit {
- namespace task_constructor {
- 
- // for debugging of how children interfaces evolve over time
--__attribute__((unused))  // silent unused-function warning
--static void
-+[[maybe_unused]] static void
- printChildrenInterfaces(const ContainerBasePrivate& container, bool success, const Stage& creator,
-                         std::ostream& os = std::cerr) {
- 	static unsigned int id = 0;
-diff --git a/src/cost_terms.cpp b/src/cost_terms.cpp
-index 9ddb94f..9896d36 100644
---- a/src/cost_terms.cpp
-+++ b/src/cost_terms.cpp
-@@ -298,8 +298,8 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
- 	} };
- 
- 	auto collision_comment = [=](const auto& distance) {
--		return fmt::format(PREFIX + "allegedly valid solution collides between '{}' and '{}'", distance.link_names[0],
--		                   distance.link_names[1]);
-+		return fmt::format(fmt::runtime(PREFIX + "allegedly valid solution collides between '{}' and '{}'"),
-+		                   distance.link_names[0], distance.link_names[1]);
- 	};
- 
- 	double distance{ 0.0 };
-@@ -313,10 +313,10 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
- 		}
- 		distance = distance_data.distance;
- 		if (!cumulative)
--			comment = fmt::format(PREFIX + "distance {} between '{}' and '{}'", distance, distance_data.link_names[0],
--			                      distance_data.link_names[1]);
-+			comment = fmt::format(fmt::runtime(PREFIX + "distance {} between '{}' and '{}'"), distance,
-+			                      distance_data.link_names[0], distance_data.link_names[1]);
- 		else
--			comment = fmt::format(PREFIX + "cumulative distance {}", distance);
-+			comment = fmt::format(fmt::runtime(PREFIX + "cumulative distance {}"), distance);
- 	} else {  // check trajectory
- 		for (size_t i = 0; i < s.trajectory()->getWayPointCount(); ++i) {
- 			auto distance_data = check_distance(state, s.trajectory()->getWayPoint(i));
-@@ -327,7 +327,7 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
- 			distance += distance_data.distance;
- 		}
- 		distance /= s.trajectory()->getWayPointCount();
--		comment = fmt::format(PREFIX + "average{} distance: {}", (cumulative ? " cumulative" : ""), distance);
-+		comment = fmt::format(fmt::runtime(PREFIX + "average{} distance: {}"), (cumulative ? " cumulative" : ""), distance);
- 	}
- 
- 	return distance_to_cost(distance);
-diff --git a/src/introspection.cpp b/src/introspection.cpp
-index d938f95..35d502a 100644
---- a/src/introspection.cpp
-+++ b/src/introspection.cpp
-@@ -50,6 +50,14 @@
- #include <boost/bimap.hpp>
- #include <rcutils/isalnum_no_locale.h>
- 
-+#ifdef _WIN32
-+	#include <winsock2.h>
-+	#include <process.h>
-+	#pragma comment(lib, "ws2_32.lib")
-+#else
-+	#include <unistd.h>
-+#endif
-+
- static auto LOGGER = rclcpp::get_logger("introspection");
- 
- namespace moveit {
-@@ -60,12 +68,26 @@ std::string getTaskId(const TaskPrivate* task) {
- 	static const std::string ALLOWED = "_/";
- 	std::ostringstream oss;
- 	char our_hostname[256] = { 0 };
-+	#ifdef _WIN32
-+	{
-+		static bool wsa_initialised = false;
-+		if (!wsa_initialised) {
-+			WSADATA wsaData;
-+			WSAStartup(MAKEWORD(2, 2), &wsaData);
-+			wsa_initialised = true;
-+		}
-+	}
-+	#endif
- 	gethostname(our_hostname, sizeof(our_hostname) - 1);
- 	// Replace all invalid ROS-name chars with an underscore
- 	std::replace_if(
- 	    our_hostname, our_hostname + strlen(our_hostname),
- 	    [](const char ch) { return !rcutils_isalnum_no_locale(ch) && ALLOWED.find(ch) == std::string::npos; }, '_');
--	oss << our_hostname << "_" << getpid() << "_" << reinterpret_cast<std::size_t>(task);
-+	#ifdef _WIN32
-+		oss << our_hostname << "_" << _getpid() << "_" << reinterpret_cast<std::size_t>(task);
-+	# else
-+		oss << our_hostname << "_" << getpid() << "_" << reinterpret_cast<std::size_t>(task);
-+	#endif
- 	return oss.str();
- }
- }  // namespace
-@@ -214,7 +236,7 @@ void Introspection::publishAllSolutions(bool wait) {
- 	};
- }
- 
--const SolutionBase* Introspection::solutionFromId(uint id) const {
-+const SolutionBase* Introspection::solutionFromId(uint32_t id) const {
- 	auto it = impl->id_solution_bimap_.left.find(id);
- 	if (it == impl->id_solution_bimap_.left.end())
- 		return nullptr;
-diff --git a/src/properties.cpp b/src/properties.cpp
-index 8c001de..6fd0217 100644
---- a/src/properties.cpp
-+++ b/src/properties.cpp
-@@ -38,6 +38,7 @@
- 
- #include <moveit/task_constructor/properties.h>
- #include <moveit/task_constructor/fmt_p.h>
-+#include <boost/core/demangle.hpp>
- #include <functional>
- #include <rclcpp/logging.hpp>
- #include <rclcpp/clock.hpp>
-diff --git a/src/solvers/pipeline_planner.cpp b/src/solvers/pipeline_planner.cpp
-index 9e30131..18e6fb9 100644
---- a/src/solvers/pipeline_planner.cpp
-+++ b/src/solvers/pipeline_planner.cpp
-@@ -59,7 +59,7 @@ PipelinePlanner::PipelinePlanner(
-   , stopping_criterion_callback_(stopping_criterion_callback)
-   , solution_selection_function_(solution_selection_function) {
- 	// Declare properties of the MotionPlanRequest
--	properties().declare<uint>("num_planning_attempts", 1u, "number of planning attempts");
-+	properties().declare<uint32_t>("num_planning_attempts", 1u, "number of planning attempts");
- 	properties().declare<moveit_msgs::msg::WorkspaceParameters>(
- 	    "workspace_parameters", moveit_msgs::msg::WorkspaceParameters(), "allowed workspace of mobile base?");
- 
-@@ -182,7 +182,7 @@ PlannerInterface::Result PipelinePlanner::plan(const planning_scene::PlanningSce
- 		request.planner_id = planner_id;
- 		request.allowed_planning_time = timeout;
- 		request.start_state.is_diff = true;  // we don't specify an extra start state
--		request.num_planning_attempts = properties().get<uint>("num_planning_attempts");
-+		request.num_planning_attempts = properties().get<uint32_t>("num_planning_attempts");
- 		request.max_velocity_scaling_factor = properties().get<double>("max_velocity_scaling_factor");
- 		request.max_acceleration_scaling_factor = properties().get<double>("max_acceleration_scaling_factor");
- 		request.workspace_parameters = properties().get<moveit_msgs::msg::WorkspaceParameters>("workspace_parameters");
-diff --git a/src/stage.cpp b/src/stage.cpp
-index b64ce0a..a9eb8a0 100644
---- a/src/stage.cpp
-+++ b/src/stage.cpp
-@@ -909,8 +909,9 @@ bool Connecting::compatible(const InterfaceState& from_state, const InterfaceSta
- 	const planning_scene::PlanningSceneConstPtr& from = from_state.scene();
- 	const planning_scene::PlanningSceneConstPtr& to = to_state.scene();
- 
--	auto false_with_debug = [](auto... args) {
--		RCLCPP_DEBUG_STREAM(rclcpp::get_logger("Connecting"), fmt::format(args...));
-+	auto false_with_debug = [](fmt::string_view format_str, auto&&... args) {
-+		RCLCPP_DEBUG_STREAM(rclcpp::get_logger("Connecting"),
-+		                    fmt::vformat(format_str, fmt::make_format_args(args...)));
- 		return false;
- 	};
- 
-diff --git a/src/stages/generate_place_pose.cpp b/src/stages/generate_place_pose.cpp
-index 76b9559..042882d 100644
---- a/src/stages/generate_place_pose.cpp
-+++ b/src/stages/generate_place_pose.cpp
-@@ -109,11 +109,11 @@ void GeneratePlacePose::compute() {
- 	scene->getTransforms().transformPose(pose_msg.header.frame_id, target_pose, target_pose);
- 
- 	// spawn the nominal target object pose, considering flip about z and rotations about z-axis
--	auto spawner = [&s, &scene, &ik_frame, this](const Eigen::Isometry3d& nominal, uint z_flips, uint z_rotations = 10) {
--		for (uint flip = 0; flip <= z_flips; ++flip) {
-+	auto spawner = [&s, &scene, &ik_frame, this](const Eigen::Isometry3d& nominal, uint32_t z_flips, uint32_t z_rotations = 10) {
-+		for (uint32_t flip = 0; flip <= z_flips; ++flip) {
- 			// flip about object's x-axis
- 			Eigen::Isometry3d object = nominal * Eigen::AngleAxisd(flip * M_PI, Eigen::Vector3d::UnitX());
--			for (uint i = 0; i < z_rotations; ++i) {
-+			for (uint32_t i = 0; i < z_rotations; ++i) {
- 				// rotate object at target pose about world's z-axis
- 				Eigen::Vector3d pos = object.translation();
- 				object.pretranslate(-pos)
-@@ -139,7 +139,7 @@ void GeneratePlacePose::compute() {
- 		}
- 	};
- 
--	uint z_flips = props.get<bool>("allow_z_flip") ? 1 : 0;
-+	uint32_t z_flips = props.get<bool>("allow_z_flip") ? 1 : 0;
- 	if (object && object->getShapes().size() == 1) {
- 		switch (object->getShapes()[0]->type) {
- 			case shapes::CYLINDER:
-diff --git a/test/test_stage.cpp b/test/test_stage.cpp
-index 1c0553c..39bfa92 100644
---- a/test/test_stage.cpp
-+++ b/test/test_stage.cpp
-@@ -36,7 +36,7 @@ TEST(Stage, registerCallbacks) {
- 	StandaloneGeneratorMockup g{ PredefinedCosts::constant(0.0) };
- 	g.init(getModel());
- 
--	uint called = 0;
-+	uint32_t called = 0;
- 	auto cb = [&called](const SolutionBase& /* s */) {
- 		++called;
- 		return true;
-diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
-index 26c86ac..22bf5e1 100644
---- a/python/bindings/CMakeLists.txt
-+++ b/python/bindings/CMakeLists.txt
-@@ -17,6 +17,10 @@ pybind11_add_module(pymoveit_mtc
- )
- target_include_directories(pymoveit_mtc PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
- target_link_libraries(pymoveit_mtc PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_stages ${PROJECT_NAME}_python_tools)
-+# CMake's C++20 module dependency scanner misparses pybind11::module-typed
-+# locals in headers pulled in transitively (py_binding_tools) as module
-+# control-lines; this target doesn't use C++20 modules, so just disable it.
-+set_target_properties(pymoveit_mtc PROPERTIES CXX_SCAN_FOR_MODULES OFF)
- 
- # install libs
- install(TARGETS ${PROJECT_NAME}_python_tools
-diff --git a/python/bindings/src/properties.cpp b/python/bindings/src/properties.cpp
---- a/python/bindings/src/properties.cpp
-+++ b/python/bindings/src/properties.cpp
-@@ -158,6 +158,8 @@
- 	return REGISTRY_SINGLETON.insert(type_index, ros_msg_name, to, from);
- }
- 
-+#if !defined(_MSC_VER)
- __attribute__((visibility("default"))) // export this symbol as visible in the shared library
-+#endif
- void export_properties(py::module& m) {
- 	// clang-format off
-diff --git a/python/bindings/src/solvers.cpp b/python/bindings/src/solvers.cpp
---- a/python/bindings/src/solvers.cpp
-+++ b/python/bindings/src/solvers.cpp
-@@ -73,7 +73,7 @@
- 				pipelinePlanner = core.PipelinePlanner(node, 'ompl', 'PRMkConfigDefault')
- 				pipelinePlanner.num_planning_attempts = 10
- 			)")
--	    .property<uint>("num_planning_attempts", "int: Number of planning attempts")
-+	    .property<uint32_t>("num_planning_attempts", "int: Number of planning attempts")
- 	    .property<moveit_msgs::msg::WorkspaceParameters>(
- 	        "workspace_parameters",
- 	        ":moveit_msgs:`WorkspaceParameters`: Specifies workspace box to be used for Cartesian sampling")
 diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
 index 181e1a4..fcb7315 100644
 --- a/python/CMakeLists.txt
@@ -311,38 +92,21 @@ index 181e1a4..fcb7315 100644
  # C++ wrapper code
  add_subdirectory(bindings)
  
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 1b8d21a..1d9f5d7 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -12,6 +12,8 @@ find_package(moveit_core REQUIRED)
- find_package(moveit_ros_planning REQUIRED)
- find_package(moveit_ros_planning_interface REQUIRED)
- find_package(moveit_task_constructor_msgs REQUIRED)
-+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-+find_package(pybind11 REQUIRED)
- find_package(py_binding_tools REQUIRED)
- find_package(rclcpp REQUIRED)
- find_package(rviz_marker_tools REQUIRED)
-diff --git a/include/moveit/python/task_constructor/properties.h b/include/moveit/python/task_constructor/properties.h
-index 46c0e97..70bf30e 100644
---- a/include/moveit/python/task_constructor/properties.h
-+++ b/include/moveit/python/task_constructor/properties.h
-@@ -1,14 +1,10 @@
- #pragma once
+diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
+index 26c86ac..22bf5e1 100644
+--- a/python/bindings/CMakeLists.txt
++++ b/python/bindings/CMakeLists.txt
+@@ -17,6 +17,10 @@ pybind11_add_module(pymoveit_mtc
+ )
+ target_include_directories(pymoveit_mtc PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+ target_link_libraries(pymoveit_mtc PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_stages ${PROJECT_NAME}_python_tools)
++# CMake's C++20 module dependency scanner misparses pybind11::module-typed
++# locals in headers pulled in transitively (py_binding_tools) as module
++# control-lines; this target doesn't use C++20 modules, so just disable it.
++set_target_properties(pymoveit_mtc PROPERTIES CXX_SCAN_FOR_MODULES OFF)
  
--#include <pybind11/smart_holder.h>
- #include <py_binding_tools/ros_msg_typecasters.h>
- #include <moveit/task_constructor/properties.h>
- #include <boost/any.hpp>
- #include <typeindex>
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Property)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropertyMap)
--
- namespace moveit {
- namespace python {
- 
+ # install libs
+ install(TARGETS ${PROJECT_NAME}_python_tools
 diff --git a/python/bindings/src/core.h b/python/bindings/src/core.h
 index 7ab1437..b9bdc2c 100644
 --- a/python/bindings/src/core.h
@@ -412,7 +176,7 @@ index a797711..cd66917 100644
  namespace moveit {
  namespace python {
 diff --git a/python/bindings/src/solvers.cpp b/python/bindings/src/solvers.cpp
-index 7c6a12f..eebfa2e 100644
+index 7c6a12f..35acc77 100644
 --- a/python/bindings/src/solvers.cpp
 +++ b/python/bindings/src/solvers.cpp
 @@ -46,12 +46,6 @@ using namespace py::literals;
@@ -428,6 +192,15 @@ index 7c6a12f..eebfa2e 100644
  namespace moveit {
  namespace python {
  
+@@ -73,7 +67,7 @@ void export_solvers(py::module& m) {
+ 				pipelinePlanner = core.PipelinePlanner(node, 'ompl', 'PRMkConfigDefault')
+ 				pipelinePlanner.num_planning_attempts = 10
+ 			)")
+-	    .property<uint>("num_planning_attempts", "int: Number of planning attempts")
++	    .property<uint32_t>("num_planning_attempts", "int: Number of planning attempts")
+ 	    .property<moveit_msgs::msg::WorkspaceParameters>(
+ 	        "workspace_parameters",
+ 	        ":moveit_msgs:`WorkspaceParameters`: Specifies workspace box to be used for Cartesian sampling")
 diff --git a/python/bindings/src/stages.cpp b/python/bindings/src/stages.cpp
 index 1dead16..f51308f 100644
 --- a/python/bindings/src/stages.cpp
@@ -467,3 +240,132 @@ index 1dead16..f51308f 100644
  	properties::class_<GenerateGraspPose, MonitoringGenerator>(m, "GenerateGraspPose", R"(
  			GenerateGraspPose stage derives from monitoring generator and can
  			be used to generate poses for grasping. Set the desired attributes
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 82e9875..147aa7b 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -38,7 +38,7 @@ add_library(${PROJECT_NAME} SHARED
+ 	solvers/multi_planner.cpp
+ )
+ target_link_libraries(${PROJECT_NAME}
+-	fmt
++	fmt::fmt
+ 	${moveit_core_TARGETS}
+ 	${moveit_ros_planning_TARGETS}
+ 	${moveit_ros_planning_interface_TARGETS}
+diff --git a/src/introspection.cpp b/src/introspection.cpp
+index 5dfed5d..240320f 100644
+--- a/src/introspection.cpp
++++ b/src/introspection.cpp
+@@ -64,12 +64,26 @@ std::string getTaskId(const TaskPrivate* task) {
+ 	static const std::string ALLOWED = "_/";
+ 	std::ostringstream oss;
+ 	char our_hostname[256] = { 0 };
++	#ifdef _WIN32
++	{
++		static bool wsa_initialised = false;
++		if (!wsa_initialised) {
++			WSADATA wsaData;
++			WSAStartup(MAKEWORD(2, 2), &wsaData);
++			wsa_initialised = true;
++		}
++	}
++	#endif
+ 	gethostname(our_hostname, sizeof(our_hostname) - 1);
+ 	// Replace all invalid ROS-name chars with an underscore
+ 	std::replace_if(
+ 	    our_hostname, our_hostname + strlen(our_hostname),
+ 	    [](const char ch) { return !rcutils_isalnum_no_locale(ch) && ALLOWED.find(ch) == std::string::npos; }, '_');
+-	oss << our_hostname << "_" << getpid() << "_" << reinterpret_cast<std::size_t>(task);
++	#ifdef _WIN32
++		oss << our_hostname << "_" << _getpid() << "_" << reinterpret_cast<std::size_t>(task);
++	# else
++		oss << our_hostname << "_" << getpid() << "_" << reinterpret_cast<std::size_t>(task);
++	#endif
+ 	return oss.str();
+ }
+ }  // namespace
+@@ -218,7 +232,7 @@ void Introspection::publishAllSolutions(bool wait) {
+ 	};
+ }
+ 
+-const SolutionBase* Introspection::solutionFromId(uint id) const {
++const SolutionBase* Introspection::solutionFromId(uint32_t id) const {
+ 	auto it = impl->id_solution_bimap_.left.find(id);
+ 	if (it == impl->id_solution_bimap_.left.end())
+ 		return nullptr;
+diff --git a/src/properties.cpp b/src/properties.cpp
+index e1ffdcf..1ac0102 100644
+--- a/src/properties.cpp
++++ b/src/properties.cpp
+@@ -38,6 +38,7 @@
+ 
+ #include <moveit/task_constructor/properties.h>
+ #include <moveit/task_constructor/fmt_p.h>
++#include <boost/core/demangle.hpp>
+ #include <functional>
+ #include <boost/core/demangle.hpp>
+ #include <rclcpp/logging.hpp>
+diff --git a/src/solvers/pipeline_planner.cpp b/src/solvers/pipeline_planner.cpp
+index 9e30131..18e6fb9 100644
+--- a/src/solvers/pipeline_planner.cpp
++++ b/src/solvers/pipeline_planner.cpp
+@@ -59,7 +59,7 @@ PipelinePlanner::PipelinePlanner(
+   , stopping_criterion_callback_(stopping_criterion_callback)
+   , solution_selection_function_(solution_selection_function) {
+ 	// Declare properties of the MotionPlanRequest
+-	properties().declare<uint>("num_planning_attempts", 1u, "number of planning attempts");
++	properties().declare<uint32_t>("num_planning_attempts", 1u, "number of planning attempts");
+ 	properties().declare<moveit_msgs::msg::WorkspaceParameters>(
+ 	    "workspace_parameters", moveit_msgs::msg::WorkspaceParameters(), "allowed workspace of mobile base?");
+ 
+@@ -182,7 +182,7 @@ PlannerInterface::Result PipelinePlanner::plan(const planning_scene::PlanningSce
+ 		request.planner_id = planner_id;
+ 		request.allowed_planning_time = timeout;
+ 		request.start_state.is_diff = true;  // we don't specify an extra start state
+-		request.num_planning_attempts = properties().get<uint>("num_planning_attempts");
++		request.num_planning_attempts = properties().get<uint32_t>("num_planning_attempts");
+ 		request.max_velocity_scaling_factor = properties().get<double>("max_velocity_scaling_factor");
+ 		request.max_acceleration_scaling_factor = properties().get<double>("max_acceleration_scaling_factor");
+ 		request.workspace_parameters = properties().get<moveit_msgs::msg::WorkspaceParameters>("workspace_parameters");
+diff --git a/src/stages/generate_place_pose.cpp b/src/stages/generate_place_pose.cpp
+index 76b9559..042882d 100644
+--- a/src/stages/generate_place_pose.cpp
++++ b/src/stages/generate_place_pose.cpp
+@@ -109,11 +109,11 @@ void GeneratePlacePose::compute() {
+ 	scene->getTransforms().transformPose(pose_msg.header.frame_id, target_pose, target_pose);
+ 
+ 	// spawn the nominal target object pose, considering flip about z and rotations about z-axis
+-	auto spawner = [&s, &scene, &ik_frame, this](const Eigen::Isometry3d& nominal, uint z_flips, uint z_rotations = 10) {
+-		for (uint flip = 0; flip <= z_flips; ++flip) {
++	auto spawner = [&s, &scene, &ik_frame, this](const Eigen::Isometry3d& nominal, uint32_t z_flips, uint32_t z_rotations = 10) {
++		for (uint32_t flip = 0; flip <= z_flips; ++flip) {
+ 			// flip about object's x-axis
+ 			Eigen::Isometry3d object = nominal * Eigen::AngleAxisd(flip * M_PI, Eigen::Vector3d::UnitX());
+-			for (uint i = 0; i < z_rotations; ++i) {
++			for (uint32_t i = 0; i < z_rotations; ++i) {
+ 				// rotate object at target pose about world's z-axis
+ 				Eigen::Vector3d pos = object.translation();
+ 				object.pretranslate(-pos)
+@@ -139,7 +139,7 @@ void GeneratePlacePose::compute() {
+ 		}
+ 	};
+ 
+-	uint z_flips = props.get<bool>("allow_z_flip") ? 1 : 0;
++	uint32_t z_flips = props.get<bool>("allow_z_flip") ? 1 : 0;
+ 	if (object && object->getShapes().size() == 1) {
+ 		switch (object->getShapes()[0]->type) {
+ 			case shapes::CYLINDER:
+diff --git a/test/test_stage.cpp b/test/test_stage.cpp
+index 1c0553c..39bfa92 100644
+--- a/test/test_stage.cpp
++++ b/test/test_stage.cpp
+@@ -36,7 +36,7 @@ TEST(Stage, registerCallbacks) {
+ 	StandaloneGeneratorMockup g{ PredefinedCosts::constant(0.0) };
+ 	g.init(getModel());
+ 
+-	uint called = 0;
++	uint32_t called = 0;
+ 	auto cb = [&called](const SolutionBase& /* s */) {
+ 		++called;
+ 		return true;
