@@ -104,16 +104,12 @@ jobs:
           echo "Recipe generation attempt ${attempt} failed; retrying..." >&2
           sleep 15
         done
-        # Avoid concurrent Git clone cache corruption when many ROS packages
-        # share the same release repository.
-        pixi run python use_github_source_archives.py
 
     - name: Check patches
       shell: bash -l {0}
       run: |
-        # Recipes were already generated for the matrix platform and their Git
-        # sources converted to archives. Do not use the Pixi task here because
-        # its generate-recipes dependency would overwrite both changes.
+        # Recipes were already generated for the matrix platform. Do not use
+        # the Pixi task here because it would overwrite them.
         pixi run python check_patches_clean_apply.py
 
     - name: Restore build cache
