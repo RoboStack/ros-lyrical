@@ -8,7 +8,6 @@ permissions:
 
 env:
   ROS_VERSION: 2
-  PYTHONIOENCODING: utf-8
   # Change to 'true' to enable the cache upload as artifacts
   SAVE_CACHE_AS_ARTIFACT: 'true'
   # Change to 'true' to ignore cache and force a full rebuild, but please restore to 'false' before merging
@@ -75,7 +74,8 @@ jobs:
     # For some reason, the Strawberry perl's pkg-config is found
     # instead of the conda's one, so let's delete the /c/Strawberry directory
     # Furthermore, we also need to remove an older SDK that is used and can result in compilation problems
-    - name: Debug pkg-config problem
+    # And we also remove the vcpkg installed in the image, to avoid that projects pick it
+    - name: Remove problematic files of GitHub Actions images
       if: contains(matrix.os, 'windows')
       shell: bash -l {0}
       run: |
