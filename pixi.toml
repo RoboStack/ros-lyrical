@@ -4,9 +4,10 @@ description = "RoboStack repo to package ros-lyrical packages as conda packages"
 authors = ["Tobias Fischer <tobias.fischer@qut.edu.au>", "Wolf Vollprecht <w.vollprecht@gmail.com>", "Silvio Traversaro <silvio@traversaro.it>", "Daisuke Nishimatsu <daisuke.nishimatsu1021@gmail.com>"]
 channels = ["https://repo.prefix.dev/conda-forge"]
 platforms = [
-    # 2.28 is a recent glibc version for lyrical
-    { platform = "linux-64", glibc = "2.28" },
-    { platform = "linux-aarch64", glibc = "2.28" },
+    # pixi 0.76.x rejects glibc >= 2.28 constraints with pixi-build preview;
+    # actual glibc (2.28) constraints come from conda_build_config.yaml instead
+    "linux-64",
+    "linux-aarch64",
     "osx-arm64",
     "osx-64",
     "win-64",
