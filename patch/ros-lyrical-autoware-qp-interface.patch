@@ -1,11 +1,13 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a402b138..8b50b5ae 100644
+index a402b1381..8b50b5ae0 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -38,10 +38,10 @@ target_include_directories(${PROJECT_NAME}
+@@ -36,14 +36,14 @@ target_include_directories(${PROJECT_NAME}
+   SYSTEM PUBLIC
+     "${OSQP_INCLUDE_DIR}"
      "${EIGEN3_INCLUDE_DIR}"
  )
- 
+
 -ament_target_dependencies(${PROJECT_NAME}
 -  Eigen3
 -  osqp_vendor
@@ -15,13 +17,78 @@ index a402b138..8b50b5ae 100644
 +  osqp::osqp
 +  proxsuite::proxsuite
  )
- 
+
  # crucial so downstream package builds because osqp_interface exposes osqp.hpp
+ ament_export_include_directories("${OSQP_INCLUDE_DIR}")
+ # crucial so the linking order is correct in a downstream package: libosqp_interface.a should come before libosqp.a
+diff --git a/include/autoware/qp_interface/osqp_csc_matrix_conv.hpp b/include/autoware/qp_interface/osqp_csc_matrix_conv.hpp
+index 5d447e5ce..8dcc3615c 100644
+--- a/include/autoware/qp_interface/osqp_csc_matrix_conv.hpp
++++ b/include/autoware/qp_interface/osqp_csc_matrix_conv.hpp
+@@ -15,14 +15,18 @@
+ #ifndef AUTOWARE__QP_INTERFACE__OSQP_CSC_MATRIX_CONV_HPP_
+ #define AUTOWARE__QP_INTERFACE__OSQP_CSC_MATRIX_CONV_HPP_
+
+ #include <Eigen/Core>
+
+-#include <osqp/glob_opts.h>
++#include <osqp/osqp.h>
+
+ #include <vector>
+
++// Preserve the OSQP 0.6 type names used by this package's public API.
++using c_float = OSQPFloat;
++using c_int = OSQPInt;
++
+ namespace autoware::qp_interface
+ {
+ /// \brief Compressed-Column-Sparse Matrix
+ struct CSC_Matrix
+ {
+diff --git a/include/autoware/qp_interface/osqp_interface.hpp b/include/autoware/qp_interface/osqp_interface.hpp
+index c8e8f6962..c4ff18953 100644
+--- a/include/autoware/qp_interface/osqp_interface.hpp
++++ b/include/autoware/qp_interface/osqp_interface.hpp
+@@ -56,11 +56,11 @@ public:
+     const std::vector<double> & l, const std::vector<double> & u,
+     const bool enable_warm_start = false,
+     const c_float eps_abs = std::numeric_limits<c_float>::epsilon());
+   ~OSQPInterface() override;
+
+-  static void OSQPWorkspaceDeleter(OSQPWorkspace * ptr) noexcept;
++  static void OSQPSolverDeleter(OSQPSolver * ptr) noexcept;
+
+   std::vector<double> optimize(
+     CSC_Matrix P, CSC_Matrix A, const std::vector<double> & q, const std::vector<double> & l,
+     const std::vector<double> & u);
+
+@@ -120,17 +120,17 @@ public:
+     const std::vector<double> & primal_variables, const std::vector<double> & dual_variables);
+   bool setPrimalVariables(const std::vector<double> & primal_variables);
+   bool setDualVariables(const std::vector<double> & dual_variables);
+
+ private:
+-  std::unique_ptr<OSQPWorkspace, std::function<void(OSQPWorkspace *)>> work_;
++  std::unique_ptr<OSQPSolver, std::function<void(OSQPSolver *)>> work_;
+   std::unique_ptr<OSQPSettings> settings_;
+-  std::unique_ptr<OSQPData> data_;
+   // store last work info since work is cleaned up at every execution to prevent memory leak.
+   OSQPInfo latest_work_info_;
+   // Number of parameters to optimize
+   int64_t param_n_;
++  int64_t constraint_n_;
+   // Flag to check if the current work exists
+   bool work__initialized = false;
+   // Exitflag
+   int64_t exitflag_;
+
 diff --git a/src/osqp_csc_matrix_conv.cpp b/src/osqp_csc_matrix_conv.cpp
-index 15314a9e..96056753 100644
+index 15314a9e4..960567534 100644
 --- a/src/osqp_csc_matrix_conv.cpp
 +++ b/src/osqp_csc_matrix_conv.cpp
-@@ -25,9 +25,9 @@ namespace autoware::qp_interface
+@@ -23,13 +23,13 @@
+
+ namespace autoware::qp_interface
  {
  CSC_Matrix calCSCMatrix(const Eigen::MatrixXd & mat)
  {
@@ -29,17 +96,338 @@ index 15314a9e..96056753 100644
    const Eigen::Index rows = mat.rows();
    const Eigen::Index cols = mat.cols();
 +  const size_t elem = static_cast<size_t>(rows * cols);
- 
+
    std::vector<c_float> vals;
    vals.reserve(elem);
-@@ -66,9 +66,9 @@ CSC_Matrix calCSCMatrix(const Eigen::MatrixXd & mat)
- 
+   std::vector<c_int> row_idxs;
+   row_idxs.reserve(elem);
+@@ -64,13 +64,13 @@ CSC_Matrix calCSCMatrix(const Eigen::MatrixXd & mat)
+   return csc_matrix;
+ }
+
  CSC_Matrix calCSCMatrixTrapezoidal(const Eigen::MatrixXd & mat)
  {
 -  const size_t elem = static_cast<size_t>(mat.nonZeros());
    const Eigen::Index rows = mat.rows();
    const Eigen::Index cols = mat.cols();
 +  const size_t elem = static_cast<size_t>(rows * (rows + 1) / 2);
- 
+
    if (rows != cols) {
      throw std::invalid_argument("Matrix must be square (n, n)");
+   }
+
+diff --git a/src/osqp_interface.cpp b/src/osqp_interface.cpp
+index 89a0b10e0..4dcb14f43 100644
+--- a/src/osqp_interface.cpp
++++ b/src/osqp_interface.cpp
+@@ -26,26 +26,25 @@
+ namespace autoware::qp_interface
+ {
+ OSQPInterface::OSQPInterface(
+   const bool enable_warm_start, const int max_iteration, const c_float eps_abs,
+   const c_float eps_rel, const bool polish, const bool verbose)
+-: QPInterface(enable_warm_start), work_{nullptr, OSQPWorkspaceDeleter}
++: QPInterface(enable_warm_start), work_{nullptr, OSQPSolverDeleter}
+ {
+   settings_ = std::make_unique<OSQPSettings>();
+-  data_ = std::make_unique<OSQPData>();
+
+   if (settings_) {
+     osqp_set_default_settings(settings_.get());
+     settings_->alpha = 1.6;  // Change alpha parameter
+     settings_->eps_rel = eps_rel;
+     settings_->eps_abs = eps_abs;
+     settings_->eps_prim_inf = 1.0E-4;
+     settings_->eps_dual_inf = 1.0E-4;
+-    settings_->warm_start = enable_warm_start;
++    settings_->warm_starting = enable_warm_start;
+     settings_->max_iter = max_iteration;
+     settings_->verbose = verbose;
+-    settings_->polish = polish;
++    settings_->polishing = polish;
+   }
+   exitflag_ = 0;
+ }
+
+ OSQPInterface::OSQPInterface(
+@@ -64,15 +63,11 @@ OSQPInterface::OSQPInterface(
+ : OSQPInterface(enable_warm_start, OSQP_MAX_ITERATION, eps_abs)
+ {
+   initializeCSCProblemImpl(P, A, q, l, u);
+ }
+
+-OSQPInterface::~OSQPInterface()
+-{
+-  if (data_->P) free(data_->P);
+-  if (data_->A) free(data_->A);
+-}
++OSQPInterface::~OSQPInterface() = default;
+
+ void OSQPInterface::initializeProblemImpl(
+   const Eigen::MatrixXd & P, const Eigen::MatrixXd & A, const std::vector<double> & q,
+   const std::vector<double> & l, const std::vector<double> & u)
+ {
+@@ -95,71 +90,68 @@ void OSQPInterface::initializeCSCProblemImpl(
+
+   /**********************
+    * OBJECTIVE FUNCTION
+    **********************/
+   param_n_ = static_cast<int>(q.size());
+-  data_->m = static_cast<int>(l.size());
++  constraint_n_ = static_cast<int>(l.size());
+
+   /*****************
+    * POPULATE DATA
+    *****************/
+-  data_->n = param_n_;
+-  if (data_->P) free(data_->P);
+-  data_->P = csc_matrix(
+-    data_->n, data_->n, static_cast<c_int>(P_csc.vals_.size()), P_csc.vals_.data(),
++  OSQPCscMatrix P;
++  OSQPCscMatrix_set_data(
++    &P, param_n_, param_n_, static_cast<c_int>(P_csc.vals_.size()), P_csc.vals_.data(),
+     P_csc.row_idxs_.data(), P_csc.col_idxs_.data());
+-  data_->q = q_dyn;
+-  if (data_->A) free(data_->A);
+-  data_->A = csc_matrix(
+-    data_->m, data_->n, static_cast<c_int>(A_csc.vals_.size()), A_csc.vals_.data(),
++  OSQPCscMatrix A;
++  OSQPCscMatrix_set_data(
++    &A, constraint_n_, param_n_, static_cast<c_int>(A_csc.vals_.size()), A_csc.vals_.data(),
+     A_csc.row_idxs_.data(), A_csc.col_idxs_.data());
+-  data_->l = l_dyn;
+-  data_->u = u_dyn;
+
+   // Setup workspace
+-  OSQPWorkspace * workspace;
+-  exitflag_ = osqp_setup(&workspace, data_.get(), settings_.get());
+-  work_.reset(workspace);
+-  work__initialized = true;
++  OSQPSolver * solver = nullptr;
++  exitflag_ = osqp_setup(
++    &solver, &P, q_dyn, &A, l_dyn, u_dyn, constraint_n_, param_n_, settings_.get());
++  work_.reset(solver);
++  work__initialized = exitflag_ == 0;
+ }
+
+-void OSQPInterface::OSQPWorkspaceDeleter(OSQPWorkspace * ptr) noexcept
++void OSQPInterface::OSQPSolverDeleter(OSQPSolver * ptr) noexcept
+ {
+   if (ptr != nullptr) {
+     osqp_cleanup(ptr);
+   }
+ }
+
+ void OSQPInterface::updateEpsAbs(const double eps_abs)
+ {
+   settings_->eps_abs = eps_abs;  // for default setting
+   if (work__initialized) {
+-    osqp_update_eps_abs(work_.get(), eps_abs);  // for current work
++    osqp_update_settings(work_.get(), settings_.get());  // for current work
+   }
+ }
+
+ void OSQPInterface::updateEpsRel(const double eps_rel)
+ {
+   settings_->eps_rel = eps_rel;  // for default setting
+   if (work__initialized) {
+-    osqp_update_eps_rel(work_.get(), eps_rel);  // for current work
++    osqp_update_settings(work_.get(), settings_.get());  // for current work
+   }
+ }
+
+ void OSQPInterface::updateMaxIter(const int max_iter)
+ {
+   settings_->max_iter = max_iter;  // for default setting
+   if (work__initialized) {
+-    osqp_update_max_iter(work_.get(), max_iter);  // for current work
++    osqp_update_settings(work_.get(), settings_.get());  // for current work
+   }
+ }
+
+ void OSQPInterface::updateVerbose(const bool is_verbose)
+ {
+   settings_->verbose = is_verbose;  // for default setting
+   if (work__initialized) {
+-    osqp_update_verbose(work_.get(), is_verbose);  // for current work
++    osqp_update_settings(work_.get(), settings_.get());  // for current work
+   }
+ }
+
+ void OSQPInterface::updateRhoInterval(const int rho_interval)
+ {
+@@ -176,24 +168,24 @@ void OSQPInterface::updateRho(const double rho)
+
+ void OSQPInterface::updateAlpha(const double alpha)
+ {
+   settings_->alpha = alpha;
+   if (work__initialized) {
+-    osqp_update_alpha(work_.get(), alpha);
++    osqp_update_settings(work_.get(), settings_.get());
+   }
+ }
+
+ void OSQPInterface::updateScaling(const int scaling)
+ {
+   settings_->scaling = scaling;
+ }
+
+ void OSQPInterface::updatePolish(const bool polish)
+ {
+-  settings_->polish = polish;
++  settings_->polishing = polish;
+   if (work__initialized) {
+-    osqp_update_polish(work_.get(), polish);
++    osqp_update_settings(work_.get(), settings_.get());
+   }
+ }
+
+ void OSQPInterface::updatePolishRefinementIteration(const int polish_refine_iter)
+ {
+@@ -202,11 +194,11 @@ void OSQPInterface::updatePolishRefinementIteration(const int polish_refine_iter
+     return;
+   }
+
+   settings_->polish_refine_iter = polish_refine_iter;
+   if (work__initialized) {
+-    osqp_update_polish_refine_iter(work_.get(), polish_refine_iter);
++    osqp_update_settings(work_.get(), settings_.get());
+   }
+ }
+
+ void OSQPInterface::updateCheckTermination(const int check_termination)
+ {
+@@ -215,11 +207,11 @@ void OSQPInterface::updateCheckTermination(const int check_termination)
+     return;
+   }
+
+   settings_->check_termination = check_termination;
+   if (work__initialized) {
+-    osqp_update_check_termination(work_.get(), check_termination);
++    osqp_update_settings(work_.get(), settings_.get());
+   }
+ }
+
+ bool OSQPInterface::setWarmStart(
+   const std::vector<double> & primal_variables, const std::vector<double> & dual_variables)
+@@ -231,11 +223,11 @@ bool OSQPInterface::setPrimalVariables(const std::vector<double> & primal_variab
+ {
+   if (!work__initialized) {
+     return false;
+   }
+
+-  const auto result = osqp_warm_start_x(work_.get(), primal_variables.data());
++  const auto result = osqp_warm_start(work_.get(), primal_variables.data(), OSQP_NULL);
+   if (result != 0) {
+     std::cerr << "Failed to set primal variables for warm start" << std::endl;
+     return false;
+   }
+
+@@ -246,11 +238,11 @@ bool OSQPInterface::setDualVariables(const std::vector<double> & dual_variables)
+ {
+   if (!work__initialized) {
+     return false;
+   }
+
+-  const auto result = osqp_warm_start_y(work_.get(), dual_variables.data());
++  const auto result = osqp_warm_start(work_.get(), OSQP_NULL, dual_variables.data());
+   if (result != 0) {
+     std::cerr << "Failed to set dual variables for warm start" << std::endl;
+     return false;
+   }
+
+@@ -267,16 +259,20 @@ void OSQPInterface::updateP(const Eigen::MatrixXd & P_new)
+   double *P_val_ptr = P_sparse.valuePtr();
+   // Convert dynamic 'int' arrays to 'c_int' arrays (OSQP input type)
+   c_int P_elem_N = P_sparse.nonZeros();
+   */
+   CSC_Matrix P_csc = calCSCMatrixTrapezoidal(P_new);
+-  osqp_update_P(work_.get(), P_csc.vals_.data(), OSQP_NULL, static_cast<c_int>(P_csc.vals_.size()));
++  osqp_update_data_mat(
++    work_.get(), P_csc.vals_.data(), OSQP_NULL, static_cast<c_int>(P_csc.vals_.size()),
++    OSQP_NULL, OSQP_NULL, 0);
+ }
+
+ void OSQPInterface::updateCscP(const CSC_Matrix & P_csc)
+ {
+-  osqp_update_P(work_.get(), P_csc.vals_.data(), OSQP_NULL, static_cast<c_int>(P_csc.vals_.size()));
++  osqp_update_data_mat(
++    work_.get(), P_csc.vals_.data(), OSQP_NULL, static_cast<c_int>(P_csc.vals_.size()),
++    OSQP_NULL, OSQP_NULL, 0);
+ }
+
+ void OSQPInterface::updateA(const Eigen::MatrixXd & A_new)
+ {
+   /*
+@@ -285,48 +281,52 @@ void OSQPInterface::updateA(const Eigen::MatrixXd & A_new)
+   double *A_val_ptr = A_sparse.valuePtr();
+   // Convert dynamic 'int' arrays to 'c_int' arrays (OSQP input type)
+   c_int A_elem_N = A_sparse.nonZeros();
+   */
+   CSC_Matrix A_csc = calCSCMatrix(A_new);
+-  osqp_update_A(work_.get(), A_csc.vals_.data(), OSQP_NULL, static_cast<c_int>(A_csc.vals_.size()));
++  osqp_update_data_mat(
++    work_.get(), OSQP_NULL, OSQP_NULL, 0, A_csc.vals_.data(), OSQP_NULL,
++    static_cast<c_int>(A_csc.vals_.size()));
+   return;
+ }
+
+ void OSQPInterface::updateCscA(const CSC_Matrix & A_csc)
+ {
+-  osqp_update_A(work_.get(), A_csc.vals_.data(), OSQP_NULL, static_cast<c_int>(A_csc.vals_.size()));
++  osqp_update_data_mat(
++    work_.get(), OSQP_NULL, OSQP_NULL, 0, A_csc.vals_.data(), OSQP_NULL,
++    static_cast<c_int>(A_csc.vals_.size()));
+ }
+
+ void OSQPInterface::updateQ(const std::vector<double> & q_new)
+ {
+   std::vector<double> q_tmp(q_new.begin(), q_new.end());
+   double * q_dyn = q_tmp.data();
+-  osqp_update_lin_cost(work_.get(), q_dyn);
++  osqp_update_data_vec(work_.get(), q_dyn, OSQP_NULL, OSQP_NULL);
+ }
+
+ void OSQPInterface::updateL(const std::vector<double> & l_new)
+ {
+   std::vector<double> l_tmp(l_new.begin(), l_new.end());
+   double * l_dyn = l_tmp.data();
+-  osqp_update_lower_bound(work_.get(), l_dyn);
++  osqp_update_data_vec(work_.get(), OSQP_NULL, l_dyn, OSQP_NULL);
+ }
+
+ void OSQPInterface::updateU(const std::vector<double> & u_new)
+ {
+   std::vector<double> u_tmp(u_new.begin(), u_new.end());
+   double * u_dyn = u_tmp.data();
+-  osqp_update_upper_bound(work_.get(), u_dyn);
++  osqp_update_data_vec(work_.get(), OSQP_NULL, OSQP_NULL, u_dyn);
+ }
+
+ void OSQPInterface::updateBounds(
+   const std::vector<double> & l_new, const std::vector<double> & u_new)
+ {
+   std::vector<double> l_tmp(l_new.begin(), l_new.end());
+   std::vector<double> u_tmp(u_new.begin(), u_new.end());
+   double * l_dyn = l_tmp.data();
+   double * u_dyn = u_tmp.data();
+-  osqp_update_bounds(work_.get(), l_dyn, u_dyn);
++  osqp_update_data_vec(work_.get(), OSQP_NULL, l_dyn, u_dyn);
+ }
+
+ int OSQPInterface::getIterationNumber() const
+ {
+   return work_->info->iter;
+@@ -348,11 +348,11 @@ int OSQPInterface::getPolishStatus() const
+ }
+
+ std::vector<double> OSQPInterface::getDualSolution() const
+ {
+   double * sol_y = work_->solution->y;
+-  std::vector<double> dual_solution(sol_y, sol_y + data_->m);
++  std::vector<double> dual_solution(sol_y, sol_y + constraint_n_);
+   return dual_solution;
+ }
+
+ std::vector<double> OSQPInterface::optimizeImpl()
+ {
