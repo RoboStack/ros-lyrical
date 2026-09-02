@@ -177,18 +177,6 @@ ros_gz_sim:
 ament_cmake_ros:
   # Break the test-only runtime cycle so a new mutex migration can bootstrap.
   remove_run: ["ros-lyrical-rmw-test-fixture-implementation"]
-cyclonedds:
-  # The posh CMake targets reference the iox-roudi executable shipped by the
-  # top-level iceoryx package, so the split devel packages alone are incomplete.
-  add_host: ["iceoryx", "libiceoryx-hoofs-devel", "libiceoryx-posh-devel"]
-  add_run: ["libiceoryx-hoofs", "libiceoryx-posh"]
-  remove_host: ["ros-lyrical-iceoryx-hoofs", "ros-lyrical-iceoryx-posh"]
-  remove_run: ["ros-lyrical-iceoryx-hoofs", "ros-lyrical-iceoryx-posh"]
-rmw_cyclonedds_cpp:
-  add_host: ["libiceoryx-binding-c-devel"]
-  add_run: ["libiceoryx-binding-c"]
-  remove_host: ["ros-lyrical-iceoryx-binding-c"]
-  remove_run: ["ros-lyrical-iceoryx-binding-c"]
 geometric_shapes:
   add_host: ["libboost-devel", "octomap"]
 ros_image_to_qimage:
