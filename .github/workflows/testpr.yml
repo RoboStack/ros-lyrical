@@ -123,7 +123,30 @@ jobs:
       id: build-recipes
       shell: bash -l {0}
       run: |
-        pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
+        set +e
+        pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing 2>&1 | tee rattler-build.log
+        build_status=${PIPESTATUS[0]}
+        echo "exit-code=${build_status}" >> "$GITHUB_OUTPUT"
+        exit "$build_status"
+
+    - name: Summarize build result
+      if: always()
+      shell: bash -l {0}
+      run: |
+        pixi run python .github/scripts/summarize_rattler_build.py \
+          --log rattler-build.log \
+          --platform "${{ matrix.platform }}" \
+          --outcome "${{ steps.build-recipes.outcome }}" \
+          >> "$GITHUB_STEP_SUMMARY"
+
+    - name: Upload build log
+      if: always()
+      uses: actions/upload-artifact@v6
+      with:
+        name: build-log-${{ matrix.platform }}-${{ github.run_id }}-${{ github.run_attempt }}
+        path: rattler-build.log
+        if-no-files-found: warn
+        retention-days: 7
 
     - name: See packages that will be saved in cache
       shell: bash -l {0}
