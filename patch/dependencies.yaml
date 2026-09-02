@@ -105,14 +105,6 @@ nav2_rviz_plugins:
   # Qt 6 provides its StateMachine component through the qt6-scxml package.
   add_host: ["qt6-scxml"]
   add_run: ["qt6-scxml"]
-nav2_route:
-  # Both dependencies are exported by nav2_routeConfig.cmake.
-  add_run: ["nanoflann", "nlohmann_json"]
-nav2_util:
-  add_host: ["libboost-devel"]
-  # nav2_util exports angles from its CMake config, so downstream consumers
-  # need it in the runtime environment as well.
-  add_run: ["ros-lyrical-angles"]
 nav2_constrained_smoother:
   add_host: ["${{ 'openblas' if win }}", "ceres-solver * cpu*"]
 ompl:
