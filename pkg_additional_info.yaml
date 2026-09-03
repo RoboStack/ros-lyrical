@@ -175,3 +175,7 @@ visp:
 zenoh_cpp_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK -DUSE_SYSTEM_ZENOH=ON"
 # Remove all lines after this one on new full rebuild
+rosidl_cli:
+  build_number: 23
+ros2cli:
+  build_number: 23
