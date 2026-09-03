@@ -12,9 +12,9 @@ libboost_devel:
 libboost_python_devel:
   - '1.90'
 libprotobuf:
-  - 6.33.5
+  - 7.35.1
 protobuf:
-  - 6.33.5
+  - 7.35.1
 spdlog:
   - 1.17
 pugixml:
