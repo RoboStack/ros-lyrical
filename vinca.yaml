@@ -288,8 +288,7 @@ packages_select_by_deps:
   - builtin_interfaces
   - irobot_create_msgs
   - mavros_msgs
-  - mujoco_ros2_control_msgs
-  - mujoco_vendor
+
   - nav2_loopback_sim
   - osrf_testing_tools_cpp
   - picknik_ament_copyright
@@ -356,8 +355,6 @@ packages_select_by_deps:
       - moveit-ros-perception
       - moveit-runtime
       - moveit_resources
-      - mujoco_ros2_control
-      - mujoco_ros2_control_demos
       - navmap_core
       - navmap_ros
       - navmap_ros_interfaces

@@ -27,7 +27,7 @@ rattler-index = ">=0.27.16"
 curl = "*"
 go-yq = "*"
 colordiff = "*"
-vinca = { git = "https://github.com/RoboStack/vinca.git", rev = "6aacb6f6334b0df6bc9c863c37eb02ba685f1a1b" }
+vinca = { git = "https://github.com/RoboStack/vinca.git" }
 # For local development uncomment:
 # vinca.path = "../vinca"
 
@@ -43,7 +43,7 @@ generate-gha-workflows = { cmd = "vinca-gha --trigger-branch dummy_build_branch_
 check-patches = { cmd = "python check_patches_clean_apply.py", depends-on = ["generate-recipes"] }
 create_snapshot = { cmd = "vinca-snapshot -d lyrical -o rosdistro_snapshot.yaml" }
 upload = "rattler-build upload prefix -c robostack-lyrical --generate-attestation"
-build_continue_on_failure = { cmd = "rattler-build build --recipe-dir ./recipes -m ./conda_build_config.yaml -c robostack-lyrical -c https://repo.prefix.dev/conda-forge --continue-on-failure --skip-existing", depends-on = ["generate-recipes"] }
+build_continue_on_failure = { cmd = "rattler-build build --recipe-dir ./recipes -m ./conda_build_config.yaml -c https://prefix.dev/robostack-lyrical -c https://repo.prefix.dev/conda-forge --continue-on-failure --skip-existing", depends-on = ["generate-recipes"] }
 sort = { cmd = "vinca-sort-vinca-lists {{ check }} vinca.yaml && vinca-sort-yaml-keys {{ check }} pkg_additional_info.yaml robostack.yaml rosdistro_additional_recipes.yaml", args = [{ arg = "check", default = "" }] }
 
 [tasks.build]
