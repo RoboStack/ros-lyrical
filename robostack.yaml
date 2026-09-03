@@ -308,7 +308,7 @@ libgazebo11-dev:
 libgazebo9-dev:
   robostack: [gazebo, libprotobuf, libabseil]
 libgdal-dev:
-  robostack: [libgdal]
+  robostack: [libgdal-core]
 libgeos++-dev:
   robostack: [geos]
 libgflags-dev:

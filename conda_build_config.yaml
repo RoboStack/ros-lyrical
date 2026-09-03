@@ -25,10 +25,16 @@ libxml2:
   - 2.14.*
 graphviz:
   - 14.*
+libgdal:
+  - '3.13'
+libgdal_core:
+  - '3.13'
 # Mitigation for
 # https://github.com/RoboStack/ros-jazzy/pull/126#issuecomment-3515455380
 libcap:
   - 2.78
+libtheora:
+  - '1.2'
 fmt:
   - 12.1
 lua:
@@ -37,6 +43,8 @@ tbb:
   - '2023'
 tbb_devel:
   - '2023'
+jsoncpp:
+  - 1.9.8
 
 # Workaround for https://github.com/RoboStack/ros-jazzy/pull/40#issuecomment-2782226697
 cmake:
