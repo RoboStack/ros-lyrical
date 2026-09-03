@@ -29,7 +29,7 @@ git = "*"
 
 [pypi-dependencies]
 # This is typically the latest commit on main branch
-vinca = { git = "https://github.com/RoboStack/vinca.git", rev = "4683e080a18be89703b4088c90fca8eaa8620ebe" }
+vinca = { git = "https://github.com/RoboStack/vinca.git", rev = "45d6e8b23135dbbe99084fab0e1e4f26218d9126" }
 # Uncomment this line to work with a local vinca for faster iteration, but remember to comment it back
 # (and regenerate the pixi.lock) once you push the modified commit to the repo
 # vinca = { path = "../vinca", editable = true }
@@ -56,4 +56,3 @@ description = "Remove all generated recipes, before regenerating them."
 cmd = "cp ./patch/{{ PACKAGE }}.*patch ./recipes/{{ PACKAGE }}/patch/; rattler-build build --recipe ./recipes/{{ PACKAGE }}/recipe.yaml -m ./conda_build_config.yaml -c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge"
 args = [{ arg = "PACKAGE", default = "ros-lyrical-ros-workspace" }]
 description = "Build a single package, from the ./recipes dir. Add the `ros-lyrical-` prefix to the package name, e.g. `pixi build-one --package ros-lyrical-ros-workspace`"
-
