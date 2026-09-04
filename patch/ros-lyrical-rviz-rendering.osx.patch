@@ -1,10 +1,10 @@
 diff --git a/src/rviz_rendering/ogre_render_window_impl.cpp b/src/rviz_rendering/ogre_render_window_impl.cpp
-index 466e1d1e4..8fcd56d57 100644
+index 27ff2ce..38ade73 100644
 --- a/src/rviz_rendering/ogre_render_window_impl.cpp
 +++ b/src/rviz_rendering/ogre_render_window_impl.cpp
-@@ -235,12 +235,21 @@ void
- RenderWindowImpl::resize(size_t width, size_t height)
- {
+@@ -243,12 +243,21 @@ RenderWindowImpl::resize(size_t width, size_t height)
+     return;
+   }
    if (ogre_render_window_) {
 -    this->setCameraAspectRatio();
 -    ogre_render_window_->resize(
@@ -31,7 +31,7 @@ index 466e1d1e4..8fcd56d57 100644
    this->renderLater();
  }
 diff --git a/src/rviz_rendering/ogre_render_window_impl.hpp b/src/rviz_rendering/ogre_render_window_impl.hpp
-index 7bd7b2238..8391498fe 100644
+index 7bd7b22..8391498 100644
 --- a/src/rviz_rendering/ogre_render_window_impl.hpp
 +++ b/src/rviz_rendering/ogre_render_window_impl.hpp
 @@ -150,6 +150,9 @@ protected:

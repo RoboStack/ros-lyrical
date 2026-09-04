@@ -2,9 +2,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  actions: read
+  contents: read
+
 env:
   ROS_VERSION: 2
-  PYTHONIOENCODING: utf-8
   # Change to 'true' to enable the cache upload as artifacts
   SAVE_CACHE_AS_ARTIFACT: 'true'
   # Change to 'true' to ignore cache and force a full rebuild, but please restore to 'false' before merging
@@ -45,6 +48,12 @@ jobs:
         pixi-version: v0.75.0
         frozen: true
 
+    - name: Check sorting
+      if: matrix.platform == 'linux-64'
+      shell: bash -l {0}
+      run: |
+        pixi run sort --check
+
     - name: Long paths workarounds for win-64
       shell: bash -l {0}
       if: matrix.platform == 'win-64'
@@ -65,23 +74,43 @@ jobs:
     # For some reason, the Strawberry perl's pkg-config is found
     # instead of the conda's one, so let's delete the /c/Strawberry directory
     # Furthermore, we also need to remove an older SDK that is used and can result in compilation problems
-    - name: Debug pkg-config problem
+    # And we also remove the vcpkg installed in the image, to avoid that projects pick it
+    - name: Remove problematic files of GitHub Actions images
       if: contains(matrix.os, 'windows')
       shell: bash -l {0}
       run: |
         rm -rf /c/Strawberry
         rm -rf "/c/Program Files (x86)/Windows Kits/10/Include/10.0.17763.0/"
 
+    - name: Disable git auto-maintenance in source caches
+      shell: bash -l {0}
+      run: |
+        git config --global maintenance.auto false
+
     - name: Generate recipes
       shell: bash -l {0}
       run: |
-        mkdir -p recipes
-        pixi run -v vinca --platform ${{ matrix.platform }} -m -n
+        set -e
+        for attempt in 1 2 3; do
+          rm -rf recipes
+          mkdir -p recipes
+          if pixi run -v vinca --platform ${{ matrix.platform }} -m -n; then
+            break
+          fi
+          if [[ "${attempt}" == "3" ]]; then
+            echo "Recipe generation failed after ${attempt} attempts" >&2
+            exit 1
+          fi
+          echo "Recipe generation attempt ${attempt} failed; retrying..." >&2
+          sleep 15
+        done
 
     - name: Check patches
       shell: bash -l {0}
       run: |
-        pixi run check-patches
+        # Recipes were already generated for the matrix platform. Do not use
+        # the Pixi task here because it would overwrite them.
+        pixi run python check_patches_clean_apply.py
 
     - name: Restore build cache
       id: cache-restore
@@ -94,6 +123,40 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-${{ matrix.platform }}-pr-${{ github.event.pull_request.number }}-
 
+    - name: Restore latest partial-build artifact
+      if: ${{ steps.cache-restore.outputs.cache-hit != 'true' && env.IGNORE_CACHE_AND_DO_FULL_REBUILD != 'true' }}
+      shell: bash -l {0}
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        # A hosted job canceled at the hard six-hour limit cannot reliably save
+        # its actions/cache entry, but always() still uploads its partial output
+        # as an artifact. Recover the newest such checkpoint on the next run.
+        prefix="cache-${{ matrix.platform }}-"
+        artifact_id=""
+        # Query artifacts per workflow run rather than the repository-wide
+        # first page, which can omit this branch's checkpoint in a busy repo.
+        for run_id in $(gh api -X GET \
+          "repos/${GITHUB_REPOSITORY}/actions/workflows/testpr.yml/runs" \
+          -f branch="${GITHUB_HEAD_REF}" -f event="pull_request" -f per_page=20 \
+          --jq '.workflow_runs[].id'); do
+          [[ "${run_id}" == "${GITHUB_RUN_ID}" ]] && continue
+          artifact_id=$(gh api -X GET \
+            "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" \
+            -f name="${prefix}${run_id}" \
+            --jq '.artifacts | map(select(.expired == false)) | first | .id // empty')
+          [[ -n "${artifact_id}" ]] && break
+        done
+        if [[ -n "${artifact_id}" ]]; then
+          echo "Restoring partial-build artifact ${artifact_id}"
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${artifact_id}/zip" > partial-cache.zip
+          mkdir -p ${{ matrix.folder_cache }}
+          pixi run python -m zipfile -e partial-cache.zip ${{ matrix.folder_cache }}
+          rm partial-cache.zip
+        else
+          echo "No partial-build artifact found for ${{ matrix.platform }}"
+        fi
+
     - name: Optional force full rebuild
       if: ${{ env.IGNORE_CACHE_AND_DO_FULL_REBUILD == 'true' }}
       shell: bash -l {0}
@@ -103,7 +166,17 @@ jobs:
     - name: Delete specific outdated cache entries
       shell: bash -l {0}
       run: |
-        # rm -rf ${{ matrix.folder_cache }}/ros-lyrical-pcl-conversions* 2>/dev/null || true
+        # nav2-util was cached before its exported angles dependency was
+        # propagated; force replacement without discarding the full rebuild.
+        rm -rf ${{ matrix.folder_cache }}/ros-lyrical-nav2-util-* 2>/dev/null || true
+        rm -rf ${{ matrix.folder_cache }}/ros-lyrical-nav2-route-* 2>/dev/null || true
+        rm -rf ${{ matrix.folder_cache }}/ros-lyrical-nav2-ros-common-* 2>/dev/null || true
+        # Build 23 caches contain a mixture of pre- and post-mutex-migration
+        # packages with identical filenames. Remove them now that this rebuild
+        # uses build 24, otherwise strict local-channel priority can select an
+        # incompatible package requiring the old mutex.
+        rm -rf ${{ matrix.folder_cache }}/*_23.conda 2>/dev/null || true
+        rm -rf ${{ matrix.folder_cache }}/ros2-distro-mutex-*-lyrical_23.conda 2>/dev/null || true
         mkdir -p ${{ matrix.folder_cache }}
         pixi run rattler-index fs ${{ matrix.folder_cache }}/.. --force
 
@@ -113,8 +186,37 @@ jobs:
         ls ${{ matrix.folder_cache }} || true
 
     - name: Build recipes
+      id: build-recipes
       shell: bash -l {0}
       run: |
+        set -e
+        # rattler-build orders build and host dependencies, but runtime-only
+        # dependencies do not create build-graph edges. A mutex migration makes
+        # old runtime packages unusable, so run tolerant passes to populate the
+        # new mutex generation before the final strict validation. Four passes
+        # also let the build recover when an earlier failed run saved little or
+        # no usable cache.
+        pass_count=4
+        # Hosted macOS and Windows jobs have a hard six-hour limit. Restore the
+        # latest build-24 artifact layer, then use one tolerant pass on macOS.
+        # A tolerant Windows scan alone exceeds six hours, so validate its
+        # mature checkpoint directly and save any additional strict progress.
+        if [[ "${{ matrix.platform }}" == osx-* ]]; then
+          pass_count=1
+        elif [[ "${{ matrix.platform }}" == "win-64" ]]; then
+          pass_count=0
+        fi
+
+        for pass in $(seq 1 "${pass_count}"); do
+          echo "Dependency-tolerant build pass ${pass}/${pass_count}"
+          rm -rf ${{ matrix.folder_cache }}/../src_cache/git
+          pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --continue-on-failure --skip-existing || true
+          # Each rattler-build invocation resolves against channel repodata read
+          # at startup. Publish this pass's new artifacts before the next pass.
+          pixi run rattler-index fs ${{ matrix.folder_cache }}/.. --force
+        done
+
+        rm -rf ${{ matrix.folder_cache }}/../src_cache/git
         pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing
 
     - name: See packages that will be saved in cache
@@ -125,7 +227,9 @@ jobs:
 
     - name: Save build cache
       uses: actions/cache/save@v5
-      if: always()
+      # Preserve useful partial builds, but do not let a recipe-generation or
+      # patch-check failure replace the restore prefix with an empty cache.
+      if: ${{ always() && (steps.build-recipes.outcome == 'success' || steps.build-recipes.outcome == 'failure') }}
       with:
         path: |
           ${{ matrix.folder_cache }}
@@ -134,7 +238,18 @@ jobs:
     - name: Generate GitHub Actions workflows to catch post-PR problems
       shell: bash -l {0}
       run: |
-        pixi run vinca-gha --platform ${{ matrix.platform }} --trigger-branch dummy_build_branch_as_it_is_unused -d ./recipes
+        set -e
+        for attempt in 1 2 3; do
+          if pixi run vinca-gha --platform ${{ matrix.platform }} --trigger-branch dummy_build_branch_as_it_is_unused -d ./recipes; then
+            break
+          fi
+          if [[ "${attempt}" == "3" ]]; then
+            echo "Workflow generation failed after ${attempt} attempts" >&2
+            exit 1
+          fi
+          echo "Workflow generation attempt ${attempt} failed; retrying..." >&2
+          sleep 15
+        done
 
     - name: Upload build cache as artifact
       if: ${{ always() && env.SAVE_CACHE_AS_ARTIFACT == 'true' }}

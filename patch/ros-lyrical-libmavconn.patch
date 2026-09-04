@@ -1,0 +1,60 @@
+--- a/include/mavconn/io_context_runner.hpp
++++ b/include/mavconn/io_context_runner.hpp
+@@ -15,6 +15,38 @@
+ #include <memory>
+ #include <thread>
+ #include <utility>
++// macOS 11/12 libc++ (in the macOS SDK) does not declare std::jthread; it was
++// added to the macOS SDK in version 13.  The deployment target here is 11.0,
++// so we provide a minimal shim that satisfies the API used in this file:
++//   - constructor(callable)
++//   - move assignment / destructor with auto-join
++//   - request_stop()  (no-op: io_.stop() / work-guard handles shutdown)
++//   - join() / joinable() / get_id() / detach()
++// Guarded by __cpp_lib_jthread so the shim is skipped on macOS 13+ or when
++// the conda-forge libcxx headers already provide a native jthread.
++#ifdef __APPLE__
++#ifndef __cpp_lib_jthread
++namespace std {
++class jthread {
++  thread t_;
++public:
++  jthread() = default;
++  template<class F, class... Args>
++  explicit jthread(F && f, Args &&... args)
++    : t_(std::forward<F>(f), std::forward<Args>(args)...) {}
++  jthread(jthread &&) = default;
++  jthread & operator=(jthread &&) = default;
++  ~jthread() { if (t_.joinable()) t_.join(); }
++  bool joinable() const noexcept { return t_.joinable(); }
++  thread::id get_id() const noexcept { return t_.get_id(); }
++  void join() { t_.join(); }
++  void detach() { t_.detach(); }
++  void request_stop() noexcept {}
++};
++}  // namespace std
++#endif  // __cpp_lib_jthread
++#endif  // __APPLE__
++
+
+ #include <asio.hpp>
+
+--- a/include/mavconn/mavlink_dialect.hpp.em
++++ b/include/mavconn/mavlink_dialect.hpp.em
+@@ -44,6 +44,17 @@
+ #pragma GCC diagnostic push
+ #pragma GCC diagnostic ignored "-Wpedantic"
+
++// macOS missing htole*/le*toh - provide shims before mavlink includes
++#ifdef __APPLE__
++#include <libkern/OSByteOrder.h>
++#define htole16(x) OSSwapHostToLittleInt16(x)
++#define htole32(x) OSSwapHostToLittleInt32(x)
++#define htole64(x) OSSwapHostToLittleInt64(x)
++#define le16toh(x) OSSwapLittleToHostInt16(x)
++#define le32toh(x) OSSwapLittleToHostInt32(x)
++#define le64toh(x) OSSwapLittleToHostInt64(x)
++#endif
++
+ @[for dialect in MAVLINK_V20_DIALECTS]#include <mavlink/v2.0/@(dialect)/@(dialect).hpp>
+ @[end for]

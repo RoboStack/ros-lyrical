@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Working notes for future coding agents in a RoboStack repo. Replace $DISTRO with e.g. noetic/humble/kilted/lyrical/rolling and so forth; you can check the working directory.
+Working notes for future coding agents in a RoboStack repo. Replace $DISTRO with e.g. noetic/humble/kilted and so forth; you can check the working directory.
 
 ## Session defaults for this repo
 
@@ -168,6 +168,14 @@ Rules:
 - If package A depends on package B (for example `rosmon` -> `rosmon-core`), build/fix B first.
 - Run parallel lanes only for packages that do not depend on each other.
 - If unsure, serialize the builds.
+
+## Cross-distribution sync
+
+- Work from the clean checked-out heads of rolling, lyrical, kilted, jazzy, and humble; create `codex/cross-distro-sync` in each repo and never merge their independent histories.
+- Classify every candidate before editing: portable shared tooling/CI/metadata, conditional package fix requiring a compatible source and refreshed patch, or excluded distro-owned state.
+- Keep rosdistro snapshots, mutex/build numbers, ABI/compiler/Python pins, channels/upload targets, package selection, generated recipes, and temporary rebuild controls distro-owned.
+- Port patches only for an existing compatible package, using `patch/ros-$DISTRO-<pkg>.patch` and matching recipe wiring; do not copy a patch solely because its filename exists elsewhere.
+- Validate changed patch metadata with `pixi run check-patches` and each changed package with `pixi run build-one ros-$DISTRO-<pkg>`; inspect final diffs for protected state.
 
 ## Inspect a built conda package
 
