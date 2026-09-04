@@ -97,10 +97,6 @@ nav2_smac_planner:
   add_build: ["${{ 'llvm-openmp' if osx }}"]
   # omplConfig.cmake exports Boost as a dependency.
   add_host: ["${{ 'llvm-openmp' if osx }}", "ompl", "libode", "libboost-devel"]
-nav2_map_server:
-  # rosdep does not resolve libuuid on macOS, though conda-forge provides it.
-  add_host: ["libuuid"]
-  add_run: ["libuuid"]
 nav2_rviz_plugins:
   # Qt 6 provides its StateMachine component through the qt6-scxml package.
   add_host: ["qt6-scxml"]
