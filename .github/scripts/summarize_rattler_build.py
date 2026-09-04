@@ -12,7 +12,8 @@ from pathlib import Path
 ANSI_ESCAPE = re.compile(r"\x1b(?:[@-_][0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1b\\))")
 TIMESTAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z\s*")
 DIAGNOSTIC = re.compile(
-    r"(?:Error:\s+×|fatal error:|\berror:|FAILED:|Patch application error|"
+    r"(?:Error:\s+×|fatal error(?:\s+[A-Z]+\d+)?:|\berror(?:\s+[A-Z]+\d+)?:|"
+    r"CMake Error(?::|\s+at\b)|FAILED:|Patch application error|"
     r"Failed to resolve dependencies|Cannot solve the request)",
     re.IGNORECASE,
 )

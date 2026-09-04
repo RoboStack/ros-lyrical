@@ -51,6 +51,9 @@ jobs:
       run: |
         # Workaround for problem related to long paths
         echo "CONDA_BLD_PATH=C:\\bld\\" >> $GITHUB_ENV
+        # Keep rattler-build's package-specific directory but omit its timestamp
+        # suffix, which can push generated MSVC object paths over MAX_PATH.
+        echo "RATTLER_BUILD_EXTRA_ARGS=--no-build-id" >> $GITHUB_ENV
         mkdir /c/bld
 
     # Workaround for https://github.com/RoboStack/ros-humble/pull/141#issuecomment-1941919816
@@ -124,7 +127,7 @@ jobs:
       shell: bash -l {0}
       run: |
         set +e
-        pixi run rattler-build build --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing 2>&1 | tee rattler-build.log
+        pixi run rattler-build build ${RATTLER_BUILD_EXTRA_ARGS:-} --recipe-dir recipes --target-platform ${{ matrix.platform }} -m ./conda_build_config.yaml -c https://prefix.dev/conda-forge -c https://prefix.dev/robostack-lyrical --skip-existing 2>&1 | tee rattler-build.log
         build_status=${PIPESTATUS[0]}
         echo "exit-code=${build_status}" >> "$GITHUB_OUTPUT"
         exit "$build_status"
