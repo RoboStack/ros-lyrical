@@ -1,35 +1,3 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7b47abc..1b82b12 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -12,6 +12,8 @@ find_package(moveit_core REQUIRED)
- find_package(moveit_ros_planning REQUIRED)
- find_package(moveit_ros_planning_interface REQUIRED)
- find_package(moveit_task_constructor_msgs REQUIRED)
-+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-+find_package(pybind11 REQUIRED)
- find_package(py_binding_tools REQUIRED)
- find_package(rclcpp REQUIRED)
- find_package(rviz_marker_tools REQUIRED)
-diff --git a/include/moveit/python/task_constructor/properties.h b/include/moveit/python/task_constructor/properties.h
-index 46c0e97..70bf30e 100644
---- a/include/moveit/python/task_constructor/properties.h
-+++ b/include/moveit/python/task_constructor/properties.h
-@@ -1,14 +1,10 @@
- #pragma once
- 
--#include <pybind11/smart_holder.h>
- #include <py_binding_tools/ros_msg_typecasters.h>
- #include <moveit/task_constructor/properties.h>
- #include <boost/any.hpp>
- #include <typeindex>
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Property)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropertyMap)
--
- namespace moveit {
- namespace python {
- 
 diff --git a/include/moveit/task_constructor/introspection.h b/include/moveit/task_constructor/introspection.h
 index cf4dfb7..b7e26d5 100644
 --- a/include/moveit/task_constructor/introspection.h
@@ -56,42 +24,6 @@ index e217ad6..708a2fb 100644
  	/// function callback used to initialize property value from another PropertyMap
  	using InitializerFunction = std::function<boost::any(const PropertyMap&)>;
  
-diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
-index 181e1a4..fcb7315 100644
---- a/python/CMakeLists.txt
-+++ b/python/CMakeLists.txt
-@@ -1,28 +1,12 @@
--# We rely on pybind11's smart_holder branch imported pybind11 via git submodule
--
-+# Use the pybind11 provided by the environment (with upstream smart_holder support since 3.0),
-+# rather than vendoring our own fork, so we share a single pybind11 with py_binding_tools.
- find_package(ament_cmake_python REQUIRED)
- find_package(Python3 COMPONENTS Interpreter Development)
--# pybind11 must use the ROS python version
--set(PYBIND11_PYTHON_VERSION ${PYTHON_VERSION})
-+find_package(pybind11 REQUIRED)
- 
- # Use minimum-size optimization for pybind11 bindings
- add_compile_options("-Os")
- 
--# configure pybind11 install for use by downstream packages in install space
--set(PYBIND11_INSTALL ON CACHE INTERNAL "Install pybind11")
--set(CMAKE_INSTALL_INCLUDEDIR include/moveit/python)
--set(PYBIND11_CMAKECONFIG_INSTALL_DIR share/${PROJECT_NAME}/cmake
--    CACHE INTERNAL "install path for pybind11 cmake files")
--
--# source pybind11 folder, which exposes its targets and installs them
--if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pybind11/CMakeLists.txt")
--	message("Missing content of submodule pybind11: Use 'git clone --recurse-submodule' in future.\n"
--	        "Checking out content automatically")
--	execute_process(COMMAND git submodule init WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
--	execute_process(COMMAND git submodule update WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
--endif()
--add_subdirectory(pybind11)
--
- # C++ wrapper code
- add_subdirectory(bindings)
- 
 diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
 index 26c86ac..22bf5e1 100644
 --- a/python/bindings/CMakeLists.txt
@@ -107,92 +39,11 @@ index 26c86ac..22bf5e1 100644
  
  # install libs
  install(TARGETS ${PROJECT_NAME}_python_tools
-diff --git a/python/bindings/src/core.h b/python/bindings/src/core.h
-index 7ab1437..b9bdc2c 100644
---- a/python/bindings/src/core.h
-+++ b/python/bindings/src/core.h
-@@ -34,12 +34,12 @@
- 
- #pragma once
- 
-+#include <pybind11/pybind11.h>
- #include <moveit/task_constructor/stage.h>
- #include <moveit/task_constructor/container.h>
- #include <moveit/task_constructor/cost_queue.h>
- #include <moveit/task_constructor/cost_terms.h>
- #include <moveit/utils/moveit_error_code.hpp>
--#include <pybind11/smart_holder.h>
- 
- /** Trampoline classes to allow inheritance in Python (overriding virtual functions) */
- 
-@@ -109,36 +109,3 @@ public:
- }  // namespace task_constructor
- }  // namespace moveit
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::solvers::PlannerInterface)
--
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::SolutionBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::SubTrajectory)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(ordered<moveit::task_constructor::SolutionBaseConstPtr>)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::InterfaceState)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::core::MoveItErrorCode)
--
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::CostTerm)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::TrajectoryCostTerm)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::PathLength)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::DistanceToReference)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::TrajectoryDuration)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::LinkMotion)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::LinkRotation)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::Clearance)
--
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Stage)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropagatingEitherWay)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropagatingForward)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropagatingBackward)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Generator)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::MonitoringGenerator)
--
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::ContainerBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::SerialContainer)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::ParallelContainerBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Alternatives)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Fallbacks)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Merger)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::WrapperBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Task)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Introspection)
-diff --git a/python/bindings/src/module.cpp b/python/bindings/src/module.cpp
-index a797711..cd66917 100644
---- a/python/bindings/src/module.cpp
-+++ b/python/bindings/src/module.cpp
-@@ -32,7 +32,7 @@
-  *  POSSIBILITY OF SUCH DAMAGE.
-  *********************************************************************/
- 
--#include <pybind11/smart_holder.h>
-+#include <pybind11/pybind11.h>
- 
- namespace moveit {
- namespace python {
 diff --git a/python/bindings/src/solvers.cpp b/python/bindings/src/solvers.cpp
-index 7c6a12f..35acc77 100644
+index eebfa2e..35acc77 100644
 --- a/python/bindings/src/solvers.cpp
 +++ b/python/bindings/src/solvers.cpp
-@@ -46,12 +46,6 @@ using namespace py::literals;
- using namespace moveit::task_constructor;
- using namespace moveit::task_constructor::solvers;
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(PlannerInterface)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(PipelinePlanner)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(JointInterpolationPlanner)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(CartesianPath)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(MultiPlanner)
--
- namespace moveit {
- namespace python {
- 
-@@ -73,7 +67,7 @@ void export_solvers(py::module& m) {
+@@ -67,7 +67,7 @@ void export_solvers(py::module& m) {
  				pipelinePlanner = core.PipelinePlanner(node, 'ompl', 'PRMkConfigDefault')
  				pipelinePlanner.num_planning_attempts = 10
  			)")
@@ -201,45 +52,6 @@ index 7c6a12f..35acc77 100644
  	    .property<moveit_msgs::msg::WorkspaceParameters>(
  	        "workspace_parameters",
  	        ":moveit_msgs:`WorkspaceParameters`: Specifies workspace box to be used for Cartesian sampling")
-diff --git a/python/bindings/src/stages.cpp b/python/bindings/src/stages.cpp
-index 1dead16..f51308f 100644
---- a/python/bindings/src/stages.cpp
-+++ b/python/bindings/src/stages.cpp
-@@ -48,26 +48,6 @@ using namespace py::literals;
- using namespace moveit::task_constructor;
- using namespace moveit::task_constructor::stages;
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(ModifyPlanningScene)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(CurrentState)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(FixedState)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(ComputeIK)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(MoveTo)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(MoveRelative)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(Connect)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(FixCollisionObjects)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(GenerateGraspPose)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(GeneratePlacePose)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(GenerateRandomPose)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(GeneratePose)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(Pick)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(Place)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(SimpleGraspBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(SimpleGrasp)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(SimpleUnGrasp)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(PassThrough)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(LimitSolutions)
--
- namespace moveit {
- namespace python {
- 
-@@ -369,7 +349,6 @@ void export_stages(pybind11::module& m) {
- 		)")
- 		.def(py::init<const std::string&>(), "name"_a = std::string("Generate Place Pose"));
- 
--
- 	properties::class_<GenerateGraspPose, MonitoringGenerator>(m, "GenerateGraspPose", R"(
- 			GenerateGraspPose stage derives from monitoring generator and can
- 			be used to generate poses for grasping. Set the desired attributes
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
 index 82e9875..147aa7b 100644
 --- a/src/CMakeLists.txt
@@ -254,7 +66,7 @@ index 82e9875..147aa7b 100644
  	${moveit_ros_planning_TARGETS}
  	${moveit_ros_planning_interface_TARGETS}
 diff --git a/src/introspection.cpp b/src/introspection.cpp
-index 5dfed5d..240320f 100644
+index c045a6c..e6990e4 100644
 --- a/src/introspection.cpp
 +++ b/src/introspection.cpp
 @@ -64,12 +64,26 @@ std::string getTaskId(const TaskPrivate* task) {
@@ -285,8 +97,8 @@ index 5dfed5d..240320f 100644
  	return oss.str();
  }
  }  // namespace
-@@ -218,7 +232,7 @@ void Introspection::publishAllSolutions(bool wait) {
- 	};
+@@ -220,7 +234,7 @@ void Introspection::publishAllSolutions(bool wait) {
+ 	// NOLINTEND(clang-analyzer-unix.BlockInCriticalSection)
  }
  
 -const SolutionBase* Introspection::solutionFromId(uint id) const {
@@ -294,20 +106,8 @@ index 5dfed5d..240320f 100644
  	auto it = impl->id_solution_bimap_.left.find(id);
  	if (it == impl->id_solution_bimap_.left.end())
  		return nullptr;
-diff --git a/src/properties.cpp b/src/properties.cpp
-index e1ffdcf..1ac0102 100644
---- a/src/properties.cpp
-+++ b/src/properties.cpp
-@@ -38,6 +38,7 @@
- 
- #include <moveit/task_constructor/properties.h>
- #include <moveit/task_constructor/fmt_p.h>
-+#include <boost/core/demangle.hpp>
- #include <functional>
- #include <boost/core/demangle.hpp>
- #include <rclcpp/logging.hpp>
 diff --git a/src/solvers/pipeline_planner.cpp b/src/solvers/pipeline_planner.cpp
-index 9e30131..18e6fb9 100644
+index e4d1ab2..b712e04 100644
 --- a/src/solvers/pipeline_planner.cpp
 +++ b/src/solvers/pipeline_planner.cpp
 @@ -59,7 +59,7 @@ PipelinePlanner::PipelinePlanner(
