@@ -88,6 +88,8 @@ libcamera:
     override_version: '0.5.2'
 libcurl_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+libg2o:
+  additional_cmake_args: "-DG2O_BUILD_APPS=OFF -DG2O_BUILD_EXAMPLES=OFF -DG2O_USE_OPENGL=OFF -DBUILD_LGPL_SHARED_LIBS=ON"
 liblz4_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 librealsense2:
@@ -133,8 +135,10 @@ pybind11_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR"
 robot_state_publisher:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
-libg2o:
-  additional_cmake_args: "-DG2O_BUILD_APPS=OFF -DG2O_BUILD_EXAMPLES=OFF -DG2O_USE_OPENGL=OFF -DBUILD_LGPL_SHARED_LIBS=ON"
+ros2cli:
+  build_number: 23
+rosidl_cli:
+  build_number: 23
 rosx_introspection:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 rviz_ogre_vendor:
