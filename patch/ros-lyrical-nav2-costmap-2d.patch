@@ -1,3 +1,19 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8b836ce..42f7ba8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -107,7 +107,9 @@ if(ENABLE_OPENMP)
+   message(STATUS "OpenMP ENABLED for nav2_costmap_2d layers (${OpenMP_CXX_VERSION})")
+   target_link_libraries(layers PRIVATE OpenMP::OpenMP_CXX)
+   target_compile_options(layers PRIVATE -fopenmp)
+ else()
+   message(STATUS "OpenMP DISABLED for nav2_costmap_2d layers")
+-  target_compile_options(layers PRIVATE -Wno-unknown-pragmas)
++  if(NOT MSVC)
++    target_compile_options(layers PRIVATE -Wno-unknown-pragmas)
++  endif()
+ endif()
+
 diff --git a/include/nav2_costmap_2d/footprint_subscriber.hpp b/include/nav2_costmap_2d/footprint_subscriber.hpp
 index ef14eb6..f5e000d 100644
 --- a/include/nav2_costmap_2d/footprint_subscriber.hpp
