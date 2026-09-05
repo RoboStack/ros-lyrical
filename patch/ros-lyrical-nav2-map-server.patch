@@ -24,6 +24,15 @@ index 4f199df51..b367da68c 100644
  
  nav2_package()
  
+@@ -94,5 +98,8 @@ add_library(${vo_library_name} SHARED
+   src/vo_server/vector_object_shapes.cpp
+   src/vo_server/vector_object_server.cpp)
++if(WIN32)
++  target_compile_definitions(${vo_library_name} PRIVATE NOMINMAX)
++endif()
+ target_include_directories(${vo_library_name}
+   PUBLIC
+   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
 diff --git a/include/nav2_map_server/uuid.hpp b/include/nav2_map_server/uuid.hpp
 new file mode 100644
 index 000000000..8f67f9f6b
