@@ -24,6 +24,34 @@ index e217ad6..708a2fb 100644
  	/// function callback used to initialize property value from another PropertyMap
  	using InitializerFunction = std::function<boost::any(const PropertyMap&)>;
  
+diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
+index 26c86ac..22bf5e1 100644
+--- a/python/bindings/CMakeLists.txt
++++ b/python/bindings/CMakeLists.txt
+@@ -17,6 +17,10 @@ pybind11_add_module(pymoveit_mtc
+ )
+ target_include_directories(pymoveit_mtc PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
+ target_link_libraries(pymoveit_mtc PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_stages ${PROJECT_NAME}_python_tools)
++# CMake's C++20 module dependency scanner misparses pybind11::module-typed
++# locals in headers pulled in transitively (py_binding_tools) as module
++# control-lines; this target doesn't use C++20 modules, so just disable it.
++set_target_properties(pymoveit_mtc PROPERTIES CXX_SCAN_FOR_MODULES OFF)
+ 
+ # install libs
+ install(TARGETS ${PROJECT_NAME}_python_tools
+diff --git a/python/bindings/src/solvers.cpp b/python/bindings/src/solvers.cpp
+index eebfa2e..35acc77 100644
+--- a/python/bindings/src/solvers.cpp
++++ b/python/bindings/src/solvers.cpp
+@@ -67,7 +67,7 @@ void export_solvers(py::module& m) {
+ 				pipelinePlanner = core.PipelinePlanner(node, 'ompl', 'PRMkConfigDefault')
+ 				pipelinePlanner.num_planning_attempts = 10
+ 			)")
+-	    .property<uint>("num_planning_attempts", "int: Number of planning attempts")
++	    .property<uint32_t>("num_planning_attempts", "int: Number of planning attempts")
+ 	    .property<moveit_msgs::msg::WorkspaceParameters>(
+ 	        "workspace_parameters",
+ 	        ":moveit_msgs:`WorkspaceParameters`: Specifies workspace box to be used for Cartesian sampling")
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
 index 82e9875..147aa7b 100644
 --- a/src/CMakeLists.txt
@@ -37,78 +65,11 @@ index 82e9875..147aa7b 100644
  	${moveit_core_TARGETS}
  	${moveit_ros_planning_TARGETS}
  	${moveit_ros_planning_interface_TARGETS}
-diff --git a/src/container.cpp b/src/container.cpp
-index febc00f..fded044 100644
---- a/src/container.cpp
-+++ b/src/container.cpp
-@@ -57,8 +57,7 @@ namespace moveit {
- namespace task_constructor {
- 
- // for debugging of how children interfaces evolve over time
--__attribute__((unused))  // silent unused-function warning
--static void
-+[[maybe_unused]] static void
- printChildrenInterfaces(const ContainerBasePrivate& container, bool success, const Stage& creator,
-                         std::ostream& os = std::cerr) {
- 	static unsigned int id = 0;
-diff --git a/src/cost_terms.cpp b/src/cost_terms.cpp
-index 9ddb94f..9896d36 100644
---- a/src/cost_terms.cpp
-+++ b/src/cost_terms.cpp
-@@ -298,8 +298,8 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
- 	} };
- 
- 	auto collision_comment = [=](const auto& distance) {
--		return fmt::format(PREFIX + "allegedly valid solution collides between '{}' and '{}'", distance.link_names[0],
--		                   distance.link_names[1]);
-+		return fmt::format(fmt::runtime(PREFIX + "allegedly valid solution collides between '{}' and '{}'"),
-+		                   distance.link_names[0], distance.link_names[1]);
- 	};
- 
- 	double distance{ 0.0 };
-@@ -313,10 +313,10 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
- 		}
- 		distance = distance_data.distance;
- 		if (!cumulative)
--			comment = fmt::format(PREFIX + "distance {} between '{}' and '{}'", distance, distance_data.link_names[0],
--			                      distance_data.link_names[1]);
-+			comment = fmt::format(fmt::runtime(PREFIX + "distance {} between '{}' and '{}'"), distance,
-+			                      distance_data.link_names[0], distance_data.link_names[1]);
- 		else
--			comment = fmt::format(PREFIX + "cumulative distance {}", distance);
-+			comment = fmt::format(fmt::runtime(PREFIX + "cumulative distance {}"), distance);
- 	} else {  // check trajectory
- 		for (size_t i = 0; i < s.trajectory()->getWayPointCount(); ++i) {
- 			auto distance_data = check_distance(state, s.trajectory()->getWayPoint(i));
-@@ -327,7 +327,7 @@ double Clearance::operator()(const SubTrajectory& s, std::string& comment) const
- 			distance += distance_data.distance;
- 		}
- 		distance /= s.trajectory()->getWayPointCount();
--		comment = fmt::format(PREFIX + "average{} distance: {}", (cumulative ? " cumulative" : ""), distance);
-+		comment = fmt::format(fmt::runtime(PREFIX + "average{} distance: {}"), (cumulative ? " cumulative" : ""), distance);
- 	}
- 
- 	return distance_to_cost(distance);
 diff --git a/src/introspection.cpp b/src/introspection.cpp
-index d938f95..35d502a 100644
+index c045a6c..e6990e4 100644
 --- a/src/introspection.cpp
 +++ b/src/introspection.cpp
-@@ -50,6 +50,14 @@
- #include <boost/bimap.hpp>
- #include <rcutils/isalnum_no_locale.h>
- 
-+#ifdef _WIN32
-+	#include <winsock2.h>
-+	#include <process.h>
-+	#pragma comment(lib, "ws2_32.lib")
-+#else
-+	#include <unistd.h>
-+#endif
-+
- static auto LOGGER = rclcpp::get_logger("introspection");
- 
- namespace moveit {
-@@ -60,12 +68,26 @@ std::string getTaskId(const TaskPrivate* task) {
+@@ -64,12 +64,26 @@ std::string getTaskId(const TaskPrivate* task) {
  	static const std::string ALLOWED = "_/";
  	std::ostringstream oss;
  	char our_hostname[256] = { 0 };
@@ -136,8 +97,8 @@ index d938f95..35d502a 100644
  	return oss.str();
  }
  }  // namespace
-@@ -214,7 +236,7 @@ void Introspection::publishAllSolutions(bool wait) {
- 	};
+@@ -220,7 +234,7 @@ void Introspection::publishAllSolutions(bool wait) {
+ 	// NOLINTEND(clang-analyzer-unix.BlockInCriticalSection)
  }
  
 -const SolutionBase* Introspection::solutionFromId(uint id) const {
@@ -145,20 +106,8 @@ index d938f95..35d502a 100644
  	auto it = impl->id_solution_bimap_.left.find(id);
  	if (it == impl->id_solution_bimap_.left.end())
  		return nullptr;
-diff --git a/src/properties.cpp b/src/properties.cpp
-index 8c001de..6fd0217 100644
---- a/src/properties.cpp
-+++ b/src/properties.cpp
-@@ -38,6 +38,7 @@
- 
- #include <moveit/task_constructor/properties.h>
- #include <moveit/task_constructor/fmt_p.h>
-+#include <boost/core/demangle.hpp>
- #include <functional>
- #include <rclcpp/logging.hpp>
- #include <rclcpp/clock.hpp>
 diff --git a/src/solvers/pipeline_planner.cpp b/src/solvers/pipeline_planner.cpp
-index 9e30131..18e6fb9 100644
+index e4d1ab2..b712e04 100644
 --- a/src/solvers/pipeline_planner.cpp
 +++ b/src/solvers/pipeline_planner.cpp
 @@ -59,7 +59,7 @@ PipelinePlanner::PipelinePlanner(
@@ -179,22 +128,6 @@ index 9e30131..18e6fb9 100644
  		request.max_velocity_scaling_factor = properties().get<double>("max_velocity_scaling_factor");
  		request.max_acceleration_scaling_factor = properties().get<double>("max_acceleration_scaling_factor");
  		request.workspace_parameters = properties().get<moveit_msgs::msg::WorkspaceParameters>("workspace_parameters");
-diff --git a/src/stage.cpp b/src/stage.cpp
-index b64ce0a..a9eb8a0 100644
---- a/src/stage.cpp
-+++ b/src/stage.cpp
-@@ -909,8 +909,9 @@ bool Connecting::compatible(const InterfaceState& from_state, const InterfaceSta
- 	const planning_scene::PlanningSceneConstPtr& from = from_state.scene();
- 	const planning_scene::PlanningSceneConstPtr& to = to_state.scene();
- 
--	auto false_with_debug = [](auto... args) {
--		RCLCPP_DEBUG_STREAM(rclcpp::get_logger("Connecting"), fmt::format(args...));
-+	auto false_with_debug = [](fmt::string_view format_str, auto&&... args) {
-+		RCLCPP_DEBUG_STREAM(rclcpp::get_logger("Connecting"),
-+		                    fmt::vformat(format_str, fmt::make_format_args(args...)));
- 		return false;
- 	};
- 
 diff --git a/src/stages/generate_place_pose.cpp b/src/stages/generate_place_pose.cpp
 index 76b9559..042882d 100644
 --- a/src/stages/generate_place_pose.cpp
@@ -236,234 +169,3 @@ index 1c0553c..39bfa92 100644
  	auto cb = [&called](const SolutionBase& /* s */) {
  		++called;
  		return true;
-diff --git a/python/bindings/CMakeLists.txt b/python/bindings/CMakeLists.txt
-index 26c86ac..22bf5e1 100644
---- a/python/bindings/CMakeLists.txt
-+++ b/python/bindings/CMakeLists.txt
-@@ -17,6 +17,10 @@ pybind11_add_module(pymoveit_mtc
- )
- target_include_directories(pymoveit_mtc PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
- target_link_libraries(pymoveit_mtc PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_stages ${PROJECT_NAME}_python_tools)
-+# CMake's C++20 module dependency scanner misparses pybind11::module-typed
-+# locals in headers pulled in transitively (py_binding_tools) as module
-+# control-lines; this target doesn't use C++20 modules, so just disable it.
-+set_target_properties(pymoveit_mtc PROPERTIES CXX_SCAN_FOR_MODULES OFF)
- 
- # install libs
- install(TARGETS ${PROJECT_NAME}_python_tools
-diff --git a/python/bindings/src/properties.cpp b/python/bindings/src/properties.cpp
---- a/python/bindings/src/properties.cpp
-+++ b/python/bindings/src/properties.cpp
-@@ -158,6 +158,8 @@
- 	return REGISTRY_SINGLETON.insert(type_index, ros_msg_name, to, from);
- }
- 
-+#if !defined(_MSC_VER)
- __attribute__((visibility("default"))) // export this symbol as visible in the shared library
-+#endif
- void export_properties(py::module& m) {
- 	// clang-format off
-diff --git a/python/bindings/src/solvers.cpp b/python/bindings/src/solvers.cpp
---- a/python/bindings/src/solvers.cpp
-+++ b/python/bindings/src/solvers.cpp
-@@ -73,7 +73,7 @@
- 				pipelinePlanner = core.PipelinePlanner(node, 'ompl', 'PRMkConfigDefault')
- 				pipelinePlanner.num_planning_attempts = 10
- 			)")
--	    .property<uint>("num_planning_attempts", "int: Number of planning attempts")
-+	    .property<uint32_t>("num_planning_attempts", "int: Number of planning attempts")
- 	    .property<moveit_msgs::msg::WorkspaceParameters>(
- 	        "workspace_parameters",
- 	        ":moveit_msgs:`WorkspaceParameters`: Specifies workspace box to be used for Cartesian sampling")
-diff --git a/python/CMakeLists.txt b/python/CMakeLists.txt
-index 181e1a4..fcb7315 100644
---- a/python/CMakeLists.txt
-+++ b/python/CMakeLists.txt
-@@ -1,28 +1,12 @@
--# We rely on pybind11's smart_holder branch imported pybind11 via git submodule
--
-+# Use the pybind11 provided by the environment (with upstream smart_holder support since 3.0),
-+# rather than vendoring our own fork, so we share a single pybind11 with py_binding_tools.
- find_package(ament_cmake_python REQUIRED)
- find_package(Python3 COMPONENTS Interpreter Development)
--# pybind11 must use the ROS python version
--set(PYBIND11_PYTHON_VERSION ${PYTHON_VERSION})
-+find_package(pybind11 REQUIRED)
- 
- # Use minimum-size optimization for pybind11 bindings
- add_compile_options("-Os")
- 
--# configure pybind11 install for use by downstream packages in install space
--set(PYBIND11_INSTALL ON CACHE INTERNAL "Install pybind11")
--set(CMAKE_INSTALL_INCLUDEDIR include/moveit/python)
--set(PYBIND11_CMAKECONFIG_INSTALL_DIR share/${PROJECT_NAME}/cmake
--    CACHE INTERNAL "install path for pybind11 cmake files")
--
--# source pybind11 folder, which exposes its targets and installs them
--if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pybind11/CMakeLists.txt")
--	message("Missing content of submodule pybind11: Use 'git clone --recurse-submodule' in future.\n"
--	        "Checking out content automatically")
--	execute_process(COMMAND git submodule init WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
--	execute_process(COMMAND git submodule update WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
--endif()
--add_subdirectory(pybind11)
--
- # C++ wrapper code
- add_subdirectory(bindings)
- 
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 1b8d21a..1d9f5d7 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -12,6 +12,8 @@ find_package(moveit_core REQUIRED)
- find_package(moveit_ros_planning REQUIRED)
- find_package(moveit_ros_planning_interface REQUIRED)
- find_package(moveit_task_constructor_msgs REQUIRED)
-+find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-+find_package(pybind11 REQUIRED)
- find_package(py_binding_tools REQUIRED)
- find_package(rclcpp REQUIRED)
- find_package(rviz_marker_tools REQUIRED)
-diff --git a/include/moveit/python/task_constructor/properties.h b/include/moveit/python/task_constructor/properties.h
-index 46c0e97..70bf30e 100644
---- a/include/moveit/python/task_constructor/properties.h
-+++ b/include/moveit/python/task_constructor/properties.h
-@@ -1,14 +1,10 @@
- #pragma once
- 
--#include <pybind11/smart_holder.h>
- #include <py_binding_tools/ros_msg_typecasters.h>
- #include <moveit/task_constructor/properties.h>
- #include <boost/any.hpp>
- #include <typeindex>
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Property)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropertyMap)
--
- namespace moveit {
- namespace python {
- 
-diff --git a/python/bindings/src/core.h b/python/bindings/src/core.h
-index 7ab1437..b9bdc2c 100644
---- a/python/bindings/src/core.h
-+++ b/python/bindings/src/core.h
-@@ -34,12 +34,12 @@
- 
- #pragma once
- 
-+#include <pybind11/pybind11.h>
- #include <moveit/task_constructor/stage.h>
- #include <moveit/task_constructor/container.h>
- #include <moveit/task_constructor/cost_queue.h>
- #include <moveit/task_constructor/cost_terms.h>
- #include <moveit/utils/moveit_error_code.hpp>
--#include <pybind11/smart_holder.h>
- 
- /** Trampoline classes to allow inheritance in Python (overriding virtual functions) */
- 
-@@ -109,36 +109,3 @@ public:
- }  // namespace task_constructor
- }  // namespace moveit
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::solvers::PlannerInterface)
--
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::SolutionBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::SubTrajectory)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(ordered<moveit::task_constructor::SolutionBaseConstPtr>)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::InterfaceState)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::core::MoveItErrorCode)
--
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::CostTerm)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::TrajectoryCostTerm)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::PathLength)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::DistanceToReference)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::TrajectoryDuration)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::LinkMotion)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::LinkRotation)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::cost::Clearance)
--
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Stage)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropagatingEitherWay)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropagatingForward)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::PropagatingBackward)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Generator)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::MonitoringGenerator)
--
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::ContainerBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::SerialContainer)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::ParallelContainerBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Alternatives)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Fallbacks)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Merger)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::WrapperBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Task)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(moveit::task_constructor::Introspection)
-diff --git a/python/bindings/src/module.cpp b/python/bindings/src/module.cpp
-index a797711..cd66917 100644
---- a/python/bindings/src/module.cpp
-+++ b/python/bindings/src/module.cpp
-@@ -32,7 +32,7 @@
-  *  POSSIBILITY OF SUCH DAMAGE.
-  *********************************************************************/
- 
--#include <pybind11/smart_holder.h>
-+#include <pybind11/pybind11.h>
- 
- namespace moveit {
- namespace python {
-diff --git a/python/bindings/src/solvers.cpp b/python/bindings/src/solvers.cpp
-index 7c6a12f..eebfa2e 100644
---- a/python/bindings/src/solvers.cpp
-+++ b/python/bindings/src/solvers.cpp
-@@ -46,12 +46,6 @@ using namespace py::literals;
- using namespace moveit::task_constructor;
- using namespace moveit::task_constructor::solvers;
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(PlannerInterface)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(PipelinePlanner)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(JointInterpolationPlanner)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(CartesianPath)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(MultiPlanner)
--
- namespace moveit {
- namespace python {
- 
-diff --git a/python/bindings/src/stages.cpp b/python/bindings/src/stages.cpp
-index 1dead16..f51308f 100644
---- a/python/bindings/src/stages.cpp
-+++ b/python/bindings/src/stages.cpp
-@@ -48,26 +48,6 @@ using namespace py::literals;
- using namespace moveit::task_constructor;
- using namespace moveit::task_constructor::stages;
- 
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(ModifyPlanningScene)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(CurrentState)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(FixedState)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(ComputeIK)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(MoveTo)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(MoveRelative)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(Connect)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(FixCollisionObjects)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(GenerateGraspPose)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(GeneratePlacePose)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(GenerateRandomPose)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(GeneratePose)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(Pick)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(Place)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(SimpleGraspBase)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(SimpleGrasp)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(SimpleUnGrasp)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(PassThrough)
--PYBIND11_SMART_HOLDER_TYPE_CASTERS(LimitSolutions)
--
- namespace moveit {
- namespace python {
- 
-@@ -369,7 +349,6 @@ void export_stages(pybind11::module& m) {
- 		)")
- 		.def(py::init<const std::string&>(), "name"_a = std::string("Generate Place Pose"));
- 
--
- 	properties::class_<GenerateGraspPose, MonitoringGenerator>(m, "GenerateGraspPose", R"(
- 			GenerateGraspPose stage derives from monitoring generator and can
- 			be used to generate poses for grasping. Set the desired attributes

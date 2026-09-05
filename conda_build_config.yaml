@@ -12,9 +12,9 @@ libboost_devel:
 libboost_python_devel:
   - '1.90'
 libprotobuf:
-  - 6.33.5
+  - 7.35.1
 protobuf:
-  - 6.33.5
+  - 7.35.1
 spdlog:
   - 1.17
 pugixml:
@@ -25,18 +25,26 @@ libxml2:
   - 2.14.*
 graphviz:
   - 14.*
+libgdal:
+  - '3.13'
+libgdal_core:
+  - '3.13'
 # Mitigation for
 # https://github.com/RoboStack/ros-jazzy/pull/126#issuecomment-3515455380
 libcap:
-  - 2.77
+  - 2.78
+libtheora:
+  - '1.2'
 fmt:
   - 12.1
 lua:
   - 5.4
 tbb:
-  - '2022'
+  - '2023'
 tbb_devel:
-  - '2022'
+  - '2023'
+jsoncpp:
+  - 1.9.8
 
 # Workaround for https://github.com/RoboStack/ros-jazzy/pull/40#issuecomment-2782226697
 cmake:
@@ -60,7 +68,7 @@ c_compiler:
   - vs2022                     # [win]
 c_compiler_version:            # [unix]
   - 14                         # [linux]
-  - 18                         # [osx]
+  - 19                         # [osx]
 c_stdlib:
   - sysroot                    # [linux]
   - macosx_deployment_target   # [osx]
@@ -75,7 +83,7 @@ cxx_compiler:
   - vs2022                     # [win]
 cxx_compiler_version:          # [unix]
   - 14                         # [linux]
-  - 18                         # [osx]
+  - 19                         # [osx]
 
 libzenohc:
   - 1.9.0
@@ -83,4 +91,4 @@ libzenohcxx:
   - 1.9.0
 
 libhwloc:
-  - 2.12.2
+  - 2.13.0
