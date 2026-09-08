@@ -130,6 +130,7 @@ packages_select_by_deps:
   - moveit-task-constructor-demo
   - moveit-visual-tools
   - nav2_bringup
+  - nav2_lifecycle_manager
   - nav2_minimal_tb3_sim
   - nav2_minimal_tb4_sim
   - navigation2
