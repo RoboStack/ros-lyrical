@@ -1175,7 +1175,7 @@ unzip:
 uuid:
   robostack:
     linux: [libuuid]
-    osx: []
+    osx: []  # macOS has a native UUID implementation which is preferred
     win64: []
 virtualenv:
   robostack: [virtualenv]
