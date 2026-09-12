@@ -1,0 +1,291 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4f199df51..b367da68c 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,7 +12,6 @@ find_package(nav_msgs REQUIRED)
+ find_package(nav2_common REQUIRED)
+ find_package(nav2_msgs REQUIRED)
+ find_package(nav2_util REQUIRED)
+-find_package(PkgConfig REQUIRED)
+ find_package(rclcpp REQUIRED)
+ find_package(rclcpp_components REQUIRED)
+ find_package(rclcpp_lifecycle REQUIRED)
+@@ -24,7 +23,12 @@ find_package(yaml_cpp_vendor REQUIRED)
+ find_package(yaml-cpp REQUIRED)
+ find_package(Eigen3 REQUIRED)
+ 
+-pkg_search_module(UUID REQUIRED uuid)
++if(WIN32)
++  set(UUID_LIBRARIES Rpcrt4.lib)
++else()
++  find_package(PkgConfig REQUIRED)
++  pkg_search_module(UUID REQUIRED uuid)
++endif()
+ 
+ nav2_package()
+ 
+@@ -94,5 +98,8 @@ add_library(${vo_library_name} SHARED
+   src/vo_server/vector_object_shapes.cpp
+   src/vo_server/vector_object_server.cpp)
++if(WIN32)
++  target_compile_definitions(${vo_library_name} PRIVATE NOMINMAX)
++endif()
+ target_include_directories(${vo_library_name}
+   PUBLIC
+   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+diff --git a/include/nav2_map_server/uuid.hpp b/include/nav2_map_server/uuid.hpp
+new file mode 100644
+index 000000000..8f67f9f6b
+--- /dev/null
++++ b/include/nav2_map_server/uuid.hpp
+@@ -0,0 +1,125 @@
++// Copyright (c) 2023 Samsung R&D Institute Russia
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++
++#ifndef NAV2_MAP_SERVER__UUID_HPP_
++#define NAV2_MAP_SERVER__UUID_HPP_
++
++#ifdef _WIN32
++#include <Rpc.h>
++#else
++#include <uuid/uuid.h>
++#endif
++
++#include <algorithm>
++#include <stdexcept>
++#include <string>
++
++namespace nav2_map_server
++{
++
++#ifdef _WIN32
++
++inline UUID toWindowsUUID(const unsigned char * uuid)
++{
++  UUID result{};
++  result.Data1 =
++    (static_cast<unsigned long>(uuid[0]) << 24) |
++    (static_cast<unsigned long>(uuid[1]) << 16) |
++    (static_cast<unsigned long>(uuid[2]) << 8) |
++    static_cast<unsigned long>(uuid[3]);
++  result.Data2 = static_cast<unsigned short>(
++    (static_cast<unsigned short>(uuid[4]) << 8) |
++    static_cast<unsigned short>(uuid[5]));
++  result.Data3 = static_cast<unsigned short>(
++    (static_cast<unsigned short>(uuid[6]) << 8) |
++    static_cast<unsigned short>(uuid[7]));
++  std::copy(uuid + 8, uuid + 16, result.Data4);
++  return result;
++}
++
++inline void fromWindowsUUID(const UUID & windows_uuid, unsigned char * uuid)
++{
++  uuid[0] = static_cast<unsigned char>((windows_uuid.Data1 >> 24) & 0xff);
++  uuid[1] = static_cast<unsigned char>((windows_uuid.Data1 >> 16) & 0xff);
++  uuid[2] = static_cast<unsigned char>((windows_uuid.Data1 >> 8) & 0xff);
++  uuid[3] = static_cast<unsigned char>(windows_uuid.Data1 & 0xff);
++  uuid[4] = static_cast<unsigned char>((windows_uuid.Data2 >> 8) & 0xff);
++  uuid[5] = static_cast<unsigned char>(windows_uuid.Data2 & 0xff);
++  uuid[6] = static_cast<unsigned char>((windows_uuid.Data3 >> 8) & 0xff);
++  uuid[7] = static_cast<unsigned char>(windows_uuid.Data3 & 0xff);
++  std::copy(windows_uuid.Data4, windows_uuid.Data4 + 8, uuid + 8);
++}
++
++#endif
++
++inline bool parseUUID(const std::string & uuid_string, unsigned char * uuid)
++{
++#ifdef _WIN32
++  UUID windows_uuid{};
++  auto input = reinterpret_cast<RPC_CSTR>(const_cast<char *>(uuid_string.c_str()));
++  if (UuidFromStringA(input, &windows_uuid) != RPC_S_OK) {
++    return false;
++  }
++  fromWindowsUUID(windows_uuid, uuid);
++  return true;
++#else
++  return uuid_parse(uuid_string.c_str(), uuid) == 0;
++#endif
++}
++
++inline void generateUUID(unsigned char * uuid)
++{
++#ifdef _WIN32
++  UUID windows_uuid{};
++  const RPC_STATUS status = UuidCreate(&windows_uuid);
++  if (status != RPC_S_OK && status != RPC_S_UUID_LOCAL_ONLY) {
++    throw std::runtime_error{"Failed to generate UUID"};
++  }
++  fromWindowsUUID(windows_uuid, uuid);
++#else
++  uuid_generate(uuid);
++#endif
++}
++
++inline std::string unparseUUID(const unsigned char * uuid)
++{
++#ifdef _WIN32
++  UUID windows_uuid = toWindowsUUID(uuid);
++  RPC_CSTR uuid_string = nullptr;
++  if (UuidToStringA(&windows_uuid, &uuid_string) != RPC_S_OK) {
++    throw std::runtime_error{"Failed to convert UUID to string"};
++  }
++  std::string result{reinterpret_cast<char *>(uuid_string)};
++  RpcStringFreeA(&uuid_string);
++  return result;
++#else
++  char uuid_string[37];
++  uuid_unparse(uuid, uuid_string);
++  return std::string{uuid_string};
++#endif
++}
++
++inline bool equalUUID(const unsigned char * lhs, const unsigned char * rhs)
++{
++  return std::equal(lhs, lhs + 16, rhs);
++}
++
++inline bool isNullUUID(const unsigned char * uuid)
++{
++  return std::all_of(uuid, uuid + 16, [](unsigned char value) {return value == 0;});
++}
++
++}  // namespace nav2_map_server
++
++#endif  // NAV2_MAP_SERVER__UUID_HPP_
+diff --git a/include/nav2_map_server/vector_object_utils.hpp b/include/nav2_map_server/vector_object_utils.hpp
+index f478f71b3..06f23ce24 100644
+--- a/include/nav2_map_server/vector_object_utils.hpp
++++ b/include/nav2_map_server/vector_object_utils.hpp
+@@ -15,7 +15,6 @@
+ #ifndef NAV2_MAP_SERVER__VECTOR_OBJECT_UTILS_HPP_
+ #define NAV2_MAP_SERVER__VECTOR_OBJECT_UTILS_HPP_
+ 
+-#include <uuid/uuid.h>
+ #include <stdexcept>
+ #include <string>
+ 
+@@ -25,24 +24,11 @@
+ #include "nav2_ros_common/lifecycle_node.hpp"
+ #include "nav2_ros_common/node_utils.hpp"
+ #include "nav2_util/occ_grid_values.hpp"
++#include "nav2_map_server/uuid.hpp"
+ 
+ namespace nav2_map_server
+ {
+ 
+-// ---------- Working with UUID-s ----------
+-
+-/**
+- * @brief Converts UUID from input array to unparsed string
+- * @param uuid Input UUID in array format
+- * @return Unparsed UUID string
+- */
+-inline std::string unparseUUID(const unsigned char * uuid)
+-{
+-  char uuid_str[37];
+-  uuid_unparse(uuid, uuid_str);
+-  return std::string(uuid_str);
+-}
+-
+ // ---------- Working with shapes' overlays ----------
+ 
+ /// @brief Type of overlay between different vector objects and map
+diff --git a/src/vo_server/vector_object_shapes.cpp b/src/vo_server/vector_object_shapes.cpp
+index af85a4265..19c9e8a71 100644
+--- a/src/vo_server/vector_object_shapes.cpp
++++ b/src/vo_server/vector_object_shapes.cpp
+@@ -14,7 +14,6 @@
+ 
+ #include "nav2_map_server/vector_object_shapes.hpp"
+ 
+-#include <uuid/uuid.h>
+ #include <cmath>
+ #include <exception>
+ #include <limits>
+@@ -29,6 +28,7 @@
+ #include "nav2_util/raytrace_line_2d.hpp"
+ #include "nav2_util/robot_utils.hpp"
+ #include "nav2_ros_common/tf2_factories.hpp"
++#include "nav2_map_server/uuid.hpp"
+ 
+ namespace nav2_map_server
+ {
+@@ -58,7 +58,7 @@ bool Shape::obtainShapeUUID(const std::string & shape_name, unsigned char * out_
+     // Try to get shape UUID from ROS-parameters
+     std::string uuid_str = nav2::declare_or_get_parameter<std::string>(
+       node, shape_name + ".uuid");
+-    if (uuid_parse(uuid_str.c_str(), out_uuid) != 0) {
++    if (!parseUUID(uuid_str, out_uuid)) {
+       RCLCPP_ERROR(
+         node->get_logger(),
+         "[%s] Can not parse UUID string for shape: %s",
+@@ -67,14 +67,13 @@ bool Shape::obtainShapeUUID(const std::string & shape_name, unsigned char * out_
+     }
+   } catch (const std::exception &) {
+     // If no UUID was specified, generate a new one
+-    uuid_generate(out_uuid);
++    generateUUID(out_uuid);
+ 
+-    char uuid_str[37];
+-    uuid_unparse(out_uuid, uuid_str);
++    const std::string uuid_str = unparseUUID(out_uuid);
+     RCLCPP_INFO(
+       node->get_logger(),
+       "[%s] No UUID is specified for shape. Generating a new one: %s",
+-      shape_name.c_str(), uuid_str);
++      shape_name.c_str(), uuid_str.c_str());
+   }
+ 
+   return true;
+@@ -106,7 +105,7 @@ std::string Polygon::getUUID() const
+ 
+ bool Polygon::isUUID(const unsigned char * uuid) const
+ {
+-  return uuid_compare(params_->uuid.uuid.data(), uuid) == 0;
++  return equalUUID(params_->uuid.uuid.data(), uuid);
+ }
+ 
+ bool Polygon::isFill() const
+@@ -190,8 +189,8 @@ bool Polygon::setParams(const nav2_msgs::msg::PolygonObject::SharedPtr params)
+   polygon_->points = params_->points;
+ 
+   // If no UUID was specified, generate a new one
+-  if (uuid_is_null(params_->uuid.uuid.data())) {
+-    uuid_generate(params_->uuid.uuid.data());
++  if (isNullUUID(params_->uuid.uuid.data())) {
++    generateUUID(params_->uuid.uuid.data());
+   }
+ 
+   return checkConsistency();
+@@ -320,7 +319,7 @@ std::string Circle::getUUID() const
+ 
+ bool Circle::isUUID(const unsigned char * uuid) const
+ {
+-  return uuid_compare(params_->uuid.uuid.data(), uuid) == 0;
++  return equalUUID(params_->uuid.uuid.data(), uuid);
+ }
+ 
+ bool Circle::isFill() const
+@@ -403,8 +402,8 @@ bool Circle::setParams(const nav2_msgs::msg::CircleObject::SharedPtr params)
+   *center_ = params_->center;
+ 
+   // If no UUID was specified, generate a new one
+-  if (uuid_is_null(params_->uuid.uuid.data())) {
+-    uuid_generate(params_->uuid.uuid.data());
++  if (isNullUUID(params_->uuid.uuid.data())) {
++    generateUUID(params_->uuid.uuid.data());
+   }
+ 
+   return checkConsistency();

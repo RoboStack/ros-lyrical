@@ -1,4 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7600319..c8d7adf 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -20,7 +20,7 @@ add_library(${PROJECT_NAME} SHARED
