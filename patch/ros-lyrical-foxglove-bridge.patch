@@ -1,27 +1,27 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8ee07c2..7426013 100644
+index 6171894..f285973 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -98,6 +98,18 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "aarc
+@@ -97,6 +97,18 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "aarc
  elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
    set(FOXGLOVE_SDK_PLATFORM "x86_64-unknown-linux-gnu")
-   set(FOXGLOVE_SDK_SHA "0b9d348df3a8e98d2c2cee2360cc9f52e83bb3445044debd771d1b46dc358be4")
+   set(FOXGLOVE_SDK_SHA "4790dad26adaced1a5f81530ed406bab7b60aa202a868eb78cfc04976b9ce6d7")
 +elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
 +  set(FOXGLOVE_SDK_PLATFORM "aarch64-apple-darwin")
-+  set(FOXGLOVE_SDK_SHA "c9dfa5061d72795af2620c2840a85e695b9dacce19475eaec8caf0102c4940ef")
++  set(FOXGLOVE_SDK_SHA "70c6e59cf757ac0480912c13cb2c630a3839de34eba428ef717411dae6b1688e")
 +elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
 +  set(FOXGLOVE_SDK_PLATFORM "x86_64-apple-darwin")
-+  set(FOXGLOVE_SDK_SHA "3531502efd958be3f9dca06a099c167512dd3006b98ac3eecf8250d376eaa16b")
++  set(FOXGLOVE_SDK_SHA "c6092c615523d462a9d3779313b8c033cf923ce30a43dc5305d48fe4f6d26988")
 +elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "ARM64")
 +  set(FOXGLOVE_SDK_PLATFORM "aarch64-pc-windows-msvc")
-+  set(FOXGLOVE_SDK_SHA "da293bf4dac2b973b7c72d1d368932f7f4f989fcac9311d529b93c7d2b84eae9")
++  set(FOXGLOVE_SDK_SHA "b88abb1bc2c5e230db65cd3d608174f005b3b4563b1c0b2e33db05bc3a2b528b")
 +elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows" AND CMAKE_SYSTEM_PROCESSOR STREQUAL "AMD64")
 +  set(FOXGLOVE_SDK_PLATFORM "x86_64-pc-windows-msvc")
-+  set(FOXGLOVE_SDK_SHA "09d2ff5dbb6a5216a303f9470fbec186c0ebd849713570d6b8145a9d22d804af")
++  set(FOXGLOVE_SDK_SHA "ae4ac0f4ab9eb998542a5626cd7870ba011824499fe33fa86936e82ed6502185")
  else()
    message(FATAL_ERROR "Unsupported platform/architecture combination: ${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_SYSTEM_NAME}")
  endif()
-@@ -202,6 +214,12 @@ target_link_libraries(foxglove_bridge_component
+@@ -201,6 +213,12 @@ target_link_libraries(foxglove_bridge_component
    rosx_introspection::rosx_introspection
  )
  
@@ -35,7 +35,7 @@ index 8ee07c2..7426013 100644
  enable_strict_compiler_warnings(foxglove_bridge_component)
  set_target_properties(foxglove_bridge_component PROPERTIES
 diff --git a/src/message_definition_cache.cpp b/src/message_definition_cache.cpp
-index ef72c9c..ed85745 100644
+index cf2864e..9124c80 100644
 --- a/src/message_definition_cache.cpp
 +++ b/src/message_definition_cache.cpp
 @@ -3,6 +3,7 @@

@@ -1,0 +1,12 @@
+diff --git a/lib/karto_sdk/CMakeLists.txt b/lib/karto_sdk/CMakeLists.txt
+index fd2d403..f23fc5f 100644
+--- a/lib/karto_sdk/CMakeLists.txt
++++ b/lib/karto_sdk/CMakeLists.txt
+@@ -35,6 +35,7 @@ include_directories(include ${EIGEN3_INCLUDE_DIRS} ${TBB_INCLUDE_DIRS} ${Boost_I
+ add_library(kartoSlamToolbox SHARED src/Karto.cpp src/Mapper.cpp)
+ target_compile_definitions(kartoSlamToolbox PRIVATE KARTO_DYNAMIC)
+ target_link_libraries(kartoSlamToolbox PUBLIC
++  Eigen3::Eigen
+   rclcpp::rclcpp
+   rclcpp_lifecycle::rclcpp_lifecycle
+ )

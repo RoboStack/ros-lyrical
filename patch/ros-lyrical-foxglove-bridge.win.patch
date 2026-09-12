@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7426013..72e281d 100644
+index f285973..28652e5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -61,7 +61,7 @@ endif()
@@ -11,7 +11,7 @@ index 7426013..72e281d 100644
    elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
      target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Werror -Wold-style-cast -Wfloat-equal -Wmost -Wunused-exception-parameter)
    else()
-@@ -122,6 +122,75 @@ FetchContent_Declare(
+@@ -121,6 +121,75 @@ FetchContent_Declare(
    URL_HASH SHA256=${FOXGLOVE_SDK_SHA}
  )
  FetchContent_MakeAvailable(foxglove_sdk)
@@ -87,7 +87,7 @@ index 7426013..72e281d 100644
  
  # The dist's CMake package config defines IMPORTED targets for the prebuilt C libraries
  # (foxglove-static, foxglove-shared) and the foxglove_sdk_add_cpp_library() helper, which
-@@ -136,6 +205,16 @@ if (FOXGLOVE_BRIDGE_REMOTE_ACCESS)
+@@ -135,6 +204,16 @@ if (FOXGLOVE_BRIDGE_REMOTE_ACCESS)
  else()
    foxglove_sdk_add_cpp_library(foxglove_cpp_shared TYPE SHARED REMOTE_ACCESS OFF)
  endif()
@@ -105,11 +105,12 @@ index 7426013..72e281d 100644
    BUILD_WITH_INSTALL_RPATH TRUE
  )
 diff --git a/src/ros2_foxglove_bridge.cpp b/src/ros2_foxglove_bridge.cpp
-index 601db6c..cc4e4f5 100644
+index b7fc123..fa78588 100644
 --- a/src/ros2_foxglove_bridge.cpp
 +++ b/src/ros2_foxglove_bridge.cpp
-@@ -1,3 +1,4 @@
+@@ -1,3 +1,5 @@
 +#define _CRT_SECURE_NO_WARNINGS
- #include <filesystem>
- #include <fstream>
- #include <type_traits>
++
+ #include <algorithm>
+ #include <cctype>
+ #include <cinttypes>

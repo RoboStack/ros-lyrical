@@ -1,56 +1,82 @@
-diff --git a/include/nav2_costmap_2d/plugin_container_layer.hpp b/include/nav2_costmap_2d/plugin_container_layer.hpp
-index e98c7b813..fb1d23e2e 100644
---- a/include/nav2_costmap_2d/plugin_container_layer.hpp
-+++ b/include/nav2_costmap_2d/plugin_container_layer.hpp
-@@ -46,7 +46,7 @@ public:
-   /**
-    * @brief Initialization process of layer on startup
-    */
--  virtual void onInitialize();
-+  virtual void onInitialize() override;
-   /**
-    * @brief Update the bounds of the master costmap by this layer's update
-    *dimensions
-@@ -65,7 +65,7 @@ public:
-     double * min_x,
-     double * min_y,
-     double * max_x,
--    double * max_y);
-+    double * max_y) override;
-   /**
-    * @brief Update the costs in the master costmap in the window
-    * @param master_grid The master costmap grid to update
-@@ -79,26 +79,26 @@ public:
-     int min_i,
-     int min_j,
-     int max_i,
--    int max_j);
--  virtual void onFootprintChanged();
-+    int max_j) override;
-+  virtual void onFootprintChanged() override;
-   /** @brief Update the footprint to match size of the parent costmap. */
--  virtual void matchSize();
-+  virtual void matchSize() override;
-   /**
-    * @brief Deactivate the layer
-    */
--  virtual void deactivate();
-+  virtual void deactivate() override;
-   /**
-    * @brief Activate the layer
-    */
--  virtual void activate();
-+  virtual void activate() override;
-   /**
-    * @brief Reset this costmap
-    */
--  virtual void reset();
-+  virtual void reset() override;
-   /**
-    * @brief If clearing operations should be processed on this layer or not
-    */
--  virtual bool isClearable();
-+  virtual bool isClearable() override;
-   /**
-    * @brief Clear an area in the constituent costmaps with the given dimension
-    * if invert, then clear everything except these dimensions
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8b836ce..42f7ba8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -107,7 +107,9 @@ if(ENABLE_OPENMP)
+   message(STATUS "OpenMP ENABLED for nav2_costmap_2d layers (${OpenMP_CXX_VERSION})")
+   target_link_libraries(layers PRIVATE OpenMP::OpenMP_CXX)
+   target_compile_options(layers PRIVATE -fopenmp)
+ else()
+   message(STATUS "OpenMP DISABLED for nav2_costmap_2d layers")
+-  target_compile_options(layers PRIVATE -Wno-unknown-pragmas)
++  if(NOT MSVC)
++    target_compile_options(layers PRIVATE -Wno-unknown-pragmas)
++  endif()
+ endif()
+
+diff --git a/include/nav2_costmap_2d/footprint_subscriber.hpp b/include/nav2_costmap_2d/footprint_subscriber.hpp
+index ef14eb6..f5e000d 100644
+--- a/include/nav2_costmap_2d/footprint_subscriber.hpp
++++ b/include/nav2_costmap_2d/footprint_subscriber.hpp
+@@ -95,3 +95,7 @@ protected:
+   std::atomic_bool footprint_received_{false};
++#ifdef __cpp_lib_atomic_shared_ptr
+   std::atomic<geometry_msgs::msg::PolygonStamped::ConstSharedPtr> footprint_;
++#else
++  geometry_msgs::msg::PolygonStamped::ConstSharedPtr footprint_;
++#endif
+   nav2::Subscription<geometry_msgs::msg::PolygonStamped>::SharedPtr footprint_sub_;
+diff --git a/include/nav2_costmap_2d/layered_costmap.hpp b/include/nav2_costmap_2d/layered_costmap.hpp
+index 6c59c16..65515ad 100644
+--- a/include/nav2_costmap_2d/layered_costmap.hpp
++++ b/include/nav2_costmap_2d/layered_costmap.hpp
+@@ -192,3 +192,7 @@ public:
+   {
++#ifdef __cpp_lib_atomic_shared_ptr
+     return *footprint_.load();
++#else
++    return *std::atomic_load(&footprint_);
++#endif
+   }
+@@ -233,3 +237,7 @@ private:
+   std::atomic<double> circumscribed_radius_, inscribed_radius_;
++#ifdef __cpp_lib_atomic_shared_ptr
+   std::atomic<std::shared_ptr<std::vector<geometry_msgs::msg::Point>>> footprint_;
++#else
++  std::shared_ptr<std::vector<geometry_msgs::msg::Point>> footprint_;
++#endif
+ };
+diff --git a/src/footprint_subscriber.cpp b/src/footprint_subscriber.cpp
+index d1eedef..1168cc9 100644
+--- a/src/footprint_subscriber.cpp
++++ b/src/footprint_subscriber.cpp
+@@ -33,3 +33,7 @@ FootprintSubscriber::getFootprintRaw(
+ 
++#ifdef __cpp_lib_atomic_shared_ptr
+   auto current_footprint = footprint_.load();
++#else
++  auto current_footprint = std::atomic_load(&footprint_);
++#endif
+   if (!current_footprint) {
+@@ -79,3 +83,7 @@ FootprintSubscriber::footprint_callback(
+ {
++#ifdef __cpp_lib_atomic_shared_ptr
+   footprint_.store(msg);
++#else
++  std::atomic_store(&footprint_, msg);
++#endif
+   if (!footprint_received_.load()) {
+diff --git a/src/layered_costmap.cpp b/src/layered_costmap.cpp
+index cd42f85..99248ae 100644
+--- a/src/layered_costmap.cpp
++++ b/src/layered_costmap.cpp
+@@ -303,4 +303,8 @@ void LayeredCostmap::setFootprint(const std::vector<geometry_msgs::msg::Point> &
+   // and not otherwise locked
+-  footprint_.store(
++#ifdef __cpp_lib_atomic_shared_ptr
++  footprint_.store(std::make_shared<std::vector<geometry_msgs::msg::Point>>(footprint_spec));
++#else
++  std::atomic_store(&footprint_,
+     std::make_shared<std::vector<geometry_msgs::msg::Point>>(footprint_spec));
++#endif
+   inscribed_radius_.store(std::get<0>(inside_outside));
