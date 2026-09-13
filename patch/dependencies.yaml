@@ -326,6 +326,10 @@ depth_image_proc:
 rqt_mocap4r2_control:
   remove_host: ["qt-main"]
   remove_run: ["qt-main"]
+roboplan_example_models:
+  # src/resources.cpp uses dladdr() from dlfcn.h, which is POSIX-only.
+  # On Windows we need to depend on dlfcn-win32 instead.
+  add_host: ["${{ 'dlfcn-win32' if win }}"]
 roboplan_ros_examples:
   # package.xml only declares ament_cmake_python, but CMakeLists.txt does
   # find_package(ament_cmake REQUIRED) and build_type is ament_cmake.
