@@ -413,6 +413,8 @@ libopencv-imgproc-dev:
     win64: [py-opencv, libopencv]
 libopenni-dev:
   robostack: []
+libopenvdb-dev:
+  robostack: [openvdb]
 liborocos-kdl:
   robostack: [orocos-kdl]
 liborocos-kdl-dev:

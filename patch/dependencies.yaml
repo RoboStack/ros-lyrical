@@ -100,6 +100,10 @@ nav2_constrained_smoother:
   add_host: ["${{ 'openblas' if win }}", "ceres-solver"]
 ompl:
   add_host: ["ompl"]
+openvdb_vendor:
+  add_host: ["openvdb"]
+spatio_temporal_voxel_layer:
+  add_host: [libgl-devel, libopengl-devel, openvdb]
 pybind11_json_vendor:
   add_host: ["pybind11_json"]
   add_run: ["pybind11_json"]
