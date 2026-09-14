@@ -6,9 +6,9 @@ tests:
       else: launch_test robot_state_publisher_smoke_test_launch.py
     requirements:
       run:
-        - ros-humble-launch-testing-ros
-        - ros-humble-rcl-interfaces
-        - ros-humble-rclpy
+        - ros2-launch-testing-ros
+        - ros2-rcl-interfaces
+        - ros2-rclpy
     files:
       recipe:
         - robot_state_publisher_smoke_test_launch.py
