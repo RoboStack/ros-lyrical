@@ -208,3 +208,13 @@ nav2_map_server:
   build_number: 24
 rmw_implementation:
   build_number: 24
+rmw_test_fixture_implementation:
+  build_number: 24
+rcl:
+  build_number: 24
+rclpy:
+  build_number: 24
+test_rmw_implementation:
+  build_number: 24
+rosbag2_cpp:
+  build_number: 24
