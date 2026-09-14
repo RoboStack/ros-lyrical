@@ -29,10 +29,6 @@ packages_skip_by_deps:
       - tlsf
       - tlsf_cpp
 
-  - if: win
-    then:
-      - autoware_internal_localization_msgs  # Generated Python type support exceeds MSVC path handling
-
 packages_remove_from_deps:
 
   - if: not linux
@@ -41,10 +37,6 @@ packages_remove_from_deps:
       - rttest
       - tlsf
       - tlsf_cpp
-
-  - if: win
-    then:
-      - autoware_internal_localization_msgs  # Only pulled in as an unused package.xml <depend> of autoware_internal_msgs
 
 skip_existing:
   - https://prefix.dev/robostack-lyrical/
@@ -223,6 +215,7 @@ packages_select_by_deps:
       - autoware_core_control  # depends on autoware_motion_utils
       - autoware_core_localization  # depends on autoware_ekf_localizer
       - autoware_ekf_localizer  # Windows error: error C2338: static_assert failed: 'First argument to logging macros must be an rclcpp::Logger'
+      - autoware_internal_localization_msgs  # Generated Python type support exceeds MSVC path handling
       - autoware_lanlet2_utils  # Windows errors: C3546 (no parameter packs to expand), C2678 (no operator '|' for transform_view)
       - autoware_motion_utils  # Windows error: error C2765: 'function': an explicit specialization of a function template cannot have any default arguments
       - autoware_osqp_interface
