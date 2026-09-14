@@ -1,8 +1,7 @@
 diff --git a/src/rclcpp/context.cpp b/src/rclcpp/context.cpp
-index 0b472fd..8e022d5 100644
 --- a/src/rclcpp/context.cpp
 +++ b/src/rclcpp/context.cpp
-@@ -425,7 +425,7 @@ Context::add_shutdown_callback(
+@@ -449,7 +449,7 @@ Context::add_shutdown_callback(
    const ShutdownCallback & callback)
  {
    auto callback_shared_ptr =
@@ -11,7 +10,7 @@ index 0b472fd..8e022d5 100644
  
    static_assert(
      shutdown_type == ShutdownType::pre_shutdown || shutdown_type == ShutdownType::on_shutdown);
-@@ -438,7 +438,7 @@ Context::add_shutdown_callback(
+@@ -462,7 +462,7 @@ Context::add_shutdown_callback(
      on_shutdown_callbacks_.emplace_back(callback_shared_ptr);
    }
  
@@ -20,12 +19,3 @@ index 0b472fd..8e022d5 100644
    callback_handle.callback = callback_shared_ptr;
    return callback_handle;
  }
-@@ -446,7 +446,7 @@ Context::add_shutdown_callback(
- template<Context::ShutdownType shutdown_type>
- bool
- Context::remove_shutdown_callback(
--  const ShutdownCallbackHandle & callback_handle)
-+  const rclcpp::ShutdownCallbackHandle & callback_handle)
- {
-   const auto callback_shared_ptr = callback_handle.callback.lock();
-   if (callback_shared_ptr == nullptr) {
