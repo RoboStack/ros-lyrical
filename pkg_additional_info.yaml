@@ -206,3 +206,5 @@ gz_transport_vendor:
   build_number: 24
 nav2_map_server:
   build_number: 24
+rmw_implementation:
+  build_number: 24
