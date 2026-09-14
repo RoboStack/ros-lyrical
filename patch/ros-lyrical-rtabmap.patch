@@ -1,8 +1,19 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index b7d36de..44e1164 100644
+index 3fd1801..68f6511 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -530,8 +530,12 @@ IF(WITH_G2O)
+@@ -113,6 +113,10 @@ if(MSVC)
+     endif()
+   endif()
+   add_compile_options("/bigobj")
++  # GUI entry points use CoInitialize(). Force the COM declarations while
++  # ensuring the modern Winsock header precedes windows.h in every source.
++  add_compile_options("/FIwinsock2.h")
++  add_compile_options("/FIobjbase.h")
+ endif()
+ 
+ # [Eclipse] Automatic Discovery of Include directories (Optional, but handy) 
+@@ -536,8 +540,12 @@ IF(WITH_G2O)
  ENDIF(WITH_G2O)
  
  IF(WITH_GTSAM)
@@ -13,38 +24,23 @@ index b7d36de..44e1164 100644
 +    SET(CMAKE_FIND_PACKAGE_PREFER_CONFIG TRUE)
      FIND_PACKAGE(GTSAM CONFIG QUIET)
 +    SET(CMAKE_FIND_PACKAGE_PREFER_CONFIG ${_RTABMAP_CMAKE_FIND_PACKAGE_PREFER_CONFIG})
- ENDIF(WITH_GTSAM)
- 
- IF(WITH_MRPT)
-@@ -578,7 +582,7 @@ ENDIF(WITH_POINTMATCHER)
- IF(libpointmatcher_FOUND OR GTSAM_FOUND)
--    find_package(Boost COMPONENTS thread filesystem system program_options date_time REQUIRED)
-+    find_package(Boost COMPONENTS thread filesystem program_options date_time REQUIRED)
-     IF(Boost_MINOR_VERSION GREATER 47)
--        find_package(Boost COMPONENTS thread filesystem system program_options date_time chrono timer serialization REQUIRED)
-+        find_package(Boost COMPONENTS thread filesystem program_options date_time chrono timer serialization REQUIRED)
-     ENDIF(Boost_MINOR_VERSION GREATER 47)
-     IF(WIN32)
-         MESSAGE(STATUS "Boost_LIBRARY_DIRS=${Boost_LIBRARY_DIRS}")
-@@ -112,5 +116,9 @@ if(MSVC)
-     endif()
-   endif()
-   add_compile_options("/bigobj")
-+  # GUI entry points use CoInitialize(). Force the COM declarations while
-+  # ensuring the modern Winsock header precedes windows.h in every source.
-+  add_compile_options("/FIwinsock2.h")
-+  add_compile_options("/FIobjbase.h")
- endif()
- 
- # Detect CPU arch and whether we are in 32 or 64 bit
+     IF(GTSAM_FOUND)
+       # For issue https://github.com/introlab/rtabmap/pull/1626
+       FIND_FILE(GTSAM_NOISE_MODEL_FACTOR_N_FILE gtsam/nonlinear/NoiseModelFactorN.h
 diff --git a/corelib/src/CMakeLists.txt b/corelib/src/CMakeLists.txt
-index b758ad0..3f29cba 100644
+index e6bf74c..fdfe0fa 100644
 --- a/corelib/src/CMakeLists.txt
 +++ b/corelib/src/CMakeLists.txt
-@@ -855,0 +856,6 @@ ADD_LIBRARY(rtabmap::core ALIAS rtabmap_core)
+@@ -875,6 +875,12 @@ add_definitions(${PCL_DEFINITIONS})
+ # The extension is automatically found.
+ ADD_LIBRARY(rtabmap_core ${SRC_FILES} ${RESOURCES_HEADERS})
+ ADD_LIBRARY(rtabmap::core ALIAS rtabmap_core)
 +# GTSAM and this target both instantiate an identical inline TBB allocator
 +# vector accessor on MSVC. Let the linker coalesce that duplicate definition.
 +IF(MSVC)
 +  TARGET_LINK_OPTIONS(rtabmap_core PRIVATE "/FORCE:MULTIPLE")
 +ENDIF(MSVC)
 +
+ 
+ generate_export_header(rtabmap_core
+  DEPRECATED_MACRO_NAME RTABMAP_DEPRECATED)

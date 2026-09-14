@@ -1,23 +1,24 @@
 ros_distro: lyrical
+package_name_mode: both
 
 # mapping for package keys
 conda_index:
   - robostack.yaml
   - packages-ignore.yaml
 
-# Reminder for next full rebuild, the next build number should be 23
-build_number: 22
+# Reminder for next full rebuild, the next build number should be 25
+build_number: 23
 
 mutex_package:
   name: ros2-distro-mutex
-  version: 0.18.0
+  version: 0.19.0
   upper_bound: x.x
   run_constraints:
     - libboost 1.90.*
     - libboost-devel 1.90.*
     - pcl 1.15.1.*
     - gazebo 11.*
-    - libprotobuf 6.33.5.*
+    - libprotobuf 7.35.1.*
     - vtk 9.6.2.*
 
 packages_skip_by_deps:
@@ -149,7 +150,7 @@ packages_select_by_deps:
   - py_trees_ros_tutorials
   - rmw_zenoh_cpp  # requested in https://github.com/RoboStack/ros-humble/issues/252
   - robot
-  - robot_localization
+  - robot-localization
   - ros2_control
   - ros2_controllers
   - ros2_fmt_logger
@@ -202,7 +203,7 @@ packages_select_by_deps:
       - livox_ros_driver2
       - mavros
       - py_binding_tools
-      # - realsense2_camera  # Needs newer version of librealsense2?
+      - realsense2_camera
       - realsense2_description
       - rmf_demos
       - swri_serial_util  # Serial communication only implemented for linux

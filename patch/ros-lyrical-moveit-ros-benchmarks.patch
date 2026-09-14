@@ -1,35 +1,8 @@
-diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 58538a70b..3d0a60468 100644
---- a/CMakeLists.txt
-+++ b/CMakeLists.txt
-@@ -34,11 +34,19 @@ set_target_properties(moveit_ros_benchmarks
- if(WIN32)
-   set(EXTRA_LIB ws2_32.lib)
- endif()
--ament_target_dependencies(moveit_ros_benchmarks ${THIS_PACKAGE_INCLUDE_DEPENDS})
--target_link_libraries(moveit_ros_benchmarks ${EXTRA_LIB})
-+target_link_libraries(
-+  moveit_ros_benchmarks
-+  rclcpp::rclcpp
-+  Boost::filesystem
-+  Boost::headers
-+  tf2_eigen::tf2_eigen
-+  moveit_core::moveit_core
-+  moveit_ros_planning::moveit_ros_planning
-+  moveit_ros_warehouse::moveit_ros_warehouse
-+  pluginlib::pluginlib
-+  ${EXTRA_LIB})
- 
- add_executable(moveit_run_benchmark src/RunBenchmark.cpp)
--ament_target_dependencies(moveit_run_benchmark ${THIS_PACKAGE_INCLUDE_DEPENDS})
- target_link_libraries(moveit_run_benchmark moveit_ros_benchmarks)
- 
- install(
 diff --git a/src/BenchmarkExecutor.cpp b/src/BenchmarkExecutor.cpp
-index e43884259..a24d6a2ce 100644
+index 3461971..1c6ebf5 100644
 --- a/src/BenchmarkExecutor.cpp
 +++ b/src/BenchmarkExecutor.cpp
-@@ -62,6 +62,7 @@ using boost_progress_display = boost::progress_display;
+@@ -61,6 +61,7 @@ using boost_progress_display = boost::progress_display;
  #include <math.h>
  #include <limits>
  #include <filesystem>

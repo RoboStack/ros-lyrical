@@ -12,11 +12,15 @@ coal:
   generate_dummy_package_with_run_deps:
     dep_name: coal
     max_pin: 'x.x.x'
-    override_version: '3.0.3'
+    override_version: '3.0.4'
 compressed_depth_image_transport:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 console_bridge_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+cyclonedds:
+  generate_dummy_package_with_run_deps:
+    dep_name: cyclonedds
+    max_pin: 'x.x'
 data_tamer_cpp:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 diagnostic_aggregator:
@@ -38,8 +42,6 @@ gtsam:
     override_version: '4.2.0'
 gz_cmake_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-gz_common_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_dartsim_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_fuel_tools_vendor:
@@ -56,15 +58,9 @@ gz_physics_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_plugin_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-gz_rendering_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_ros2_control:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 gz_sensors_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-gz_sim_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-gz_transport_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_utils_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
@@ -74,6 +70,24 @@ hpp_fcl:
     max_pin: 'x.x.x'
     # the version on ros is outdated w.r.t. to the conda-forge one
     override_version: '3.0.2'
+iceoryx_binding_c:
+  generate_dummy_package_with_run_deps:
+    dep_name: libiceoryx-binding-c
+    max_pin: 'x.x.x'
+    # the version on ROS (2.0.6) is outdated w.r.t. the conda-forge one
+    override_version: '2.95.8'
+iceoryx_hoofs:
+  generate_dummy_package_with_run_deps:
+    dep_name: libiceoryx-hoofs
+    max_pin: 'x.x.x'
+    # the version on ROS (2.0.6) is outdated w.r.t. the conda-forge one
+    override_version: '2.95.8'
+iceoryx_posh:
+  generate_dummy_package_with_run_deps:
+    dep_name: libiceoryx-posh
+    max_pin: 'x.x.x'
+    # the version on ROS (2.0.6) is outdated w.r.t. the conda-forge one
+    override_version: '2.95.8'
 io_context:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 lanelet2_projection:
@@ -123,12 +137,12 @@ pinocchio:
     dep_name: pinocchio
     max_pin: 'x.x.x'
     # the version on ros is outdated w.r.t. to the conda-forge one
-    override_version: '4.0.0'
+    override_version: '4.1.0'
 proxsuite:
   generate_dummy_package_with_run_deps:
     dep_name: proxsuite
     max_pin: 'x.x'
-    override_version: '0.7.2'
+    override_version: '0.7.3'
 pybind11_json_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR"
 pybind11_vendor:
@@ -174,4 +188,33 @@ visp:
     override_version: '3.6.0'
 zenoh_cpp_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK -DUSE_SYSTEM_ZENOH=ON"
-# Remove all lines after this one on new full rebuild
+# Remove build_number fields below on new full rebuild
+# See https://github.com/RoboStack/ros-lyrical/issues/50
+bondcpp:
+  build_number: 24
+gz_common_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+  build_number: 24
+gz_rendering_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+  build_number: 24
+gz_sim_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+  build_number: 24
+gz_transport_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+  build_number: 24
+nav2_map_server:
+  build_number: 24
+rmw_implementation:
+  build_number: 24
+rmw_test_fixture_implementation:
+  build_number: 24
+rcl:
+  build_number: 24
+rclpy:
+  build_number: 24
+test_rmw_implementation:
+  build_number: 24
+rosbag2_cpp:
+  build_number: 24
