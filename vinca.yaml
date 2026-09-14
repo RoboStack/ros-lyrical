@@ -162,6 +162,7 @@ packages_select_by_deps:
   - rosidl_buffer_backend
   - rosidl_buffer_backend_registry
   - rosidl_buffer_py
+  - rosidlcpp
   - rqt_robot_monitor
   - rqt_runtime_monitor
   - rtabmap
