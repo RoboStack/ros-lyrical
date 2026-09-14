@@ -282,11 +282,6 @@ rmf_task_sequence:
   # target. Make the conda-forge CMake package directly available.
   add_host: ["json_schema_validator"]
   add_run: ["json_schema_validator"]
-rmw_implementation:
-  # These backends are only used by the disabled test suite. Keeping them all
-  # as host dependencies creates a bootstrap cycle during mutex migrations;
-  # the default Fast DDS backend is sufficient to configure the package.
-  remove_host: ["ros-lyrical-rmw-connextdds", "ros-lyrical-rmw-cyclonedds-cpp", "ros-lyrical-rmw-fastrtps-dynamic-cpp", "ros-lyrical-rmw-zenoh-cpp"]
 rclpy:
   add_host: ["typing_extensions"]
   add_run: ["typing_extensions"]
