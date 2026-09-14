@@ -146,6 +146,8 @@ packages_select_by_deps:
   - py-trees-ros-interfaces
   - py-trees-ros-viewer
   - py_trees_ros_tutorials
+  - rclpy_message_converter
+  - rclpy_message_converter_msgs
   - rmw_zenoh_cpp  # requested in https://github.com/RoboStack/ros-humble/issues/252
   - robot
   - robot-localization
