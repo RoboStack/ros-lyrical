@@ -1,0 +1,75 @@
+diff --git a/src/DataLoadROS2/dataload_ros2.cpp b/src/DataLoadROS2/dataload_ros2.cpp
+index 26402ad..1f6359a 100644
+--- a/src/DataLoadROS2/dataload_ros2.cpp
++++ b/src/DataLoadROS2/dataload_ros2.cpp
+@@ -17,7 +17,7 @@
+ #include <rosidl_typesupport_introspection_cpp/message_introspection.hpp>
+ #include <rosidl_typesupport_introspection_cpp/field_types.hpp>
+ #include <rosidl_typesupport_cpp/identifier.hpp>
+-#include <rosbag2_cpp/typesupport_helpers.hpp>
++#include <rclcpp/typesupport_helpers.hpp>
+ #include <rosbag2_cpp/types/introspection_message.hpp>
+ #include <unordered_map>
+ #include <rclcpp/rclcpp.hpp>
+diff --git a/src/TopicPublisherROS2/generic_publisher.h b/src/TopicPublisherROS2/generic_publisher.h
+index ddd45be..cb60258 100644
+--- a/src/TopicPublisherROS2/generic_publisher.h
++++ b/src/TopicPublisherROS2/generic_publisher.h
+@@ -50,8 +50,8 @@ public:
+                                                   const std::string& topic_type)
+   {
+   
+-   auto library = std::move(rosbag2_cpp::get_typesupport_library(topic_type, "rosidl_typesupport_cpp"));
+-   auto type_support = rosbag2_cpp::get_typesupport_handle(topic_type, "rosidl_typesupport_cpp", library);
++   auto library = std::move(rclcpp::get_typesupport_library(topic_type, "rosidl_typesupport_cpp"));
++   auto type_support = rclcpp::get_message_typesupport_handle(topic_type, "rosidl_typesupport_cpp", *library);
+ 
+ 
+     return std::make_shared<GenericPublisher>(node.get_node_base_interface().get(), topic_name, *type_support);
+diff --git a/src/ros_parsers/ros2_parser.cpp b/src/ros_parsers/ros2_parser.cpp
+index d182575..4cdde67 100644
+--- a/src/ros_parsers/ros2_parser.cpp
++++ b/src/ros_parsers/ros2_parser.cpp
+@@ -43,9 +43,9 @@ std::string CreateSchema(const std::string& base_type)
+ 
+   auto addTypeToSchema = [&](const std::string& type_name, bool add_header)
+   {
+-    auto introspection_library = rosbag2_cpp::get_typesupport_library(type_name, "rosidl_typesupport_introspection_cpp");
+-    auto introspection_support = rosbag2_cpp::get_typesupport_handle(type_name, "rosidl_typesupport_introspection_cpp", 
+-                                                                     introspection_library);
++    auto introspection_library = rclcpp::get_typesupport_library(type_name, "rosidl_typesupport_introspection_cpp");
++    auto introspection_support = rclcpp::get_message_typesupport_handle(type_name, "rosidl_typesupport_introspection_cpp",
++                                                                        *introspection_library);
+ 
+     if(add_header)
+     {
+@@ -119,12 +119,12 @@ TopicInfo CreateTopicInfo(const std::string& topic_name, const std::string& type
+   info.topic_name = topic_name;
+   info.type = type_name;
+ 
+-  info.introspection_library = rosbag2_cpp::get_typesupport_library(type_name, "rosidl_typesupport_introspection_cpp");
+-  info.introspection_support = rosbag2_cpp::get_typesupport_handle(type_name, "rosidl_typesupport_introspection_cpp", info.introspection_library);
++  info.introspection_library = rclcpp::get_typesupport_library(type_name, "rosidl_typesupport_introspection_cpp");
++  info.introspection_support = rclcpp::get_message_typesupport_handle(type_name, "rosidl_typesupport_introspection_cpp", *(info.introspection_library));
+ 
+   auto identifier   = rosidl_typesupport_cpp::typesupport_identifier;
+-  info.support_library = rosbag2_cpp::get_typesupport_library(type_name, identifier);
+-  info.type_support = rosbag2_cpp::get_typesupport_handle(type_name, identifier, info.support_library);
++  info.support_library = rclcpp::get_typesupport_library(type_name, identifier);
++  info.type_support = rclcpp::get_message_typesupport_handle(type_name, identifier, *(info.support_library));
+ 
+   info.has_header_stamp = TypeHasHeader(info.introspection_support);
+   return info;
+diff --git a/src/ros_parsers/ros2_parser.h b/src/ros_parsers/ros2_parser.h
+index e2f59b9..6386fc1 100644
+--- a/src/ros_parsers/ros2_parser.h
++++ b/src/ros_parsers/ros2_parser.h
+@@ -3,7 +3,7 @@
+ #include "rclcpp/rclcpp.hpp"
+ #include "rmw/rmw.h"
+ #include "rmw/types.h"
+-#include "rosbag2_cpp/typesupport_helpers.hpp"
++#include "rclcpp/typesupport_helpers.hpp"
+ #include "rosidl_typesupport_introspection_cpp/message_introspection.hpp"
+ 
+ #include <PlotJuggler/plotdata.h>
