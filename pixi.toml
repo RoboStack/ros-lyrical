@@ -2,7 +2,7 @@
 name = "ros-lyrical"
 description = "RoboStack repo to package ros-lyrical packages as conda packages"
 authors = ["Tobias Fischer <tobias.fischer@qut.edu.au>", "Wolf Vollprecht <w.vollprecht@gmail.com>", "Silvio Traversaro <silvio@traversaro.it>", "Daisuke Nishimatsu <daisuke.nishimatsu1021@gmail.com>"]
-channels = ["https://repo.prefix.dev/conda-forge"]
+channels = ["https://prefix.dev/conda-forge"]
 platforms = [
   "osx-arm64",
   # 2.17 is the glibc version used in CentOS 7
@@ -14,9 +14,8 @@ platforms = [
 
 [dependencies]
 python = ">=3.14.0,<3.15"
-# Include the latest rattler-build fixes w.r.t. to patches handling
-# rattler-build regression, pinning to 0.57
-rattler-build = "<0.58.0"
+# Include https://github.com/prefix-dev/rattler-build/pull/2796
+rattler-build = ">=0.76.0"
 cmake = "<4.0"
 setuptools = "<82.0"
 rattler-index = ">=0.27.16"

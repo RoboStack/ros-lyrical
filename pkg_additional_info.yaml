@@ -188,33 +188,12 @@ visp:
     override_version: '3.6.0'
 zenoh_cpp_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK -DUSE_SYSTEM_ZENOH=ON"
-# Remove build_number fields below on new full rebuild
-# See https://github.com/RoboStack/ros-lyrical/issues/50
-bondcpp:
-  build_number: 24
 gz_common_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-  build_number: 24
 gz_rendering_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-  build_number: 24
 gz_sim_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-  build_number: 24
 gz_transport_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-  build_number: 24
-nav2_map_server:
-  build_number: 24
-rmw_implementation:
-  build_number: 24
-rmw_test_fixture_implementation:
-  build_number: 24
-rcl:
-  build_number: 24
-rclpy:
-  build_number: 24
-test_rmw_implementation:
-  build_number: 24
-rosbag2_cpp:
-  build_number: 24
+# Remove build_number fields below on new full rebuild
