@@ -1,5 +1,5 @@
-import unittest
 import sys
+import unittest
 
 import launch
 from launch import LaunchDescription
@@ -23,6 +23,7 @@ minimal_robot_urdf = """<?xml version="1.0"?>
 </robot>
 """
 
+
 def generate_test_description():
     # Launch robot_state_publisher with our URDF
     rsp_node = launch_ros.actions.Node(
@@ -40,13 +41,13 @@ def generate_test_description():
     # We return a dictionary so we can refer to our node later if needed.
     return ld, {'rsp_node': rsp_node}
 
+
 class TestRobotStatePublisher(unittest.TestCase):
 
     def test_node_output(self, proc_output):
-        # Check that some output indicative of URDF parsing appears.
-        # The robot_state_publisher usually logs "got segment ..." for each link.
+        # Lyrical reports successful URDF parsing with this message.
         proc_output.assertWaitFor(
-            expected_output="got segment", timeout=10, stream='stderr'
+            expected_output="Robot initialized", timeout=10, stream='stderr'
         )
 
         context = rclpy.Context()
@@ -81,11 +82,16 @@ class TestRobotStatePublisher(unittest.TestCase):
                 node.destroy_node()
             rclpy.shutdown(context=context)
 
+
 # See https://github.com/RoboStack/ros-humble/pull/320#issuecomment-3078288316
-@unittest.skipIf(sys.platform == "darwin", "Post‑shutdown exit‑code is either -6 or -9 on macOS, do not check it.")
 @launch_testing.post_shutdown_test()
 class TestRobotStatePublisherPostShutdown(unittest.TestCase):
 
     def test_exit_codes(self, proc_info):
-        # Verify that all launched processes exited with code 0.
-        launch_testing.asserts.assertExitCodes(proc_info)
+        allowable_exit_codes = [launch_testing.asserts.EXIT_OK]
+        if sys.platform == "darwin":
+            allowable_exit_codes.extend([-6, -9])
+
+        launch_testing.asserts.assertExitCodes(
+            proc_info, allowable_exit_codes=allowable_exit_codes
+        )
