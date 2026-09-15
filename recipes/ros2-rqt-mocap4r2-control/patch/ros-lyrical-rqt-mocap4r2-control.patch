@@ -1,0 +1,77 @@
+diff --git a/mocap4r2_control/rqt_mocap4r2_control/CMakeLists.txt b/mocap4r2_control/rqt_mocap4r2_control/CMakeLists.txt
+index 083b464..95cbcee 100644
+--- a/mocap4r2_control/rqt_mocap4r2_control/CMakeLists.txt
++++ b/mocap4r2_control/rqt_mocap4r2_control/CMakeLists.txt
+@@ -27,17 +27,17 @@ find_package(qt_gui_cpp REQUIRED)
+ find_package(rqt_gui_cpp REQUIRED)
+ find_package(mocap4r2_control REQUIRED)
+ find_package(mocap4r2_control_msgs REQUIRED)
+-find_package(Qt5Widgets REQUIRED)
++find_package(Qt6 REQUIRED COMPONENTS Widgets)
+ find_package(ament_cmake_python REQUIRED)
+ find_package(sensor_msgs REQUIRED)
+ 
+ set(dependencies
+-  rclcpp
+-  qt_gui_cpp
+-  rqt_gui_cpp
+-  mocap4r2_control
+-  mocap4r2_control_msgs
+-  sensor_msgs
++  rclcpp::rclcpp
++  qt_gui_cpp::qt_gui_cpp
++  rqt_gui_cpp::rqt_gui_cpp
++  ${mocap4r2_control_LIBRARIES}
++  ${mocap4r2_control_msgs_TARGETS}
++  ${sensor_msgs_TARGETS}
+ )
+ 
+ set(rqt_mocap4r2_control_SRCS
+@@ -56,12 +56,11 @@ set(rqt_mocap4r2_control_UIS
+ 
+ set(rqt_mocap4r2_control_INCLUDE_DIRECTORIES
+   include
+-  ${Qt5Widgets_INCLUDE_DIRS}
+ )
+ 
+-qt5_wrap_cpp(rqt_mocap4r2_control_MOCS ${rqt_mocap4r2_control_HDRS})
++qt6_wrap_cpp(rqt_mocap4r2_control_MOCS ${rqt_mocap4r2_control_HDRS})
+ 
+-qt5_wrap_ui(rqt_mocap4r2_control_UIS_H ${rqt_mocap4r2_control_UIS})
++qt6_wrap_ui(rqt_mocap4r2_control_UIS_H ${rqt_mocap4r2_control_UIS})
+ 
+ include_directories(
+   ${rqt_mocap4r2_control_INCLUDE_DIRECTORIES}
+@@ -75,10 +74,10 @@ add_library(${PROJECT_NAME} SHARED
+ 
+ target_link_libraries(
+   ${PROJECT_NAME}
+-  Qt5::Widgets
++  Qt6::Widgets
+ )
+ 
+-ament_target_dependencies(${PROJECT_NAME} ${dependencies})
++target_link_libraries(${PROJECT_NAME} ${dependencies})
+ 
+ install(
+   TARGETS ${PROJECT_NAME}
+@@ -107,4 +106,4 @@ pluginlib_export_plugin_description_file(rqt_gui "plugin.xml")
+ ament_export_include_directories(include)
+ ament_export_libraries(${PROJECT_NAME})
+ 
+-ament_package()
+\ No newline at end of file
++ament_package()
+diff --git a/mocap4r2_control/rqt_mocap4r2_control/include/rqt_mocap4r2_control/mocap4r2_control.hpp b/mocap4r2_control/rqt_mocap4r2_control/include/rqt_mocap4r2_control/mocap4r2_control.hpp
+index 3d18161..4c46a68 100644
+--- a/mocap4r2_control/rqt_mocap4r2_control/include/rqt_mocap4r2_control/mocap4r2_control.hpp
++++ b/mocap4r2_control/rqt_mocap4r2_control/include/rqt_mocap4r2_control/mocap4r2_control.hpp
+@@ -15,7 +15,7 @@
+ #ifndef RQT_MOCAP4R2_CONTROL__MOCAP4R2_CONTROL__HPP_
+ #define RQT_MOCAP4R2_CONTROL__MOCAP4R2_CONTROL__HPP_
+ 
+-#include <rqt_gui_cpp/plugin.h>
++#include <rqt_gui_cpp/plugin.hpp>
+ 
+ #include <ui_mocap4r2_control.h>
+ 

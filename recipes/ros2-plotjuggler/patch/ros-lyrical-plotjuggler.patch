@@ -1,0 +1,10 @@
+diff --git a/plotjuggler_plugins/ParserROS/rosx_introspection/CMakeLists.txt b/plotjuggler_plugins/ParserROS/rosx_introspection/CMakeLists.txt
+index 1111111..2222222 100644
+--- a/plotjuggler_plugins/ParserROS/rosx_introspection/CMakeLists.txt
++++ b/plotjuggler_plugins/ParserROS/rosx_introspection/CMakeLists.txt
+@@ -26,4 +26,4 @@ target_include_directories(rosx_introspection PUBLIC
+     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+     $<INSTALL_INTERFACE:include>)
+
+-target_compile_features(rosx_introspection PUBLIC cxx_std_17)
++target_compile_features(rosx_introspection PUBLIC cxx_std_20)

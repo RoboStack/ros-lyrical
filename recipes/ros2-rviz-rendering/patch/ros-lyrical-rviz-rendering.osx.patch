@@ -1,0 +1,46 @@
+diff --git a/src/rviz_rendering/ogre_render_window_impl.cpp b/src/rviz_rendering/ogre_render_window_impl.cpp
+index 27ff2ce..38ade73 100644
+--- a/src/rviz_rendering/ogre_render_window_impl.cpp
++++ b/src/rviz_rendering/ogre_render_window_impl.cpp
+@@ -243,12 +243,21 @@ RenderWindowImpl::resize(size_t width, size_t height)
+     return;
+   }
+   if (ogre_render_window_) {
+-    this->setCameraAspectRatio();
+-    ogre_render_window_->resize(
+-      static_cast<unsigned int>(width),  // NOLINT
+-      static_cast<unsigned int>(height)  // NOLINT
+-    );
+-    ogre_render_window_->windowMovedOrResized();
++    // Skip the costly Ogre resize / windowMovedOrResized when the size has
++    // not actually changed. On macOS Sonoma+, windowMovedOrResized triggers
++    // [NSOpenGLContext update] -> CGLSetVirtualScreen, which is hundreds of
++    // ms per call under the OpenGL-on-Metal compatibility path; each call
++    // also re-fires an expose event, so calling it on every expose creates
++    // a positive-feedback loop that makes the splash screen never progress.
++    const auto w = static_cast<unsigned int>(width);
++    const auto h = static_cast<unsigned int>(height);
++    if (w != last_resize_width_ || h != last_resize_height_) {
++      last_resize_width_ = w;
++      last_resize_height_ = h;
++      this->setCameraAspectRatio();
++      ogre_render_window_->resize(w, h);
++      ogre_render_window_->windowMovedOrResized();
++    }
+   }
+   this->renderLater();
+ }
+diff --git a/src/rviz_rendering/ogre_render_window_impl.hpp b/src/rviz_rendering/ogre_render_window_impl.hpp
+index 7bd7b22..8391498 100644
+--- a/src/rviz_rendering/ogre_render_window_impl.hpp
++++ b/src/rviz_rendering/ogre_render_window_impl.hpp
+@@ -150,6 +150,9 @@ protected:
+ 
+   bool animating_;
+ 
++  unsigned int last_resize_width_{0};
++  unsigned int last_resize_height_{0};
++
+   Ogre::Viewport * ogre_viewport_;
+ 
+   // std::function<void()> pre_render_callback_;  ///< Functor which is called before each render

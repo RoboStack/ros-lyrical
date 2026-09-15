@@ -1,0 +1,12 @@
+diff --git a/src/BenchmarkExecutor.cpp b/src/BenchmarkExecutor.cpp
+index 3461971..1c6ebf5 100644
+--- a/src/BenchmarkExecutor.cpp
++++ b/src/BenchmarkExecutor.cpp
+@@ -61,6 +61,7 @@ using boost_progress_display = boost::progress_display;
+ #include <math.h>
+ #include <limits>
+ #include <filesystem>
++#include <regex>
+ #ifndef _WIN32
+ #include <unistd.h>
+ #else
