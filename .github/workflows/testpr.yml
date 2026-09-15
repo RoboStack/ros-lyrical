@@ -175,7 +175,7 @@ jobs:
       shell: bash -l {0}
       run: |
         extra_args=""
-        if [[ "${{ matrix.platform }}" == "win-64" ]]; then
+        if [[ "${{ matrix.platform }}" == "win-64" || "${{ matrix.platform }}" == "linux-aarch64" ]]; then
           # --batch_size 25 is a workaround for https://github.com/RoboStack/robostack.github.io/issues/105
           extra_args="--batch_size 25"
         fi
