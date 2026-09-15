@@ -1,0 +1,111 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e940609..a743203 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,8 @@
+ cmake_minimum_required(VERSION 3.5)
+ project(py_binding_tools)
+ 
++set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
++
+ find_package(ament_cmake REQUIRED)
+ find_package(ament_cmake_python REQUIRED)
+ find_package(rclcpp REQUIRED)
+@@ -13,9 +15,14 @@ add_library(${PROJECT_NAME} SHARED
+   src/ros_msg_typecasters.cpp
+   src/initializer.cpp
+ )
++
++include(GenerateExportHeader)
++generate_export_header(${PROJECT_NAME})
++
+ target_include_directories(${PROJECT_NAME}
+   PUBLIC
+     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
++    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+     $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
+ ament_target_dependencies(${PROJECT_NAME} rclcpp geometry_msgs pybind11)
+ 
+@@ -34,6 +41,8 @@ install(
+   DESTINATION include/${PROJECT_NAME}
+ )
+ 
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION include/${PROJECT_NAME})
++
+ _ament_cmake_python_register_environment_hook()
+ 
+ pybind11_add_module(rclcpp src/rclcpp.cpp)
+diff --git a/include/py_binding_tools/initializer.h b/include/py_binding_tools/initializer.h
+index c42e81a..9c23de2 100644
+--- a/include/py_binding_tools/initializer.h
++++ b/include/py_binding_tools/initializer.h
+@@ -36,6 +36,8 @@
+ #include <string>
+ #include <vector>
+ 
++#include <py_binding_tools_export.h>
++
+ namespace py_binding_tools
+ {
+ /** The constructor of this class ensures that rclcpp::init() has been called.
+@@ -48,7 +50,7 @@ public:
+   ~RCLInitializer();
+ };
+ 
+-void init(const std::vector<std::string>& args);
+-void shutdown();
++void PY_BINDING_TOOLS_EXPORT init(const std::vector<std::string>& args);
++void PY_BINDING_TOOLS_EXPORT shutdown();
+ 
+ }  // namespace py_binding_tools
+diff --git a/src/rclcpp.cpp b/src/rclcpp.cpp
+index 50232c9..794421d 100644
+--- a/src/rclcpp.cpp
++++ b/src/rclcpp.cpp
+@@ -38,12 +38,14 @@
+ #include <rclcpp/node.hpp>
+ #include <rclcpp/node_options.hpp>
+ 
++#include <py_binding_tools_export.h>
++
+ namespace py = pybind11;
+ using namespace py_binding_tools;
+ 
+ namespace py_binding_tools
+ {
+-void add_node(const rclcpp::Node::SharedPtr& node);
++void PY_BINDING_TOOLS_EXPORT add_node(const rclcpp::Node::SharedPtr& node);
+ }
+ 
+ namespace
+diff --git a/include/py_binding_tools/ros_msg_typecasters.h b/include/py_binding_tools/ros_msg_typecasters.h
+index 30c5edc..b85fd21 100644
+--- a/include/py_binding_tools/ros_msg_typecasters.h
++++ b/include/py_binding_tools/ros_msg_typecasters.h
+@@ -102,7 +102,7 @@ struct type_caster<rclcpp::Time>
+   // convert from rclcpp::Time to rclpy::Time
+   static handle cast(const rclcpp::Time& src, return_value_policy /* policy */, handle /* parent */)
+   {
+-    object Time = module::import("rclpy.time").attr("Time");
++    object Time = module_::import("rclpy.time").attr("Time");
+     object ClockType = Time().attr("clock_type").attr("__class__");
+ 
+     return Time(arg("nanoseconds") = src.nanoseconds(),
+@@ -131,7 +131,7 @@ struct RosMsgTypeCaster
+     object cls = py_binding_tools::createMessageClass(rosidl_generator_traits::name<T>());
+ 
+     // deserialize into python object
+-    module rclpy = module::import("rclpy.serialization");
++    module_ rclpy = module_::import("rclpy.serialization");
+     object msg = rclpy.attr("deserialize_message")(buf, cls);
+ 
+     return msg.release();
+@@ -145,7 +145,7 @@ struct RosMsgTypeCaster
+       return false;
+ 
+     // serialize src into python buffer
+-    module rclpy = module::import("rclpy.serialization");
++    module_ rclpy = module_::import("rclpy.serialization");
+     bytes buf = rclpy.attr("serialize_message")(src);
+ 
+     // deserialize into C++ object

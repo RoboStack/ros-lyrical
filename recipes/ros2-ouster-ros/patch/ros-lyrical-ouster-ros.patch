@@ -1,0 +1,128 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5764b78..13249cc 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -83,8 +83,18 @@ set(ouster_ros_library_deps
+   tf2_eigen
+ )
+ 
+-ament_target_dependencies(ouster_ros_library
+-  ${ouster_ros_library_deps}
++set(ouster_ros_target_deps
++  rclcpp::rclcpp
++  ${sensor_msgs_TARGETS}
++  ${geometry_msgs_TARGETS}
++  ${ouster_sensor_msgs_TARGETS}
++  pcl_conversions::pcl_conversions
++  tf2::tf2
++  tf2_eigen::tf2_eigen
++)
++
++target_link_libraries(ouster_ros_library
++  ${ouster_ros_target_deps}
+ )
+ 
+ target_link_libraries(ouster_ros_library
+@@ -111,14 +121,14 @@ function(create_ros2_component
+       "OUSTER_ROS_BUILDING_DLL"
+   )
+ 
+-  ament_target_dependencies(${component_lib_name}
+-    rclcpp
+-    class_loader
+-    rclcpp_components
+-    rclcpp_lifecycle
+-    std_msgs
+-    sensor_msgs
+-    geometry_msgs
++  target_link_libraries(${component_lib_name}
++    rclcpp::rclcpp
++    class_loader::class_loader
++    rclcpp_components::component
++    rclcpp_lifecycle::rclcpp_lifecycle
++    ${std_msgs_TARGETS}
++    ${sensor_msgs_TARGETS}
++    ${geometry_msgs_TARGETS}
+     ${additional_dependencies}
+   )
+ 
+@@ -132,7 +142,7 @@ endfunction()
+ # ==== os_sensor_component ====
+ create_ros2_component(os_sensor_component
+   "src/os_sensor_node_base.cpp;src/os_sensor_node.cpp"
+-  "std_srvs"
++  "${std_srvs_TARGETS}"
+ )
+ rclcpp_components_register_node(os_sensor_component
+   PLUGIN "ouster_ros::OusterSensor"
+@@ -152,7 +162,7 @@ rclcpp_components_register_node(os_replay_component
+ # ==== os_cloud_component ====
+ create_ros2_component(os_cloud_component
+   "src/os_processing_node_base.cpp;src/os_cloud_node.cpp"
+-  "tf2_ros"
++  "tf2_ros::tf2_ros"
+ )
+ rclcpp_components_register_node(os_cloud_component
+   PLUGIN "ouster_ros::OusterCloud"
+@@ -172,7 +182,7 @@ rclcpp_components_register_node(os_image_component
+ # ==== os_driver_component ====
+ create_ros2_component(os_driver_component
+   "src/os_sensor_node_base.cpp;src/os_sensor_node.cpp;src/os_driver_node.cpp"
+-  "std_srvs"
++  "${std_srvs_TARGETS}"
+ )
+ rclcpp_components_register_node(os_driver_component
+   PLUGIN "ouster_ros::OusterDriver"
+@@ -203,9 +213,9 @@ if(BUILD_TESTING)
+     test/point_transform_test.cpp
+     test/point_cloud_compose_test.cpp
+   )
+-  ament_target_dependencies(${PROJECT_NAME}_test
+-    rclcpp
+-    ouster_sensor_msgs
++  target_link_libraries(${PROJECT_NAME}_test
++    rclcpp::rclcpp
++    ${ouster_sensor_msgs_TARGETS}
+   )
+   target_include_directories(${PROJECT_NAME}_test PUBLIC
+     ${_ouster_ros_INCLUDE_DIRS}
+diff --git a/ouster-sdk/ouster_client/include/ouster/version.h b/ouster-sdk/ouster_client/include/ouster/version.h
+index 7867e3a..6994f3d 100644
+--- a/ouster-sdk/ouster_client/include/ouster/version.h
++++ b/ouster-sdk/ouster_client/include/ouster/version.h
+@@ -14,6 +14,16 @@
+ #include "ouster/deprecation.h"
+ #include "ouster/visibility.h"
+ 
++// glibc may expose major/minor macros through sys/types.h, which breaks
++// Version's field names when this header is included after libc headers.
++#ifdef major
++#undef major
++#endif
++
++#ifdef minor
++#undef minor
++#endif
++
+ namespace ouster {
+ namespace sdk {
+ namespace core {
+diff --git a/src/os_sensor_node.cpp b/src/os_sensor_node.cpp
+index 8a73c8c..ea3efaf 100644
+--- a/src/os_sensor_node.cpp
++++ b/src/os_sensor_node.cpp
+@@ -1028,12 +1028,12 @@ void OusterSensor::stop_sensor_connection_thread() {
+ }
+ 
+ void OusterSensor::on_lidar_packet_msg(const LidarPacket&) {
+-    lidar_packet_msg.buf.swap(lidar_packet.buf);
++    static_cast<std::vector<uint8_t>&>(lidar_packet_msg.buf).swap(lidar_packet.buf);
+     lidar_packet_pub->publish(lidar_packet_msg);
+ }
+ 
+ void OusterSensor::on_imu_packet_msg(const ImuPacket&) {
+-    imu_packet_msg.buf.swap(imu_packet.buf);
++    static_cast<std::vector<uint8_t>&>(imu_packet_msg.buf).swap(imu_packet.buf);
+     imu_packet_pub->publish(imu_packet_msg);
+ }
+ 

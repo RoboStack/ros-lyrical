@@ -1,0 +1,26 @@
+diff --git a/include/cm_executors/timer_manager.hpp b/include/cm_executors/timer_manager.hpp
+index 4fd2330..e455141 100644
+--- a/include/cm_executors/timer_manager.hpp
++++ b/include/cm_executors/timer_manager.hpp
+@@ -298,7 +298,7 @@ private:
+    */
+   bool remove_if_dropped(const TimerData * timer_data)
+   {
+-    if (timer_data->rcl_ref.unique()) {
++    if (timer_data->rcl_ref.use_count() == 1) {
+       // clear on reset callback
+       if(rcl_timer_set_on_reset_callback(timer_data->rcl_ref.get(), nullptr,
+           nullptr) != RCL_RET_OK)
+diff --git a/include/cm_executors/events_cbg_executor.hpp b/include/cm_executors/events_cbg_executor.hpp
+index 3009afe..6ded674 100644
+--- a/include/cm_executors/events_cbg_executor.hpp
++++ b/include/cm_executors/events_cbg_executor.hpp
+@@ -25,7 +25,7 @@
+ 
+ #include "rclcpp/executor.hpp"
+ #include "rclcpp/macros.hpp"
+-#include "rclcpp/memory_strategies.hpp"
++#include "rclcpp/memory_strategy.hpp"
+ #include "rclcpp/visibility_control.hpp"
+ 
+ namespace rclcpp

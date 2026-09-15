@@ -1,0 +1,32 @@
+diff --git a/mocap4r2_dummy_driver/CMakeLists.txt b/mocap4r2_dummy_driver/CMakeLists.txt
+index 8e8a863..b1569d7 100644
+--- a/mocap4r2_dummy_driver/CMakeLists.txt
++++ b/mocap4r2_dummy_driver/CMakeLists.txt
+@@ -24,18 +24,25 @@ set(dependencies
+   mocap4r2_control
+ )
+ 
++set(target_dependencies
++  rclcpp::rclcpp
++  rclcpp_lifecycle::rclcpp_lifecycle
++  ${mocap4r2_msgs_TARGETS}
++  ${mocap4r2_control_LIBRARIES}
++)
++
+ include_directories(
+   include
+ )
+ 
+ add_library(${PROJECT_NAME}
+   src/mocap4r2_dummy_driver/mocap4r2_dummy_driver.cpp)
+-ament_target_dependencies(${PROJECT_NAME} ${dependencies})
++target_link_libraries(${PROJECT_NAME} ${target_dependencies})
+ 
+ add_executable(mocap4r2_dummy_driver_main
+   src/mocap4r2_dummy_driver_main.cpp
+ )
+-ament_target_dependencies(mocap4r2_dummy_driver_main ${dependencies})
++target_link_libraries(mocap4r2_dummy_driver_main ${target_dependencies})
+ target_link_libraries(mocap4r2_dummy_driver_main ${PROJECT_NAME})
+ 
+ install(DIRECTORY
