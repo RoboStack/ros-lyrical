@@ -1,0 +1,15 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4d103d19..524e9e75 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -38,6 +38,10 @@ ament_export_dependencies(influx_component ${dependencies})
+ 
+ target_compile_features(influx_component PUBLIC c_std_99 cxx_std_17)
+ 
++if(WIN32)
++    target_compile_definitions(influx_component PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
++endif()
++
+ rclcpp_components_register_node(
+     influx_component
+     PLUGIN "InfluxDB"

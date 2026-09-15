@@ -1,0 +1,12 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 90c677c9..e94e083e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -86,6 +86,7 @@ PUBLIC
+   rclcpp::rclcpp
+   rclcpp_lifecycle::rclcpp_lifecycle
+ )
++target_compile_definitions(gz_custom_hardware_plugins PRIVATE _USE_MATH_DEFINES)
+ 
+ #########
+ 

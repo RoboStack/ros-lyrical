@@ -1,0 +1,116 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -106,10 +106,31 @@ pluginlib_export_plugin_description_file(
+ pluginlib_export_plugin_description_file(
+   rviz_common robot_state_rviz_plugin_description.xml)
+ 
+ # Create an umbrella INTERFACE target so downstream packages can use
+ # moveit_ros_visualization::moveit_ros_visualization to link all libraries at
+ # once.
++if(WIN32)
++  set(MOVEIT_ROS_VISUALIZATION_PLUGIN_LIBRARIES
++      moveit_motion_planning_rviz_plugin
++      moveit_planning_scene_rviz_plugin
++      moveit_robot_state_rviz_plugin
++      moveit_trajectory_rviz_plugin)
++  set(MOVEIT_ROS_VISUALIZATION_EXPORTED_LIBRARIES
++      moveit_motion_planning_rviz_plugin_core
++      moveit_planning_scene_rviz_plugin_core
++      moveit_robot_state_rviz_plugin_core
++      moveit_rviz_plugin_render_tools
++      moveit_trajectory_rviz_plugin_core)
++else()
++  set(MOVEIT_ROS_VISUALIZATION_EXPORTED_LIBRARIES ${THIS_PACKAGE_LIBRARIES})
++endif()
++
+ add_library(moveit_ros_visualization INTERFACE)
+ target_link_libraries(moveit_ros_visualization
+-                      INTERFACE ${THIS_PACKAGE_LIBRARIES})
++                      INTERFACE ${MOVEIT_ROS_VISUALIZATION_EXPORTED_LIBRARIES})
++
++if(WIN32)
++  install(
++    TARGETS ${MOVEIT_ROS_VISUALIZATION_PLUGIN_LIBRARIES}
++    LIBRARY DESTINATION lib
++    ARCHIVE DESTINATION lib
++    RUNTIME DESTINATION bin
++    INCLUDES
++    DESTINATION include/moveit_ros_visualization)
++endif()
+ 
+ install(
+-  TARGETS moveit_ros_visualization ${THIS_PACKAGE_LIBRARIES}
++  TARGETS moveit_ros_visualization ${MOVEIT_ROS_VISUALIZATION_EXPORTED_LIBRARIES}
+   EXPORT moveit_ros_visualizationTargets
+   LIBRARY DESTINATION lib
+   ARCHIVE DESTINATION lib
+
+diff --git a/motion_planning_rviz_plugin/CMakeLists.txt b/motion_planning_rviz_plugin/CMakeLists.txt
+--- a/motion_planning_rviz_plugin/CMakeLists.txt
++++ b/motion_planning_rviz_plugin/CMakeLists.txt
+@@ -21,10 +21,19 @@ set(SOURCE_FILES
+     src/motion_planning_display.cpp
+     src/motion_planning_frame_manipulation.cpp
+     src/motion_planning_param_widget.cpp
+-    src/interactive_marker_display.cpp
+-    src/icons/icons.qrc)
++    src/interactive_marker_display.cpp)
+ 
+-add_library(moveit_motion_planning_rviz_plugin_core SHARED
++if(WIN32)
++  # Avoid CMake's __create_def step on a SHARED target that also carries AUTORCC output.
++  set(MOVEIT_MOTION_PLANNING_RVIZ_PLUGIN_CORE_LIBRARY_TYPE STATIC)
++  set(MOVEIT_MOTION_PLANNING_RVIZ_PLUGIN_RESOURCE_FILES src/icons/icons.qrc)
++else()
++  set(MOVEIT_MOTION_PLANNING_RVIZ_PLUGIN_CORE_LIBRARY_TYPE SHARED)
++  list(APPEND SOURCE_FILES src/icons/icons.qrc)
++endif()
++
++add_library(moveit_motion_planning_rviz_plugin_core
++            ${MOVEIT_MOTION_PLANNING_RVIZ_PLUGIN_CORE_LIBRARY_TYPE}
+             ${SOURCE_FILES} ${HEADERS} ${UIC_FILES})
+ set_target_properties(moveit_motion_planning_rviz_plugin_core
+                       PROPERTIES VERSION "${${PROJECT_NAME}_VERSION}")
+@@ -50,6 +59,13 @@ target_link_libraries(
+   moveit_ros_warehouse::moveit_ros_warehouse
+   pluginlib::pluginlib
+   rviz_ogre_vendor::OgreMain
+   rviz_ogre_vendor::OgreOverlay)
++if(WIN32)
++  set_target_properties(moveit_motion_planning_rviz_plugin PROPERTIES
++    WINDOWS_EXPORT_ALL_SYMBOLS OFF
++  )
++endif()
++target_sources(moveit_motion_planning_rviz_plugin
++               PRIVATE ${MOVEIT_MOTION_PLANNING_RVIZ_PLUGIN_RESOURCE_FILES})
+ target_include_directories(moveit_motion_planning_rviz_plugin
+                            PRIVATE "${OGRE_PREFIX_DIR}/include")
+ 
+diff --git a/motion_planning_rviz_plugin/src/plugin_init.cpp b/motion_planning_rviz_plugin/src/plugin_init.cpp
+--- a/motion_planning_rviz_plugin/src/plugin_init.cpp
++++ b/motion_planning_rviz_plugin/src/plugin_init.cpp
+@@ -35,6 +35,24 @@
+ /* Author: Ioan Sucan */
+ 
+ #include <class_loader/class_loader.hpp>
++#ifdef _WIN32
++#include <QResource>
++#endif
+ #include <moveit/motion_planning_rviz_plugin/motion_planning_display.hpp>
+ 
++#ifdef _WIN32
++namespace
++{
++const bool motion_planning_resources_registered = []() {
++  Q_INIT_RESOURCE(icons);
++  return true;
++}();
++}  // namespace
++
++extern "C" __declspec(dllexport) void moveit_motion_planning_rviz_plugin_exports()
++{
++}
++#endif
++
+ CLASS_LOADER_REGISTER_CLASS(moveit_rviz_plugin::MotionPlanningDisplay, rviz_common::Display)

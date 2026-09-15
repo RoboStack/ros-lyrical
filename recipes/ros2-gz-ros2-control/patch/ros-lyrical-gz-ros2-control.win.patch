@@ -1,0 +1,12 @@
+diff --git a/src/gz_system.cpp b/src/gz_system.cpp
+index 5c9952b9..d5554d2c 100644
+--- a/src/gz_system.cpp
++++ b/src/gz_system.cpp
+@@ -51,3 +51,7 @@
++#ifdef ERROR
++#undef ERROR
++#endif
++
+ struct jointData
+ {
+   /// \brief Joint's names.

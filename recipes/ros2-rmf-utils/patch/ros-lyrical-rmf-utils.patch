@@ -1,0 +1,14 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 125a926..59fa385 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,6 +14,9 @@ include(GNUInstallDirs)
+ 
+ file(GLOB_RECURSE lib_srcs "src/rmf_utils/*.cpp")
+ add_library(rmf_utils SHARED ${lib_srcs})
++if(WIN32)
++  set_target_properties(rmf_utils PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
++endif()
+ 
+ target_include_directories(rmf_utils
+   PUBLIC
