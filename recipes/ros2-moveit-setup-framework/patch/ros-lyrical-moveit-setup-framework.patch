@@ -1,0 +1,80 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f6b1ea7..eccc707 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -25,6 +25,16 @@ else()
+ endif()
+ find_package(moveit_core REQUIRED)
+ find_package(moveit_ros_planning REQUIRED)
++# Find Qt before packages that transitively depend on it (rviz, visualization)
++find_package(Qt6 QUIET COMPONENTS Core Widgets)
++if(NOT Qt6_FOUND)
++  find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
++  set(QT_CORE Qt5::Core)
++  set(QT_WIDGETS Qt5::Widgets)
++else()
++  set(QT_CORE Qt6::Core)
++  set(QT_WIDGETS Qt6::Widgets)
++endif()
+ find_package(moveit_ros_visualization REQUIRED)
+ find_package(pluginlib REQUIRED)
+ find_package(rclcpp REQUIRED)
+@@ -52,6 +62,8 @@ add_library(
+   include/moveit_setup_framework/qt/setup_step_widget.hpp
+   include/moveit_setup_framework/qt/rviz_panel.hpp
+   include/moveit_setup_framework/qt/double_list_widget.hpp)
++include(GenerateExportHeader)
++generate_export_header(${PROJECT_NAME})
+ target_include_directories(
+   moveit_setup_framework
+   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+@@ -77,6 +89,7 @@ install(FILES moveit_setup_framework_plugins.xml
+         DESTINATION share/moveit_setup_framework)
+ 
+ install(DIRECTORY templates DESTINATION share/moveit_setup_framework)
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h DESTINATION include)
+ 
+ ament_export_targets(moveit_setup_frameworkTargets HAS_LIBRARY_TARGET)
+ install(
+diff --git a/include/moveit_setup_framework/qt/setup_step_widget.hpp b/include/moveit_setup_framework/qt/setup_step_widget.hpp
+index f32e7b5..c6f4726 100644
+--- a/include/moveit_setup_framework/qt/setup_step_widget.hpp
++++ b/include/moveit_setup_framework/qt/setup_step_widget.hpp
+@@ -40,12 +40,14 @@
+ #include <moveit_setup_framework/qt/rviz_panel.hpp>
+ #include <QWidget>
+ 
++#include <moveit_setup_framework_export.h>
++
+ namespace moveit_setup
+ {
+ /**
+  * @brief The GUI code for one SetupStep
+  */
+-class SetupStepWidget : public QWidget
++class MOVEIT_SETUP_FRAMEWORK_EXPORT SetupStepWidget : public QWidget
+ {
+   Q_OBJECT
+ public:
+diff --git a/include/moveit_setup_framework/templates.hpp b/include/moveit_setup_framework/templates.hpp
+index 1555eee..b02d520 100644
+--- a/include/moveit_setup_framework/templates.hpp
++++ b/include/moveit_setup_framework/templates.hpp
+@@ -38,6 +38,8 @@
+ #include <moveit_setup_framework/generated_file.hpp>
+ #include <string>
+ 
++#include <moveit_setup_framework_export.h>
++
+ namespace moveit_setup
+ {
+ /**
+@@ -69,7 +71,7 @@ public:
+ 
+   bool write() override;
+ 
+-  static std::vector<TemplateVariable> variables;
++  static MOVEIT_SETUP_FRAMEWORK_EXPORT std::vector<TemplateVariable> variables;
+ };
+ 
+ }  // namespace moveit_setup

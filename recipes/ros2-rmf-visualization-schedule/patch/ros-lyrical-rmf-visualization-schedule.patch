@@ -1,0 +1,15 @@
+diff --git a/src/rmf_visualization_schedule/TrajectoryServer.cpp b/src/rmf_visualization_schedule/TrajectoryServer.cpp
+index b8617ee..641efb6 100644
+--- a/src/rmf_visualization_schedule/TrajectoryServer.cpp
++++ b/src/rmf_visualization_schedule/TrajectoryServer.cpp
+@@ -23,6 +23,10 @@
+ #include <rmf_traffic/Motion.hpp>
+ #include <rmf_traffic/Trajectory.hpp>
+ 
++// Boost.Asio 1.90 removed APIs still used by websocketpp 0.8.2. Use the
++// compatible standalone Asio selected by the recipe instead.
++#define ASIO_STANDALONE
++
+ #include <websocketpp/config/asio_no_tls.hpp>
+ #include <websocketpp/server.hpp>
+ 
