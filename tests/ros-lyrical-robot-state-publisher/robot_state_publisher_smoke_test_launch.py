@@ -86,6 +86,7 @@ class TestRobotStatePublisher(unittest.TestCase):
 
 # See https://github.com/RoboStack/ros-humble/pull/320#issuecomment-3078288316
 @launch_testing.post_shutdown_test()
+@unittest.skipIf(sys.platform == "win32", "Skip exit code check on Windows")
 class TestRobotStatePublisherPostShutdown(unittest.TestCase):
 
     def test_exit_codes(self, proc_info):
