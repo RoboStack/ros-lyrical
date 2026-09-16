@@ -50,10 +50,6 @@ class TestRobotStatePublisher(unittest.TestCase):
             expected_output="Robot initialized", timeout=10, stream='stderr'
         )
 
-    @unittest.skipIf(
-        sys.platform == "darwin",
-        "Cyclone DDS service discovery is unreliable on macOS CI runners.",
-    )
     def test_parameter_service(self):
         context = rclpy.Context()
         rclpy.init(context=context)
