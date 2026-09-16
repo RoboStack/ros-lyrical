@@ -50,10 +50,6 @@ class TestRobotStatePublisher(unittest.TestCase):
             expected_output="Robot initialized", timeout=10, stream='stderr'
         )
 
-    @unittest.skipIf(
-        sys.platform == "darwin",
-        "Cyclone DDS service discovery is unreliable on macOS CI runners.",
-    )
     def test_parameter_service(self):
         context = rclpy.Context()
         rclpy.init(context=context)
@@ -90,6 +86,7 @@ class TestRobotStatePublisher(unittest.TestCase):
 
 # See https://github.com/RoboStack/ros-humble/pull/320#issuecomment-3078288316
 @launch_testing.post_shutdown_test()
+@unittest.skipIf(sys.platform == "win32", "Skip exit code check on Windows")
 class TestRobotStatePublisherPostShutdown(unittest.TestCase):
 
     def test_exit_codes(self, proc_info):

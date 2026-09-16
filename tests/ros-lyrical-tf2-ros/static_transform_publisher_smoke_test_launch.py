@@ -1,9 +1,19 @@
 import sys
 
 from launch import LaunchDescription
+from launch.actions import TimerAction
 import launch_ros.actions
 import launch_pytest
 import pytest
+
+
+@pytest.fixture
+def zenoh_router():
+    return launch_ros.actions.Node(
+        package="rmw_zenoh_cpp",
+        executable="rmw_zenohd",
+        output="screen",
+    )
 
 
 @pytest.fixture
@@ -20,19 +30,20 @@ def static_transform_publisher():
         additional_env={
             "RMW_IMPLEMENTATION": "rmw_zenoh_cpp",
             "RCUTILS_LOGGING_USE_STDOUT": "1",
-            "ZENOH_ROUTER_CHECK_ATTEMPTS": "-1",
+            "ZENOH_ROUTER_CHECK_ATTEMPTS": "10",
         },
     )
 
 @launch_pytest.fixture
-def launch_description(static_transform_publisher):
+def launch_description(zenoh_router, static_transform_publisher):
     return LaunchDescription([
-        static_transform_publisher,
+        zenoh_router,
+        TimerAction(period=1.0, actions=[static_transform_publisher]),
     ])
 
 @pytest.mark.skipif(
-    sys.platform == "darwin",
-    reason="Post-shutdown exit codes are unreliable on macOS.",
+    sys.platform == "win32",
+    reason="Zenoh router initialization hangs on Windows.",
 )
 @pytest.mark.launch(fixture=launch_description)
 def test_node_initializes(static_transform_publisher, launch_context):
