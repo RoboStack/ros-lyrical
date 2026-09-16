@@ -1,3 +1,5 @@
+import sys
+
 from launch import LaunchDescription
 from launch.actions import TimerAction
 import launch_ros.actions
@@ -39,6 +41,10 @@ def launch_description(zenoh_router, static_transform_publisher):
         TimerAction(period=1.0, actions=[static_transform_publisher]),
     ])
 
+@pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="Zenoh router initialization hangs on Windows.",
+)
 @pytest.mark.launch(fixture=launch_description)
 def test_node_initializes(static_transform_publisher, launch_context):
     def validate_output(output):
