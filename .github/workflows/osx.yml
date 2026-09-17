@@ -1,0 +1,469 @@
+jobs:
+  stage_0_job_0:
+    name: ros2-diagnostic-updater ros2-desktop
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-diagnostic-updater ros2-desktop
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-diagnostic-updater ros2-desktop
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_1:
+    name: ros2-moveit-ros-visualization ros2-moveit-resources-prbt-pg70-support ros2-moveit-py
+      ros2-nav2-bringup ros2-desktop-full
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-ros-visualization ros2-moveit-resources-prbt-pg70-support
+        ros2-moveit-py ros2-nav2-bringup ros2-desktop-full
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-ros-visualization ros2-moveit-resources-prbt-pg70-support
+          ros2-moveit-py ros2-nav2-bringup ros2-desktop-full
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_2:
+    name: diagnostic-updater desktop
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-diagnostic-updater ros-lyrical-desktop
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-diagnostic-updater ros-lyrical-desktop
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_3:
+    name: ros2-moveit-setup-framework ros2-pilz-industrial-motion-planner ros2-moveit-servo
+      ros2-moveit-task-constructor-core ros2-moveit-ros
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_1
+    - stage_1_job_2
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-setup-framework ros2-pilz-industrial-motion-planner
+        ros2-moveit-servo ros2-moveit-task-constructor-core ros2-moveit-ros
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-setup-framework ros2-pilz-industrial-motion-planner
+          ros2-moveit-servo ros2-moveit-task-constructor-core ros2-moveit-ros
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_4:
+    name: nav2-bringup moveit-ros-visualization moveit-resources-prbt-pg70-support
+      moveit-py desktop-full
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_1
+    - stage_1_job_2
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-nav2-bringup ros-lyrical-moveit-ros-visualization ros-lyrical-moveit-resources-prbt-pg70-support
+        ros-lyrical-moveit-py ros-lyrical-desktop-full
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-nav2-bringup ros-lyrical-moveit-ros-visualization
+          ros-lyrical-moveit-resources-prbt-pg70-support ros-lyrical-moveit-py ros-lyrical-desktop-full
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_3_job_5:
+    name: ros2-moveit-setup-core-plugins ros2-moveit-setup-controllers ros2-moveit-setup-app-plugins
+      ros2-moveit-setup-srdf-plugins ros2-moveit-planners
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_2_job_3
+    - stage_2_job_4
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-setup-core-plugins ros2-moveit-setup-controllers ros2-moveit-setup-app-plugins
+        ros2-moveit-setup-srdf-plugins ros2-moveit-planners
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-setup-core-plugins ros2-moveit-setup-controllers
+          ros2-moveit-setup-app-plugins ros2-moveit-setup-srdf-plugins ros2-moveit-planners
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_3_job_6:
+    name: ros2-moveit-task-constructor-visualization ros2-moveit-task-constructor-capabilities
+      ros2-moveit-ros-trajectory-cache pilz-industrial-motion-planner moveit-task-constructor-core
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_2_job_3
+    - stage_2_job_4
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-task-constructor-visualization ros2-moveit-task-constructor-capabilities
+        ros2-moveit-ros-trajectory-cache ros-lyrical-pilz-industrial-motion-planner
+        ros-lyrical-moveit-task-constructor-core
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-task-constructor-visualization ros2-moveit-task-constructor-capabilities
+          ros2-moveit-ros-trajectory-cache ros-lyrical-pilz-industrial-motion-planner
+          ros-lyrical-moveit-task-constructor-core
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_3_job_7:
+    name: moveit-setup-framework moveit-servo moveit-ros
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_2_job_3
+    - stage_2_job_4
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-moveit-setup-framework ros-lyrical-moveit-servo ros-lyrical-moveit-ros
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-moveit-setup-framework ros-lyrical-moveit-servo
+          ros-lyrical-moveit-ros
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_4_job_8:
+    name: ros2-moveit-setup-assistant ros2-ur-moveit-config ros2-moveit-task-constructor-demo
+      ros2-moveit-runtime moveit-task-constructor-visualization
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_3_job_5
+    - stage_3_job_6
+    - stage_3_job_7
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-setup-assistant ros2-ur-moveit-config ros2-moveit-task-constructor-demo
+        ros2-moveit-runtime ros-lyrical-moveit-task-constructor-visualization
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-setup-assistant ros2-ur-moveit-config ros2-moveit-task-constructor-demo
+          ros2-moveit-runtime ros-lyrical-moveit-task-constructor-visualization
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_4_job_9:
+    name: moveit-task-constructor-capabilities moveit-setup-srdf-plugins moveit-setup-core-plugins
+      moveit-setup-controllers moveit-setup-app-plugins
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_3_job_5
+    - stage_3_job_6
+    - stage_3_job_7
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-moveit-task-constructor-capabilities ros-lyrical-moveit-setup-srdf-plugins
+        ros-lyrical-moveit-setup-core-plugins ros-lyrical-moveit-setup-controllers
+        ros-lyrical-moveit-setup-app-plugins
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-moveit-task-constructor-capabilities ros-lyrical-moveit-setup-srdf-plugins
+          ros-lyrical-moveit-setup-core-plugins ros-lyrical-moveit-setup-controllers
+          ros-lyrical-moveit-setup-app-plugins
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_4_job_10:
+    name: moveit-ros-trajectory-cache moveit-planners
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_3_job_5
+    - stage_3_job_6
+    - stage_3_job_7
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-moveit-ros-trajectory-cache ros-lyrical-moveit-planners
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-moveit-ros-trajectory-cache ros-lyrical-moveit-planners
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_5_job_11:
+    name: ros2-ur-simulation-gz ros2-ur ros2-moveit ur-moveit-config moveit-task-constructor-demo
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_4_job_8
+    - stage_4_job_9
+    - stage_4_job_10
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-ur-simulation-gz ros2-ur ros2-moveit ros-lyrical-ur-moveit-config
+        ros-lyrical-moveit-task-constructor-demo
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-ur-simulation-gz ros2-ur ros2-moveit ros-lyrical-ur-moveit-config
+          ros-lyrical-moveit-task-constructor-demo
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_5_job_12:
+    name: moveit-setup-assistant moveit-runtime
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_4_job_8
+    - stage_4_job_9
+    - stage_4_job_10
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-moveit-setup-assistant ros-lyrical-moveit-runtime
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-moveit-setup-assistant ros-lyrical-moveit-runtime
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_6_job_13:
+    name: ur-simulation-gz ur moveit
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_5_job_11
+    - stage_5_job_12
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-ur-simulation-gz ros-lyrical-ur ros-lyrical-moveit
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-ur-simulation-gz ros-lyrical-ur ros-lyrical-moveit
+        BUILD_TARGET: osx-64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+name: build_osx64
+on:
+  push:
+    branches:
+    - buildbranch_osx
