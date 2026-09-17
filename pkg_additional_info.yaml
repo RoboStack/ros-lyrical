@@ -164,6 +164,13 @@ spdlog_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 sqlite3_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+toppra:
+  generate_dummy_package_with_run_deps:
+    dep_name: toppra-python
+    max_pin: 'x.x.x'
+    # roboplan-toppra-python 0.6.1 on conda-forge is built against libtoppra 0.6.9.
+    # Remove once conda-forge rebuilds roboplan-toppra-python against libtoppra 0.6.10.
+    override_version: '0.6.9'
 ublox_gps:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 uncrustify_vendor:
