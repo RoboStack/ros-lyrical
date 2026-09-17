@@ -1,0 +1,100 @@
+diff --git a/diagnostic_updater/CMakeLists.txt b/diagnostic_updater/CMakeLists.txt
+index 46c2ecc..bdbb811 100644
+--- a/diagnostic_updater/CMakeLists.txt
++++ b/diagnostic_updater/CMakeLists.txt
+@@ -9,7 +9,7 @@ endif()
+ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+   add_compile_options(-Wall -Wextra -Wpedantic)
+ endif()
+-set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
++# set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ 
+ find_package(ament_cmake REQUIRED)
+ find_package(ament_cmake_ros REQUIRED)
+@@ -19,9 +19,10 @@ find_package(rclcpp REQUIRED)
+ find_package(rclpy REQUIRED)
+ find_package(std_msgs REQUIRED)
+ 
+-add_library(${PROJECT_NAME}
++add_library(${PROJECT_NAME} SHARED
+   src/diagnostic_updater.cpp
+ )
++target_compile_definitions(${PROJECT_NAME} PRIVATE DIAGNOSTIC_UPDATER_BUILDING_DLL)
+ target_include_directories(
+   ${PROJECT_NAME}
+   PUBLIC
+diff --git a/diagnostic_updater/include/diagnostic_updater/diagnostic_updater.hpp b/diagnostic_updater/include/diagnostic_updater/diagnostic_updater.hpp
+index 517a704..e5b2ad4 100644
+--- a/diagnostic_updater/include/diagnostic_updater/diagnostic_updater.hpp
++++ b/diagnostic_updater/include/diagnostic_updater/diagnostic_updater.hpp
+@@ -46,6 +46,7 @@
+ #include "diagnostic_msgs/msg/diagnostic_array.hpp"
+ #include "diagnostic_msgs/msg/diagnostic_status.hpp"
+ 
++#include "diagnostic_updater/visibility_control.hpp"
+ #include "diagnostic_updater/diagnostic_status_wrapper.hpp"
+ 
+ #include "rcl/time.h"
+@@ -353,7 +354,7 @@ protected:
+  * determined by the "~/diagnostic_updater.period" ros2 parameter.
+  * The force_update function can always be triggered async to the period interval.
+  */
+-class Updater : public DiagnosticTaskVector
++class DIAGNOSTIC_UPDATER_PUBLIC Updater : public DiagnosticTaskVector
+ {
+ public:
+   bool verbose_;
+diff --git a/diagnostic_updater/include/diagnostic_updater/visibility_control.hpp b/diagnostic_updater/include/diagnostic_updater/visibility_control.hpp
+new file mode 100644
+index 0000000..c1684f1
+--- /dev/null
++++ b/diagnostic_updater/include/diagnostic_updater/visibility_control.hpp
+@@ -0,0 +1,28 @@
++#ifndef DIAGNOSTIC_UPDATER__VISIBILITY_CONTROL_HPP_
++#define DIAGNOSTIC_UPDATER__VISIBILITY_CONTROL_HPP_
++
++#if defined _WIN32 || defined __CYGWIN__
++  #ifdef __GNUC__
++    #define DIAGNOSTIC_UPDATER_EXPORT __attribute__ ((dllexport))
++    #define DIAGNOSTIC_UPDATER_IMPORT __attribute__ ((dllimport))
++  #else
++    #define DIAGNOSTIC_UPDATER_EXPORT __declspec(dllexport)
++    #define DIAGNOSTIC_UPDATER_IMPORT __declspec(dllimport)
++  #endif
++  #ifdef DIAGNOSTIC_UPDATER_BUILDING_DLL
++    #define DIAGNOSTIC_UPDATER_PUBLIC DIAGNOSTIC_UPDATER_EXPORT
++  #else
++    #define DIAGNOSTIC_UPDATER_PUBLIC DIAGNOSTIC_UPDATER_IMPORT
++  #endif
++  #define DIAGNOSTIC_UPDATER_PUBLIC_TYPE DIAGNOSTIC_UPDATER_PUBLIC
++  #define DIAGNOSTIC_UPDATER_LOCAL
++#else
++  #define DIAGNOSTIC_UPDATER_EXPORT __attribute__ ((visibility ("default")))
++  #define DIAGNOSTIC_UPDATER_IMPORT
++  #define DIAGNOSTIC_UPDATER_PUBLIC __attribute__ ((visibility ("default")))
++  #define DIAGNOSTIC_UPDATER_LOCAL  __attribute__ ((visibility ("hidden")))
++  #define DIAGNOSTIC_UPDATER_PUBLIC_TYPE
++#endif
++
++#endif  // DIAGNOSTIC_UPDATER__VISIBILITY_CONTROL_HPP_
++
+diff --git a/diagnostic_updater/src/diagnostic_updater.cpp b/diagnostic_updater/src/diagnostic_updater.cpp
+index 188aa31..78d59d1 100644
+--- a/diagnostic_updater/src/diagnostic_updater.cpp
++++ b/diagnostic_updater/src/diagnostic_updater.cpp
+@@ -31,14 +31,13 @@
+  *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  *  POSSIBILITY OF SUCH DAMAGE.
+  *********************************************************************/
+-
+ #include <diagnostic_updater/diagnostic_updater.hpp>
+ 
+ #include "rclcpp/rclcpp.hpp"
+ 
+ namespace diagnostic_updater
+ {
+-Updater::Updater(
++DIAGNOSTIC_UPDATER_PUBLIC Updater::Updater(
+   std::shared_ptr<rclcpp::node_interfaces::NodeBaseInterface> base_interface,
+   std::shared_ptr<rclcpp::node_interfaces::NodeClockInterface> clock_interface,
+   std::shared_ptr<rclcpp::node_interfaces::NodeLoggingInterface> logging_interface,
