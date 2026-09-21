@@ -18656,43 +18656,70 @@ rmw_zenoh_cpp:
 roboplan:
   dependencies:
   - ament_cmake
-  - ament_cmake_gmock
-  - ament_cmake_pytest
-  - ament_cmake_python
-  - pinocchio
+  - roboplan_cartesian_planning
+  - roboplan_common
+  - roboplan_core
   - roboplan_example_models
-  - yaml_cpp_vendor
+  - roboplan_examples
+  - roboplan_oink
+  - roboplan_rrt
+  - roboplan_simple_ik
+  - roboplan_toppra
   repository: https://github.com/open-planning/roboplan
-  tag: release/lyrical/roboplan/0.6.1-1
+  tag: release/lyrical/roboplan/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_cartesian_planning:
   dependencies:
   - ament_cmake
   - ament_cmake_gtest
   - ament_cmake_python
-  - roboplan
+  - roboplan_common
+  - roboplan_core
   - roboplan_example_models
   - roboplan_oink
   - roboplan_toppra
   repository: https://github.com/open-planning/roboplan
-  tag: release/lyrical/roboplan_cartesian_planning/0.6.1-1
+  tag: release/lyrical/roboplan_cartesian_planning/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan-release.git
-  version: 0.6.1
-roboplan_example_models:
+  version: 0.7.0
+roboplan_common:
   dependencies:
   - ament_cmake
   - ament_cmake_python
   repository: https://github.com/open-planning/roboplan
-  tag: release/lyrical/roboplan_example_models/0.6.1-1
+  tag: release/lyrical/roboplan_common/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan-release.git
-  version: 0.6.1
+  version: 0.7.0
+roboplan_core:
+  dependencies:
+  - ament_cmake
+  - ament_cmake_gmock
+  - ament_cmake_pytest
+  - ament_cmake_python
+  - pinocchio
+  - roboplan_common
+  - roboplan_example_models
+  - yaml_cpp_vendor
+  repository: https://github.com/open-planning/roboplan
+  tag: release/lyrical/roboplan_core/0.7.0-1
+  url: https://github.com/ros2-gbp/roboplan-release.git
+  version: 0.7.0
+roboplan_example_models:
+  dependencies:
+  - ament_cmake
+  - ament_cmake_python
+  - roboplan_common
+  repository: https://github.com/open-planning/roboplan
+  tag: release/lyrical/roboplan_example_models/0.7.0-1
+  url: https://github.com/ros2-gbp/roboplan-release.git
+  version: 0.7.0
 roboplan_examples:
   dependencies:
   - ament_cmake
   - ament_cmake_pytest
-  - roboplan
   - roboplan_cartesian_planning
+  - roboplan_core
   - roboplan_example_models
   - roboplan_oink
   - roboplan_rrt
@@ -18700,21 +18727,22 @@ roboplan_examples:
   - roboplan_toppra
   - xacro
   repository: https://github.com/open-planning/roboplan
-  tag: release/lyrical/roboplan_examples/0.6.1-1
+  tag: release/lyrical/roboplan_examples/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_oink:
   dependencies:
   - ament_cmake
   - ament_cmake_gmock
   - ament_cmake_python
   - proxsuite
-  - roboplan
+  - roboplan_common
+  - roboplan_core
   - roboplan_example_models
   repository: https://github.com/open-planning/roboplan
-  tag: release/lyrical/roboplan_oink/0.6.1-1
+  tag: release/lyrical/roboplan_oink/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_ros_cpp:
   dependencies:
   - ament_cmake
@@ -18722,29 +18750,30 @@ roboplan_ros_cpp:
   - builtin_interfaces
   - geometry_msgs
   - pinocchio
-  - roboplan
+  - roboplan_core
   - roboplan_example_models
   - rosidl_generator_cpp
   - sensor_msgs
   - tf2_eigen
   - trajectory_msgs
   repository: https://github.com/open-planning/roboplan-ros
-  tag: release/lyrical/roboplan_ros_cpp/0.6.1-1
+  tag: release/lyrical/roboplan_ros_cpp/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan_ros-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_ros_examples:
   dependencies:
+  - ament_cmake
   - ament_cmake_python
   - control_msgs
   - rclpy
-  - roboplan
+  - roboplan_core
   - sensor_msgs
   - std_msgs
   - visualization_msgs
   repository: https://github.com/open-planning/roboplan-ros
-  tag: release/lyrical/roboplan_ros_examples/0.6.1-1
+  tag: release/lyrical/roboplan_ros_examples/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan_ros-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_ros_franka:
   dependencies:
   - ament_cmake
@@ -18752,28 +18781,33 @@ roboplan_ros_franka:
   - joint_state_broadcaster
   - joint_trajectory_controller
   - parallel_gripper_controller
-  - roboplan
+  - roboplan_core
   - roboplan_example_models
+  - roboplan_oink
   - roboplan_ros_examples
+  - roboplan_rrt
+  - roboplan_simple_ik
+  - roboplan_toppra
   - robot_state_publisher
   - topic_tools
   - xacro
   repository: https://github.com/open-planning/roboplan-ros
-  tag: release/lyrical/roboplan_ros_franka/0.6.1-1
+  tag: release/lyrical/roboplan_ros_franka/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan_ros-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_ros_py:
   dependencies:
   - builtin_interfaces
   - rclpy
-  - roboplan
+  - roboplan_core
   - roboplan_ros_cpp
+  - roboplan_ros_visualization
   - sensor_msgs
   - trajectory_msgs
   repository: https://github.com/open-planning/roboplan-ros
-  tag: release/lyrical/roboplan_ros_py/0.6.1-1
+  tag: release/lyrical/roboplan_ros_py/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan_ros-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_ros_visualization:
   dependencies:
   - ament_cmake
@@ -18783,49 +18817,52 @@ roboplan_ros_visualization:
   - interactive_markers
   - rclcpp
   - rclpy
-  - roboplan
+  - roboplan_core
   - roboplan_ros_cpp
   - roboplan_simple_ik
   - rviz2
   - sensor_msgs
   - visualization_msgs
   repository: https://github.com/open-planning/roboplan-ros
-  tag: release/lyrical/roboplan_ros_visualization/0.6.1-1
+  tag: release/lyrical/roboplan_ros_visualization/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan_ros-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_rrt:
   dependencies:
   - ament_cmake
   - ament_cmake_gtest
   - ament_cmake_pytest
   - ament_cmake_python
-  - roboplan
+  - roboplan_common
+  - roboplan_core
   - roboplan_example_models
   repository: https://github.com/open-planning/roboplan
-  tag: release/lyrical/roboplan_rrt/0.6.1-1
+  tag: release/lyrical/roboplan_rrt/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_simple_ik:
   dependencies:
   - ament_cmake
   - ament_cmake_python
-  - roboplan
+  - roboplan_common
+  - roboplan_core
   repository: https://github.com/open-planning/roboplan
-  tag: release/lyrical/roboplan_simple_ik/0.6.1-1
+  tag: release/lyrical/roboplan_simple_ik/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan-release.git
-  version: 0.6.1
+  version: 0.7.0
 roboplan_toppra:
   dependencies:
   - ament_cmake
   - ament_cmake_gtest
   - ament_cmake_python
-  - roboplan
+  - roboplan_common
+  - roboplan_core
   - roboplan_example_models
   - toppra
   repository: https://github.com/open-planning/roboplan
-  tag: release/lyrical/roboplan_toppra/0.6.1-1
+  tag: release/lyrical/roboplan_toppra/0.7.0-1
   url: https://github.com/ros2-gbp/roboplan-release.git
-  version: 0.6.1
+  version: 0.7.0
 robot_arm_demo:
   dependencies:
   - ament_cmake
