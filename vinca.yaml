@@ -120,6 +120,7 @@ packages_select_by_deps:
   - joy_teleop
   - key_teleop
   - lanelet2
+  - librealsense2
   - magic_enum
   - mouse_teleop
   - moveit
