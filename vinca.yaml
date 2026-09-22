@@ -244,6 +244,7 @@ packages_select_by_deps:
       - foxglove_compressed_video_transport
       - grid_map  # rviz linking problems on Windows, see https://github.com/RoboStack/ros-jazzy/pull/79#issuecomment-2993499990
       - laser-segmentation
+      - mobile_robot_simulator
       - mocap4r2_control
       - mocap4r2_control_msgs
       - mocap4r2_dummy_driver
