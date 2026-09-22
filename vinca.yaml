@@ -272,6 +272,16 @@ packages_select_by_deps:
       - swri_console  # Until sync of: https://github.com/ros/rosdistro/pull/49750
       - trac_ik
       - velodyne
+      - yasmin
+      - yasmin_cli
+      - yasmin_demos
+      - yasmin_editor
+      - yasmin_factory
+      - yasmin_msgs
+      - yasmin_pcl
+      - yasmin_plugins_manager
+      - yasmin_ros
+      - yasmin_viewer
 
 patch_dir: patch
 rosdistro_snapshot: rosdistro_snapshot.yaml
