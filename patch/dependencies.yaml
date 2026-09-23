@@ -1,3 +1,5 @@
+mujoco_vendor:
+  add_host: ["libgl-devel"]  # MuJoCo's bundled GLFW simulation includes GL/gl.h
 ament_package:
   add_host: ['importlib_resources']
 foxglove_bridge:
