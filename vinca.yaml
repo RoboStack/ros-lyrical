@@ -179,6 +179,7 @@ packages_select_by_deps:
   - rosidl_buffer_backend
   - rosidl_buffer_backend_registry
   - rosidl_buffer_py
+  - rosidl_generator_dds_idl
   - rqt_robot_monitor
   - rqt_runtime_monitor
   - rtabmap
@@ -203,6 +204,7 @@ packages_select_by_deps:
   - if: linux
     then:
       - libcamera
+      - mujoco_ros2_control  # Isaac ROS deploy / Unitree G1 simulation
       - nobleo_socketcan_bridge  # Depends on socketcan
       - ros2_socketcan  # Depends on socketcan
       - rosgraph_monitor
