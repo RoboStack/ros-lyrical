@@ -1,0 +1,133 @@
+jobs:
+  stage_0_job_0:
+    name: ros2-tinyxml2-vendor ros2-mujoco-vendor ros2-mujoco-ros2-control-msgs ros2-rosidl-generator-dds-idl
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-tinyxml2-vendor ros2-mujoco-vendor ros2-mujoco-ros2-control-msgs
+        ros2-rosidl-generator-dds-idl
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-tinyxml2-vendor ros2-mujoco-vendor ros2-mujoco-ros2-control-msgs
+          ros2-rosidl-generator-dds-idl
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_1:
+    name: ros2-mujoco-3d-lidar tinyxml2-vendor rosidl-generator-dds-idl mujoco-vendor
+      mujoco-ros2-control-msgs
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-mujoco-3d-lidar ros-lyrical-tinyxml2-vendor ros-lyrical-rosidl-generator-dds-idl
+        ros-lyrical-mujoco-vendor ros-lyrical-mujoco-ros2-control-msgs
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-mujoco-3d-lidar ros-lyrical-tinyxml2-vendor ros-lyrical-rosidl-generator-dds-idl
+          ros-lyrical-mujoco-vendor ros-lyrical-mujoco-ros2-control-msgs
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_2:
+    name: ros2-mujoco-ros2-control-plugins mujoco-3d-lidar ros2-mujoco-ros2-control
+      mujoco-ros2-control-plugins
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-mujoco-ros2-control-plugins ros-lyrical-mujoco-3d-lidar ros2-mujoco-ros2-control
+        ros-lyrical-mujoco-ros2-control-plugins
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-mujoco-ros2-control-plugins ros-lyrical-mujoco-3d-lidar
+          ros2-mujoco-ros2-control ros-lyrical-mujoco-ros2-control-plugins
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_3_job_3:
+    name: mujoco-ros2-control
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_2_job_2
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-mujoco-ros2-control
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-mujoco-ros2-control
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+name: build_linux64
+on:
+  push:
+    branches:
+    - buildbranch_linux

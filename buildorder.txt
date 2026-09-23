@@ -1,0 +1,14 @@
+ros2-tinyxml2-vendor
+ros2-mujoco-vendor
+ros2-mujoco-ros2-control-msgs
+ros2-rosidl-generator-dds-idl
+ros2-mujoco-3d-lidar
+ros-lyrical-tinyxml2-vendor
+ros-lyrical-rosidl-generator-dds-idl
+ros-lyrical-mujoco-vendor
+ros-lyrical-mujoco-ros2-control-msgs
+ros2-mujoco-ros2-control-plugins
+ros-lyrical-mujoco-3d-lidar
+ros2-mujoco-ros2-control
+ros-lyrical-mujoco-ros2-control-plugins
+ros-lyrical-mujoco-ros2-control
