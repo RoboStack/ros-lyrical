@@ -120,6 +120,7 @@ packages_select_by_deps:
   - joy_teleop
   - key_teleop
   - lanelet2
+  - librealsense2
   - magic_enum
   - mouse_teleop
   - moveit
@@ -219,6 +220,8 @@ packages_select_by_deps:
       - livox_ros_driver2
       - mavros
       - py_binding_tools
+      - realsense2_camera
+      - realsense2_description
       - rmf_demos
       - swri_serial_util  # Serial communication only implemented for linux
       - v4l2_camera  # Depends on v4l that is only available on linux
