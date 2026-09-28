@@ -141,6 +141,15 @@ packages_select_by_deps:
   - point_cloud_transport_py
   - polygon_msgs
   - proxsuite
+  - py-trees
+  - py-trees-ros
+  - py-trees-ros-interfaces
+  - py-trees-ros-viewer
+  - py_trees_ros_tutorials
+  - rclcpp_async
+  - rclpy_message_converter
+  - rclpy_message_converter_msgs
+  - rmw_zenoh_cpp  # requested in https://github.com/RoboStack/ros-humble/issues/252
   - roboplan  # Requested in https://github.com/RoboStack/ros-jazzy/issues/250
   - roboplan_cartesian_planning
   - roboplan_common
@@ -156,14 +165,6 @@ packages_select_by_deps:
   - roboplan_rrt
   - roboplan_simple_ik
   - roboplan_toppra
-  - py-trees
-  - py-trees-ros
-  - py-trees-ros-interfaces
-  - py-trees-ros-viewer
-  - py_trees_ros_tutorials
-  - rclpy_message_converter
-  - rclpy_message_converter_msgs
-  - rmw_zenoh_cpp  # requested in https://github.com/RoboStack/ros-humble/issues/252
   - robot
   - robot-localization
   - ros2_control
