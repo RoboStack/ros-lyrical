@@ -1,0 +1,24 @@
+diff --git a/cmake/ament_python_install_module.cmake b/cmake/ament_python_install_module.cmake
+index 6d61edc..ed972cf 100644
+--- a/cmake/ament_python_install_module.cmake
++++ b/cmake/ament_python_install_module.cmake
+@@ -60,6 +60,7 @@ function(_ament_cmake_python_install_module module_file)
+   get_filename_component(module_file "${module_file}" NAME)
+   if(NOT ARG_SKIP_COMPILE)
+     get_executable_path(python_interpreter Python3::Interpreter CONFIGURE)
++    string(REPLACE "\\" "/" python_interpreter "${python_interpreter}")
+     # compile Python files
+     install(CODE
+       "execute_process(
+diff --git a/cmake/ament_python_install_registered_packages.cmake b/cmake/ament_python_install_registered_packages.cmake
+index 305d92f..dd4f7de 100644
+--- a/cmake/ament_python_install_registered_packages.cmake
++++ b/cmake/ament_python_install_registered_packages.cmake
+@@ -167,6 +167,7 @@ endmacro()
+ 
+ macro(_ament_cmake_python_byte_compile package_name)
+   get_executable_path(python_interpreter_config Python3::Interpreter CONFIGURE)
++  string(REPLACE "\\" "/" python_interpreter_config "${python_interpreter_config}")
+   # compile Python files
+   install(CODE
+     "execute_process(
