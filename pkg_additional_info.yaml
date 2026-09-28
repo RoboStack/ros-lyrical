@@ -25,6 +25,8 @@ data_tamer_cpp:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 diagnostic_aggregator:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
+diagnostic_updater:
+  additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 eigenpy:
   generate_dummy_package_with_run_deps:
     dep_name: eigenpy
@@ -189,6 +191,8 @@ roboplan_toppra:
   generate_dummy_package_with_run_deps:
     dep_name: roboplan-toppra-python
     max_pin: 'x.x'
+robot_state_publisher:
+  additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 rosx_introspection:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 rviz_ogre_vendor:
@@ -233,11 +237,3 @@ visp:
 zenoh_cpp_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK -DUSE_SYSTEM_ZENOH=ON"
 # Remove build_number fields below on new full rebuild
-diagnostic_updater:
-  additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
-  build_number: 26
-robot_state_publisher:
-  additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
-  build_number: 26
-tf2_ros:
-  build_number: 26

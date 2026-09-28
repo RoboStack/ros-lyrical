@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5ed278fe..043f6526 100644
+index ea78923..a46f34d 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -13,12 +13,7 @@ endif()
@@ -16,3 +16,25 @@ index 5ed278fe..043f6526 100644
  
  find_package(OpenCV REQUIRED)
  
+diff --git a/src/crop_foremost.cpp b/src/crop_foremost.cpp
+index 25eaea6..44037eb 100644
+--- a/src/crop_foremost.cpp
++++ b/src/crop_foremost.cpp
+@@ -136,7 +136,7 @@ void CropForemostNode::depthCb(const sensor_msgs::msg::Image::ConstSharedPtr & r
+     case CV_8UC1:
+     case CV_8SC1:
+     case CV_32F:
+-      cv::threshold(cv_ptr->image, cv_ptr->image, minVal + distance_, 0, CV_THRESH_TOZERO_INV);
++      cv::threshold(cv_ptr->image, cv_ptr->image, minVal + distance_, 0, cv::THRESH_TOZERO_INV);
+       break;
+     case CV_16UC1:
+     case CV_16SC1:
+@@ -144,7 +144,7 @@ void CropForemostNode::depthCb(const sensor_msgs::msg::Image::ConstSharedPtr & r
+     case CV_64F:
+       // 8 bit or 32 bit floating array is required to use cv::threshold
+       cv_ptr->image.convertTo(cv_ptr->image, CV_32F);
+-      cv::threshold(cv_ptr->image, cv_ptr->image, minVal + distance_, 1, CV_THRESH_TOZERO_INV);
++      cv::threshold(cv_ptr->image, cv_ptr->image, minVal + distance_, 1, cv::THRESH_TOZERO_INV);
+ 
+       cv_ptr->image.convertTo(cv_ptr->image, imtype);
+       break;
