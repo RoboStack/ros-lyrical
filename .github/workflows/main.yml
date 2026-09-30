@@ -27,7 +27,8 @@ jobs:
         pixi run -v vinca --multiple --platform linux-64
     - name: Generate GitHub Actions pipelines for linux-64
       run: |
-        pixi run -v vinca-gha --platform linux-64 --trigger-branch buildbranch_linux -d ./recipes
+        # --batch_size is a workaround for https://github.com/RoboStack/robostack.github.io/issues/105
+        pixi run -v vinca-gha --platform linux-64 --trigger-branch buildbranch_linux -d ./recipes --batch_size 25
     - name: Commit files for linux-64
       run: |
         if [[ -f "linux.yml" ]]; then
@@ -52,7 +53,8 @@ jobs:
         pixi run -v vinca --multiple --platform osx-64
     - name: Generate GitHub Actions pipelines for osx-64
       run: |
-        pixi run -v vinca-gha --platform osx-64 --trigger-branch buildbranch_osx -d ./recipes
+        # --batch_size is a workaround for https://github.com/RoboStack/robostack.github.io/issues/105
+        pixi run -v vinca-gha --platform osx-64 --trigger-branch buildbranch_osx -d ./recipes --batch_size 25
     - name: Commit files for osx-64
       run: |
         if [[ -f "osx.yml" ]]; then
@@ -77,7 +79,8 @@ jobs:
         pixi run -v vinca --multiple --platform osx-arm64
     - name: Generate GitHub Actions pipelines for osx-arm64
       run: |
-        pixi run -v vinca-gha --platform osx-arm64 --trigger-branch buildbranch_osx_arm64 -d ./recipes
+        # --batch_size is a workaround for https://github.com/RoboStack/robostack.github.io/issues/105
+        pixi run -v vinca-gha --platform osx-arm64 --trigger-branch buildbranch_osx_arm64 -d ./recipes --batch_size 25
     - name: Commit files for osx-arm64
       run: |
         if [[ -f "osx_arm64.yml" ]]; then
