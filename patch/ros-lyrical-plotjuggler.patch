@@ -1,17 +1,3 @@
-diff --git a/plotjuggler_plugins/ParserROS/ros_parser.cpp b/plotjuggler_plugins/ParserROS/ros_parser.cpp
-index 1ee03a8b..cd711f28 100644
---- a/plotjuggler_plugins/ParserROS/ros_parser.cpp
-+++ b/plotjuggler_plugins/ParserROS/ros_parser.cpp
-@@ -113,7 +113,8 @@ bool ParserROS::parseMessage(const PJ::MessageRef serialized_msg, double& timest
-     return true;
-   }
-
--  _parser.deserialize(serialized_msg, &_flat_msg, _deserializer.get());
-+  _parser.deserialize(Span<const uint8_t>(serialized_msg.data(), serialized_msg.size()),
-+                      &_flat_msg, _deserializer.get());
-
-   if (_has_header && this->useEmbeddedTimestamp())
-   {
 diff --git a/plotjuggler_plugins/ParserROS/rosx_introspection/CMakeLists.txt b/plotjuggler_plugins/ParserROS/rosx_introspection/CMakeLists.txt
 index 1111111..2222222 100644
 --- a/plotjuggler_plugins/ParserROS/rosx_introspection/CMakeLists.txt

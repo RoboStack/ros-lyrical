@@ -1,3 +1,7 @@
+mujoco_vendor:
+  add_host: ["libgl-devel"]  # MuJoCo's bundled GLFW simulation includes GL/gl.h
+mujoco_ros2_control_plugins:
+  add_host: ["libegl-devel"]  # CMake finds OpenGL COMPONENTS EGL
 ament_package:
   add_host: ['importlib_resources']
 foxglove_bridge:
@@ -309,7 +313,7 @@ grid_map_octomap:
 py_trees:
   add_host: ["hatchling"]
 py_trees_js:
-  add_host: ["poetry-core"]
+  add_host: ["hatchling"]
 py_trees_ros:
   add_host: ["poetry-core"]
 py_trees_ros_viewer:

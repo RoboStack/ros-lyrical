@@ -1,0 +1,13 @@
+tests:
+  # Regression test for an RMW implementation identifier mismatch when using Zenoh.
+  # i.e. https://github.com/RoboStack/ros-lyrical/issues/53
+  - script:
+      - python -m pytest static_transform_publisher_smoke_test_launch.py
+    requirements:
+      run:
+        - ros2-launch-pytest
+        - ros2-launch-ros
+        - ros2-rmw-zenoh-cpp
+    files:
+      recipe:
+        - static_transform_publisher_smoke_test_launch.py

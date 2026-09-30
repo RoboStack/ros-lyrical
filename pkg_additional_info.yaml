@@ -42,6 +42,8 @@ gtsam:
     override_version: '4.2.0'
 gz_cmake_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+gz_common_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_dartsim_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_fuel_tools_vendor:
@@ -58,9 +60,15 @@ gz_physics_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_plugin_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+gz_rendering_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_ros2_control:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 gz_sensors_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+gz_sim_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+gz_transport_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_utils_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
@@ -147,6 +155,42 @@ pybind11_json_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR"
 pybind11_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR"
+roboplan:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-python
+    max_pin: 'x.x'
+roboplan_cartesian_planning:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-cartesian-planning-python
+    max_pin: 'x.x'
+roboplan_common:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-common
+    max_pin: 'x.x'
+roboplan_core:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-core-python
+    max_pin: 'x.x'
+roboplan_example_models:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-example-models-python
+    max_pin: 'x.x'
+roboplan_oink:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-oink-python
+    max_pin: 'x.x'
+roboplan_rrt:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-rrt-python
+    max_pin: 'x.x'
+roboplan_simple_ik:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-simple-ik-python
+    max_pin: 'x.x'
+roboplan_toppra:
+  generate_dummy_package_with_run_deps:
+    dep_name: roboplan-toppra-python
+    max_pin: 'x.x'
 robot_state_publisher:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 rosx_introspection:
@@ -160,6 +204,10 @@ spdlog_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 sqlite3_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+toppra:
+  generate_dummy_package_with_run_deps:
+    dep_name: toppra-python
+    max_pin: 'x.x.x'
 ublox_gps:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 uncrustify_vendor:
@@ -189,32 +237,3 @@ visp:
 zenoh_cpp_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK -DUSE_SYSTEM_ZENOH=ON"
 # Remove build_number fields below on new full rebuild
-# See https://github.com/RoboStack/ros-lyrical/issues/50
-bondcpp:
-  build_number: 24
-gz_common_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-  build_number: 24
-gz_rendering_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-  build_number: 24
-gz_sim_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-  build_number: 24
-gz_transport_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-  build_number: 24
-nav2_map_server:
-  build_number: 24
-rcl:
-  build_number: 24
-rclpy:
-  build_number: 24
-rmw_implementation:
-  build_number: 24
-rmw_test_fixture_implementation:
-  build_number: 24
-rosbag2_cpp:
-  build_number: 24
-test_rmw_implementation:
-  build_number: 24
