@@ -135,6 +135,7 @@ packages_select_by_deps:
   - nav2_minimal_tb4_sim
   - navigation2
   - nmea-navsat-driver
+  - nonpersistent_voxel_layer
   - perception
   - persist-parameter-server
   - pick_ik
