@@ -5,14 +5,13 @@ package_name_mode: both
 conda_index:
   - robostack.yaml
   - packages-ignore.yaml
-
 # Reminder for next full rebuild, the next build number should be 28
 build_number: 27
 
 mutex_package:
-  name: "ros2-distro-mutex"
-  version: "0.21.0"
-  upper_bound: "x.x"
+  name: ros2-distro-mutex
+  version: 0.21.0
+  upper_bound: x.x
   run_constraints:
     - libboost 1.90.*
     - libboost-devel 1.90.*
