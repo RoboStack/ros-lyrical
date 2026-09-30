@@ -208,7 +208,7 @@ pixi run build
 ## Full rebuilds
 For full rebuilds also remember:
 - refresh snapshot: `pixi run create_snapshot`
-- update `conda_build_config.yaml` for active migrations. You can use https://github.com/conda-forge/conda-forge-pinning-feedstock/blob/main/recipe/conda_build_config.yaml as a base, and then also apply migrations that are mostly done; you can check the status at https://conda-forge.org/status/.
+- update pinning: `conda_build_config.yaml` is generated, do not edit it directly. Run `pixi run vinca-pinning-update --render` to move `vinca_pinning.yaml` to the latest conda-forge pinning and select migrations that are done for our dependencies, then put distro-specific pins under `pinning_overrides` and re-render with `pixi run vinca-pinning-render`.
 - bump `build_number`
 - bump mutex minor and update hardcoded mutex refs where needed
 - clear stale `pkg_additional_info.yaml` build-number overrides unless intentional

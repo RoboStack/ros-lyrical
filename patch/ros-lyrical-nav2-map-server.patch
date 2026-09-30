@@ -1,30 +1,20 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 4f199df51..b367da68c 100644
+index 52ff964..69bb6b5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -12,7 +12,6 @@ find_package(nav_msgs REQUIRED)
- find_package(nav2_common REQUIRED)
- find_package(nav2_msgs REQUIRED)
- find_package(nav2_util REQUIRED)
--find_package(PkgConfig REQUIRED)
- find_package(rclcpp REQUIRED)
- find_package(rclcpp_components REQUIRED)
- find_package(rclcpp_lifecycle REQUIRED)
-@@ -24,7 +23,12 @@ find_package(yaml_cpp_vendor REQUIRED)
+@@ -23,7 +23,9 @@ find_package(yaml_cpp_vendor REQUIRED)
  find_package(yaml-cpp REQUIRED)
  find_package(Eigen3 REQUIRED)
  
--pkg_search_module(UUID REQUIRED uuid)
+-if(UNIX AND NOT APPLE)
 +if(WIN32)
 +  set(UUID_LIBRARIES Rpcrt4.lib)
 +elseif(UNIX AND NOT APPLE)
-+  find_package(PkgConfig REQUIRED)
-+  pkg_search_module(UUID REQUIRED uuid)
-+endif()
- 
- nav2_package()
- 
-@@ -94,5 +98,8 @@ add_library(${vo_library_name} SHARED
+   find_package(PkgConfig REQUIRED)
+   pkg_search_module(UUID REQUIRED uuid)
+ endif()
+@@ -96,6 +98,9 @@ target_link_libraries(${library_name} PRIVATE
+ add_library(${vo_library_name} SHARED
    src/vo_server/vector_object_shapes.cpp
    src/vo_server/vector_object_server.cpp)
 +if(WIN32)
@@ -35,7 +25,7 @@ index 4f199df51..b367da68c 100644
    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
 diff --git a/include/nav2_map_server/uuid.hpp b/include/nav2_map_server/uuid.hpp
 new file mode 100644
-index 000000000..8f67f9f6b
+index 0000000..8f67f9f
 --- /dev/null
 +++ b/include/nav2_map_server/uuid.hpp
 @@ -0,0 +1,125 @@
@@ -165,7 +155,7 @@ index 000000000..8f67f9f6b
 +
 +#endif  // NAV2_MAP_SERVER__UUID_HPP_
 diff --git a/include/nav2_map_server/vector_object_utils.hpp b/include/nav2_map_server/vector_object_utils.hpp
-index f478f71b3..06f23ce24 100644
+index 19bbdb6..3b27189 100644
 --- a/include/nav2_map_server/vector_object_utils.hpp
 +++ b/include/nav2_map_server/vector_object_utils.hpp
 @@ -15,7 +15,6 @@
@@ -203,7 +193,7 @@ index f478f71b3..06f23ce24 100644
  
  /// @brief Type of overlay between different vector objects and map
 diff --git a/src/vo_server/vector_object_shapes.cpp b/src/vo_server/vector_object_shapes.cpp
-index af85a4265..19c9e8a71 100644
+index 7ba886f..8bab809 100644
 --- a/src/vo_server/vector_object_shapes.cpp
 +++ b/src/vo_server/vector_object_shapes.cpp
 @@ -14,7 +14,6 @@
@@ -211,10 +201,10 @@ index af85a4265..19c9e8a71 100644
  #include "nav2_map_server/vector_object_shapes.hpp"
  
 -#include <uuid/uuid.h>
+ #include <algorithm>
  #include <cmath>
  #include <exception>
- #include <limits>
-@@ -29,6 +28,7 @@
+@@ -31,6 +30,7 @@
  #include "nav2_util/raytrace_line_2d.hpp"
  #include "nav2_util/robot_utils.hpp"
  #include "nav2_ros_common/tf2_factories.hpp"
@@ -222,7 +212,7 @@ index af85a4265..19c9e8a71 100644
  
  namespace nav2_map_server
  {
-@@ -58,7 +58,7 @@ bool Shape::obtainShapeUUID(const std::string & shape_name, unsigned char * out_
+@@ -156,7 +156,7 @@ bool Shape::obtainShapeUUID(const std::string & shape_name, unsigned char * out_
      // Try to get shape UUID from ROS-parameters
      std::string uuid_str = nav2::declare_or_get_parameter<std::string>(
        node, shape_name + ".uuid");
@@ -231,7 +221,7 @@ index af85a4265..19c9e8a71 100644
        RCLCPP_ERROR(
          node->get_logger(),
          "[%s] Can not parse UUID string for shape: %s",
-@@ -67,14 +67,13 @@ bool Shape::obtainShapeUUID(const std::string & shape_name, unsigned char * out_
+@@ -165,14 +165,13 @@ bool Shape::obtainShapeUUID(const std::string & shape_name, unsigned char * out_
      }
    } catch (const std::exception &) {
      // If no UUID was specified, generate a new one
@@ -249,7 +239,7 @@ index af85a4265..19c9e8a71 100644
    }
  
    return true;
-@@ -106,7 +105,7 @@ std::string Polygon::getUUID() const
+@@ -204,7 +203,7 @@ std::string Polygon::getUUID() const
  
  bool Polygon::isUUID(const unsigned char * uuid) const
  {
@@ -258,7 +248,7 @@ index af85a4265..19c9e8a71 100644
  }
  
  bool Polygon::isFill() const
-@@ -190,8 +189,8 @@ bool Polygon::setParams(const nav2_msgs::msg::PolygonObject::SharedPtr params)
+@@ -288,8 +287,8 @@ bool Polygon::setParams(const nav2_msgs::msg::PolygonObject::SharedPtr params)
    polygon_->points = params_->points;
  
    // If no UUID was specified, generate a new one
@@ -269,7 +259,7 @@ index af85a4265..19c9e8a71 100644
    }
  
    return checkConsistency();
-@@ -320,7 +319,7 @@ std::string Circle::getUUID() const
+@@ -447,7 +446,7 @@ std::string Circle::getUUID() const
  
  bool Circle::isUUID(const unsigned char * uuid) const
  {
@@ -278,7 +268,7 @@ index af85a4265..19c9e8a71 100644
  }
  
  bool Circle::isFill() const
-@@ -403,8 +402,8 @@ bool Circle::setParams(const nav2_msgs::msg::CircleObject::SharedPtr params)
+@@ -530,8 +529,8 @@ bool Circle::setParams(const nav2_msgs::msg::CircleObject::SharedPtr params)
    *center_ = params_->center;
  
    // If no UUID was specified, generate a new one
