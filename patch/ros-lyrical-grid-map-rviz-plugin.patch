@@ -1,0 +1,61 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -5,7 +5,7 @@
+ find_package(grid_map_cmake_helpers REQUIRED)
+ find_package(grid_map_msgs REQUIRED)
+ find_package(grid_map_ros REQUIRED)
+-find_package(Qt5 REQUIRED COMPONENTS Core Widgets)
++find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+ find_package(rclcpp REQUIRED)
+ find_package(rviz_common REQUIRED)
+ find_package(rviz_ogre_vendor REQUIRED)
+@@ -34,7 +34,7 @@
+   include/grid_map_rviz_plugin/GridMapDisplay.hpp
+ )
+ 
+-qt5_wrap_cpp(MOC_FILES ${INCLUDE_FILES_QT})
++qt6_wrap_cpp(MOC_FILES ${INCLUDE_FILES_QT})
+ 
+ ## Avoid Qt signals and slots defining "emit", "slots", etc.
+ add_definitions(-DQT_NO_KEYWORDS)
+@@ -54,8 +54,18 @@
+   ${MOC_FILES}
+ )
+ 
+-ament_target_dependencies(${PROJECT_NAME} SYSTEM
+-  ${dependencies}
++target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
++  ${grid_map_ros_INCLUDE_DIRS}
++)
++target_link_libraries(${PROJECT_NAME} PUBLIC
++  ${grid_map_msgs_TARGETS}
++  ${grid_map_ros_LIBRARIES}
++  rclcpp::rclcpp
++  rviz_common::rviz_common
++  rviz_ogre_vendor::OgreMain
++  rviz_rendering::rviz_rendering
++  Qt6::Core
++  Qt6::Widgets
+ )
+ 
+ # Causes the visibility macros to use dllexport rather than dllimport,
+@@ -133,7 +143,7 @@
+ ament_export_include_directories(include)
+ ament_export_targets(${PROJECT_NAME} HAS_LIBRARY_TARGET)
+ ament_export_dependencies(
+-  Qt5
++  Qt6
+   rviz_common
+   geometry_msgs
+   nav_msgs
+--- a/src/GridMapDisplay.cpp
++++ b/src/GridMapDisplay.cpp
+@@ -11,7 +11,7 @@
+ 
+ 
+ #include <rclcpp/rclcpp.hpp>
+-#include <tf2_ros/transform_listener.h>
++#include <tf2_ros/transform_listener.hpp>
+ #include <rviz_common/properties/bool_property.hpp>
+ #include <rviz_common/properties/color_property.hpp>
+ #include <rviz_common/properties/float_property.hpp>

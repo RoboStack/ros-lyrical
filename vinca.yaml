@@ -112,6 +112,11 @@ packages_select_by_deps:
   - flex_sync
   - foxglove_bridge
   - foxglove_msgs
+  - grid_map_cmake_helpers
+  - grid_map_core
+  - grid_map_cv
+  - grid_map_msgs
+  - grid_map_ros
   - gripper_controllers
   - gtsam
   - gz_ros2_control
@@ -245,7 +250,7 @@ packages_select_by_deps:
       - dual-laser-merger
       - ffmpeg_image_transport  # TODO on windows: fix iconv link issue
       - foxglove_compressed_video_transport
-      - grid_map  # rviz linking problems on Windows, see https://github.com/RoboStack/ros-jazzy/pull/79#issuecomment-2993499990
+      - grid_map_rviz_plugin  # rviz linking problems on Windows, see https://github.com/RoboStack/ros-jazzy/pull/79#issuecomment-2993499990
       - laser-segmentation
       - mobile_robot_simulator
       - mocap4r2_control

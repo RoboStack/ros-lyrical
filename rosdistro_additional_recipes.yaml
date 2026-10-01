@@ -355,6 +355,31 @@ cm_executors:
   tag: 0.9.1
   url: https://github.com/cellumation/cm_executors.git
   version: 0.9.1
+# TODO: remove grid_map and its sub packages after they are released in lyrical
+grid_map_cmake_helpers:
+  tag: release/kilted/grid_map_cmake_helpers/2.4.0-1
+  url: https://github.com/ros2-gbp/grid_map-release.git
+  version: 2.4.0
+grid_map_core:
+  tag: release/kilted/grid_map_core/2.4.0-1
+  url: https://github.com/ros2-gbp/grid_map-release.git
+  version: 2.4.0
+grid_map_cv:
+  tag: release/kilted/grid_map_cv/2.4.0-1
+  url: https://github.com/ros2-gbp/grid_map-release.git
+  version: 2.4.0
+grid_map_msgs:
+  tag: release/kilted/grid_map_msgs/2.4.0-1
+  url: https://github.com/ros2-gbp/grid_map-release.git
+  version: 2.4.0
+grid_map_ros:
+  tag: release/kilted/grid_map_ros/2.4.0-1
+  url: https://github.com/ros2-gbp/grid_map-release.git
+  version: 2.4.0
+grid_map_rviz_plugin:
+  tag: release/kilted/grid_map_rviz_plugin/2.4.0-1
+  url: https://github.com/ros2-gbp/grid_map-release.git
+  version: 2.4.0
 livox_ros_driver2:
   tag: 1.2.4
   url: https://github.com/Livox-SDK/livox_ros_driver2.git

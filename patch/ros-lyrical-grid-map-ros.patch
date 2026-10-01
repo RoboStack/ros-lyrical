@@ -1,0 +1,29 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -56,8 +56,24 @@
+   src/PolygonRosConverter.cpp
+ )
+ 
+-ament_target_dependencies(${PROJECT_NAME} SYSTEM
+-  ${dependencies}
++target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
++  ${grid_map_cv_INCLUDE_DIRS}
++)
++target_link_libraries(${PROJECT_NAME} PUBLIC
++  cv_bridge::cv_bridge
++  ${geometry_msgs_TARGETS}
++  grid_map_core::grid_map_core
++  ${grid_map_cv_LIBRARIES}
++  ${grid_map_msgs_TARGETS}
++  ${nav2_msgs_TARGETS}
++  ${nav_msgs_TARGETS}
++  rcutils::rcutils
++  rosbag2_cpp::rosbag2_cpp
++  ${sensor_msgs_TARGETS}
++  ${std_msgs_TARGETS}
++  tf2::tf2
++  ${visualization_msgs_TARGETS}
++  rclcpp::rclcpp
+ )
+ 
+ #############
