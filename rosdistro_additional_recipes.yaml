@@ -355,7 +355,8 @@ cm_executors:
   tag: 0.9.1
   url: https://github.com/cellumation/cm_executors.git
   version: 0.9.1
-# TODO: remove grid_map and its sub packages after they are released in lyrical
+# grid_map has no lyrical release yet, so build it from the kilted tags.
+# TODO: delete these grid_map_* entries once grid_map is in the lyrical rosdistro.
 grid_map_cmake_helpers:
   tag: release/kilted/grid_map_cmake_helpers/2.4.0-1
   url: https://github.com/ros2-gbp/grid_map-release.git
