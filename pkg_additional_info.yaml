@@ -48,8 +48,6 @@ gz_dartsim_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_fuel_tools_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-gz_gui_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_math_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_msgs_vendor:
@@ -65,8 +63,6 @@ gz_rendering_vendor:
 gz_ros2_control:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 gz_sensors_vendor:
-  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
-gz_sim_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
 gz_transport_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
@@ -237,3 +233,37 @@ visp:
 zenoh_cpp_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK -DUSE_SYSTEM_ZENOH=ON"
 # Remove build_number fields below on new full rebuild
+# Rebuild with qt6-main 6.11: b27 of these was built against qt6-main 6.12 on at
+# least one platform, which can't be installed together with pyqt6 6.11.
+gz_gui_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+  build_number: 28
+gz_sim_vendor:
+  additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
+  build_number: 28
+rqt_plot:
+  build_number: 28
+rqt_py_common:
+  build_number: 28
+rviz2:
+  build_number: 28
+rviz_common:
+  build_number: 28
+rviz_default_plugins:
+  build_number: 28
+rviz_imu_plugin:
+  build_number: 28
+rviz_rendering:
+  build_number: 28
+rviz_rendering_tests:
+  build_number: 28
+rviz_satellite:
+  build_number: 28
+rviz_visual_testing_framework:
+  build_number: 28
+rviz_visual_tools:
+  build_number: 28
+slam_toolbox:
+  build_number: 28
+turtlesim:
+  build_number: 28
