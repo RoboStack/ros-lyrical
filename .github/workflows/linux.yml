@@ -1,0 +1,640 @@
+jobs:
+  stage_0_job_0:
+    name: ros2-moveit-ros-occupancy-map-monitor ros2-rosbag2-py ros2-moveit-simple-controller-manager
+      ros2-moveit-resources-prbt-ikfast-manipulator-plugin ros2-nav2-controller ros2-dwb-core
+      ros2-pcl-ros ros2-pilz-industrial-motion-planner-testutils ros2-chomp-motion-planner
+      ros2-nav2-route ros2-grid-map-cmake-helpers ros2-autoware-behavior-velocity-planner-common
+      ros2-moveit-planners-stomp ros2-opennav-docking-bt ros2-nav2-waypoint-follower
+      ros2-nav2-theta-star-planner ros2-nav2-smoother ros2-nav2-smac-planner ros2-nav2-planner
+      ros2-nav2-navfn-planner ros2-nav2-mppi-controller ros2-nav2-constrained-smoother
+      ros2-nav2-bt-navigator ros2-nav2-behaviors ros2-ur-calibration
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-ros-occupancy-map-monitor ros2-rosbag2-py ros2-moveit-simple-controller-manager
+        ros2-moveit-resources-prbt-ikfast-manipulator-plugin ros2-nav2-controller
+        ros2-dwb-core ros2-pcl-ros ros2-pilz-industrial-motion-planner-testutils ros2-chomp-motion-planner
+        ros2-nav2-route ros2-grid-map-cmake-helpers ros2-autoware-behavior-velocity-planner-common
+        ros2-moveit-planners-stomp ros2-opennav-docking-bt ros2-nav2-waypoint-follower
+        ros2-nav2-theta-star-planner ros2-nav2-smoother ros2-nav2-smac-planner ros2-nav2-planner
+        ros2-nav2-navfn-planner ros2-nav2-mppi-controller ros2-nav2-constrained-smoother
+        ros2-nav2-bt-navigator ros2-nav2-behaviors ros2-ur-calibration
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-ros-occupancy-map-monitor ros2-rosbag2-py ros2-moveit-simple-controller-manager
+          ros2-moveit-resources-prbt-ikfast-manipulator-plugin ros2-nav2-controller
+          ros2-dwb-core ros2-pcl-ros ros2-pilz-industrial-motion-planner-testutils
+          ros2-chomp-motion-planner ros2-nav2-route ros2-grid-map-cmake-helpers ros2-autoware-behavior-velocity-planner-common
+          ros2-moveit-planners-stomp ros2-opennav-docking-bt ros2-nav2-waypoint-follower
+          ros2-nav2-theta-star-planner ros2-nav2-smoother ros2-nav2-smac-planner ros2-nav2-planner
+          ros2-nav2-navfn-planner ros2-nav2-mppi-controller ros2-nav2-constrained-smoother
+          ros2-nav2-bt-navigator ros2-nav2-behaviors ros2-ur-calibration
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_0_job_1:
+    name: ros2-trac-ik-kinematics-plugin ros2-cloudini-lib ros2-autoware-core-map
+      ros2-autoware-core-api ros2-swri-console ros2-plotjuggler-ros ros2-pick-ik ros2-apriltag-tools
+      yasmin-cli urdf-tutorial ur-robot-driver rosbag2-transport ros-gz ros2-controllers
+      roboplan-ros-py
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-trac-ik-kinematics-plugin ros2-cloudini-lib ros2-autoware-core-map
+        ros2-autoware-core-api ros2-swri-console ros2-plotjuggler-ros ros2-pick-ik
+        ros2-apriltag-tools ros-lyrical-yasmin-cli ros-lyrical-urdf-tutorial ros-lyrical-ur-robot-driver
+        ros-lyrical-rosbag2-transport ros-lyrical-ros-gz ros-lyrical-ros2-controllers
+        ros-lyrical-roboplan-ros-py
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-trac-ik-kinematics-plugin ros2-cloudini-lib ros2-autoware-core-map
+          ros2-autoware-core-api ros2-swri-console ros2-plotjuggler-ros ros2-pick-ik
+          ros2-apriltag-tools ros-lyrical-yasmin-cli ros-lyrical-urdf-tutorial ros-lyrical-ur-robot-driver
+          ros-lyrical-rosbag2-transport ros-lyrical-ros-gz ros-lyrical-ros2-controllers
+          ros-lyrical-roboplan-ros-py
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_2:
+    name: ros2-moveit-ros-planning ros2-ros2bag ros2-nav2-graceful-controller ros2-nav2-regulated-pure-pursuit-controller
+      ros2-dwb-plugins ros2-dwb-critics ros2-rqt-bag ros2-autoware-object-recognition-utils
+      ros2-autoware-utils-pcl ros2-autoware-point-types ros2-moveit-planners-chomp
+      ros2-nav2-rviz-plugins ros2-grid-map-core ros2-grid-map-msgs ros2-perception-pcl
+      ros2-moveit-plugins ros2-trac-ik ros2-moveit-ros-control-interface ros2-dual-laser-merger
+      ros2-cloudini-ros ur-calibration trac-ik-kinematics-plugin swri-console rosbag2-py
+      plotjuggler-ros
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    - stage_0_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-ros-planning ros2-ros2bag ros2-nav2-graceful-controller
+        ros2-nav2-regulated-pure-pursuit-controller ros2-dwb-plugins ros2-dwb-critics
+        ros2-rqt-bag ros2-autoware-object-recognition-utils ros2-autoware-utils-pcl
+        ros2-autoware-point-types ros2-moveit-planners-chomp ros2-nav2-rviz-plugins
+        ros2-grid-map-core ros2-grid-map-msgs ros2-perception-pcl ros2-moveit-plugins
+        ros2-trac-ik ros2-moveit-ros-control-interface ros2-dual-laser-merger ros2-cloudini-ros
+        ros-lyrical-ur-calibration ros-lyrical-trac-ik-kinematics-plugin ros-lyrical-swri-console
+        ros-lyrical-rosbag2-py ros-lyrical-plotjuggler-ros
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-ros-planning ros2-ros2bag ros2-nav2-graceful-controller
+          ros2-nav2-regulated-pure-pursuit-controller ros2-dwb-plugins ros2-dwb-critics
+          ros2-rqt-bag ros2-autoware-object-recognition-utils ros2-autoware-utils-pcl
+          ros2-autoware-point-types ros2-moveit-planners-chomp ros2-nav2-rviz-plugins
+          ros2-grid-map-core ros2-grid-map-msgs ros2-perception-pcl ros2-moveit-plugins
+          ros2-trac-ik ros2-moveit-ros-control-interface ros2-dual-laser-merger ros2-cloudini-ros
+          ros-lyrical-ur-calibration ros-lyrical-trac-ik-kinematics-plugin ros-lyrical-swri-console
+          ros-lyrical-rosbag2-py ros-lyrical-plotjuggler-ros
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_3:
+    name: pilz-industrial-motion-planner-testutils pick-ik pcl-ros opennav-docking-bt
+      nav2-waypoint-follower nav2-theta-star-planner nav2-smoother nav2-smac-planner
+      nav2-route nav2-planner nav2-navfn-planner nav2-mppi-controller nav2-controller
+      nav2-constrained-smoother nav2-bt-navigator nav2-behaviors moveit-simple-controller-manager
+      moveit-ros-occupancy-map-monitor moveit-resources-prbt-ikfast-manipulator-plugin
+      moveit-planners-stomp grid-map-cmake-helpers dwb-core cloudini-lib chomp-motion-planner
+      autoware-core-map
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    - stage_0_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-pilz-industrial-motion-planner-testutils ros-lyrical-pick-ik
+        ros-lyrical-pcl-ros ros-lyrical-opennav-docking-bt ros-lyrical-nav2-waypoint-follower
+        ros-lyrical-nav2-theta-star-planner ros-lyrical-nav2-smoother ros-lyrical-nav2-smac-planner
+        ros-lyrical-nav2-route ros-lyrical-nav2-planner ros-lyrical-nav2-navfn-planner
+        ros-lyrical-nav2-mppi-controller ros-lyrical-nav2-controller ros-lyrical-nav2-constrained-smoother
+        ros-lyrical-nav2-bt-navigator ros-lyrical-nav2-behaviors ros-lyrical-moveit-simple-controller-manager
+        ros-lyrical-moveit-ros-occupancy-map-monitor ros-lyrical-moveit-resources-prbt-ikfast-manipulator-plugin
+        ros-lyrical-moveit-planners-stomp ros-lyrical-grid-map-cmake-helpers ros-lyrical-dwb-core
+        ros-lyrical-cloudini-lib ros-lyrical-chomp-motion-planner ros-lyrical-autoware-core-map
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-pilz-industrial-motion-planner-testutils ros-lyrical-pick-ik
+          ros-lyrical-pcl-ros ros-lyrical-opennav-docking-bt ros-lyrical-nav2-waypoint-follower
+          ros-lyrical-nav2-theta-star-planner ros-lyrical-nav2-smoother ros-lyrical-nav2-smac-planner
+          ros-lyrical-nav2-route ros-lyrical-nav2-planner ros-lyrical-nav2-navfn-planner
+          ros-lyrical-nav2-mppi-controller ros-lyrical-nav2-controller ros-lyrical-nav2-constrained-smoother
+          ros-lyrical-nav2-bt-navigator ros-lyrical-nav2-behaviors ros-lyrical-moveit-simple-controller-manager
+          ros-lyrical-moveit-ros-occupancy-map-monitor ros-lyrical-moveit-resources-prbt-ikfast-manipulator-plugin
+          ros-lyrical-moveit-planners-stomp ros-lyrical-grid-map-cmake-helpers ros-lyrical-dwb-core
+          ros-lyrical-cloudini-lib ros-lyrical-chomp-motion-planner ros-lyrical-autoware-core-map
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_4:
+    name: autoware-core-api autoware-behavior-velocity-planner-common apriltag-tools
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    - stage_0_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-autoware-core-api ros-lyrical-autoware-behavior-velocity-planner-common
+        ros-lyrical-apriltag-tools
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-autoware-core-api ros-lyrical-autoware-behavior-velocity-planner-common
+          ros-lyrical-apriltag-tools
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_5:
+    name: ros2-moveit-kinematics ros2-moveit-ros-warehouse ros2-moveit-ros-robot-interaction
+      ros2-rosbag2-tests ros2-opennav-docking ros2-moveit-planners-ompl ros2-nav2-rotation-shim-controller
+      ros2-nav2-dwb-controller ros2-autoware-motion-velocity-planner-common ros2-autoware-behavior-velocity-planner
+      ros2-autoware-crop-box-filter ros2-grid-map-cv ros2-autoware-ground-filter ros2-autoware-ndt-scan-matcher
+      ros2-autoware-downsample-filters ros2-moveit-ros-perception ros2-moveit-visual-tools
+      ros2-autoware-utils trac-ik rqt-bag ros2bag perception-pcl nav2-rviz-plugins
+      nav2-regulated-pure-pursuit-controller nav2-graceful-controller
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_2
+    - stage_1_job_3
+    - stage_1_job_4
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-kinematics ros2-moveit-ros-warehouse ros2-moveit-ros-robot-interaction
+        ros2-rosbag2-tests ros2-opennav-docking ros2-moveit-planners-ompl ros2-nav2-rotation-shim-controller
+        ros2-nav2-dwb-controller ros2-autoware-motion-velocity-planner-common ros2-autoware-behavior-velocity-planner
+        ros2-autoware-crop-box-filter ros2-grid-map-cv ros2-autoware-ground-filter
+        ros2-autoware-ndt-scan-matcher ros2-autoware-downsample-filters ros2-moveit-ros-perception
+        ros2-moveit-visual-tools ros2-autoware-utils ros-lyrical-trac-ik ros-lyrical-rqt-bag
+        ros-lyrical-ros2bag ros-lyrical-perception-pcl ros-lyrical-nav2-rviz-plugins
+        ros-lyrical-nav2-regulated-pure-pursuit-controller ros-lyrical-nav2-graceful-controller
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-kinematics ros2-moveit-ros-warehouse ros2-moveit-ros-robot-interaction
+          ros2-rosbag2-tests ros2-opennav-docking ros2-moveit-planners-ompl ros2-nav2-rotation-shim-controller
+          ros2-nav2-dwb-controller ros2-autoware-motion-velocity-planner-common ros2-autoware-behavior-velocity-planner
+          ros2-autoware-crop-box-filter ros2-grid-map-cv ros2-autoware-ground-filter
+          ros2-autoware-ndt-scan-matcher ros2-autoware-downsample-filters ros2-moveit-ros-perception
+          ros2-moveit-visual-tools ros2-autoware-utils ros-lyrical-trac-ik ros-lyrical-rqt-bag
+          ros-lyrical-ros2bag ros-lyrical-perception-pcl ros-lyrical-nav2-rviz-plugins
+          ros-lyrical-nav2-regulated-pure-pursuit-controller ros-lyrical-nav2-graceful-controller
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_6:
+    name: moveit-ros-planning moveit-ros-control-interface moveit-plugins moveit-planners-chomp
+      grid-map-msgs grid-map-core dwb-plugins dwb-critics dual-laser-merger cloudini-ros
+      autoware-utils-pcl autoware-point-types autoware-object-recognition-utils
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_2
+    - stage_1_job_3
+    - stage_1_job_4
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-moveit-ros-planning ros-lyrical-moveit-ros-control-interface
+        ros-lyrical-moveit-plugins ros-lyrical-moveit-planners-chomp ros-lyrical-grid-map-msgs
+        ros-lyrical-grid-map-core ros-lyrical-dwb-plugins ros-lyrical-dwb-critics
+        ros-lyrical-dual-laser-merger ros-lyrical-cloudini-ros ros-lyrical-autoware-utils-pcl
+        ros-lyrical-autoware-point-types ros-lyrical-autoware-object-recognition-utils
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-moveit-ros-planning ros-lyrical-moveit-ros-control-interface
+          ros-lyrical-moveit-plugins ros-lyrical-moveit-planners-chomp ros-lyrical-grid-map-msgs
+          ros-lyrical-grid-map-core ros-lyrical-dwb-plugins ros-lyrical-dwb-critics
+          ros-lyrical-dual-laser-merger ros-lyrical-cloudini-ros ros-lyrical-autoware-utils-pcl
+          ros-lyrical-autoware-point-types ros-lyrical-autoware-object-recognition-utils
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_3_job_7:
+    name: ros2-moveit-ros-move-group ros2-rosbag2 ros2-opennav-following ros2-moveit-ros-benchmarks
+      ros2-autoware-motion-velocity-planner ros2-autoware-motion-velocity-obstacle-stop-module
+      ros2-autoware-behavior-velocity-stop-line-module ros2-autoware-euclidean-cluster-object-detector
+      ros2-grid-map-ros ros2-autoware-core-localization rosbag2-tests opennav-docking
+      nav2-rotation-shim-controller nav2-dwb-controller moveit-visual-tools moveit-ros-warehouse
+      moveit-ros-robot-interaction moveit-ros-perception moveit-planners-ompl moveit-kinematics
+      grid-map-cv autoware-utils autoware-ndt-scan-matcher autoware-motion-velocity-planner-common
+      autoware-ground-filter
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_2_job_5
+    - stage_2_job_6
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-ros-move-group ros2-rosbag2 ros2-opennav-following ros2-moveit-ros-benchmarks
+        ros2-autoware-motion-velocity-planner ros2-autoware-motion-velocity-obstacle-stop-module
+        ros2-autoware-behavior-velocity-stop-line-module ros2-autoware-euclidean-cluster-object-detector
+        ros2-grid-map-ros ros2-autoware-core-localization ros-lyrical-rosbag2-tests
+        ros-lyrical-opennav-docking ros-lyrical-nav2-rotation-shim-controller ros-lyrical-nav2-dwb-controller
+        ros-lyrical-moveit-visual-tools ros-lyrical-moveit-ros-warehouse ros-lyrical-moveit-ros-robot-interaction
+        ros-lyrical-moveit-ros-perception ros-lyrical-moveit-planners-ompl ros-lyrical-moveit-kinematics
+        ros-lyrical-grid-map-cv ros-lyrical-autoware-utils ros-lyrical-autoware-ndt-scan-matcher
+        ros-lyrical-autoware-motion-velocity-planner-common ros-lyrical-autoware-ground-filter
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-ros-move-group ros2-rosbag2 ros2-opennav-following
+          ros2-moveit-ros-benchmarks ros2-autoware-motion-velocity-planner ros2-autoware-motion-velocity-obstacle-stop-module
+          ros2-autoware-behavior-velocity-stop-line-module ros2-autoware-euclidean-cluster-object-detector
+          ros2-grid-map-ros ros2-autoware-core-localization ros-lyrical-rosbag2-tests
+          ros-lyrical-opennav-docking ros-lyrical-nav2-rotation-shim-controller ros-lyrical-nav2-dwb-controller
+          ros-lyrical-moveit-visual-tools ros-lyrical-moveit-ros-warehouse ros-lyrical-moveit-ros-robot-interaction
+          ros-lyrical-moveit-ros-perception ros-lyrical-moveit-planners-ompl ros-lyrical-moveit-kinematics
+          ros-lyrical-grid-map-cv ros-lyrical-autoware-utils ros-lyrical-autoware-ndt-scan-matcher
+          ros-lyrical-autoware-motion-velocity-planner-common ros-lyrical-autoware-ground-filter
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_3_job_8:
+    name: autoware-downsample-filters autoware-crop-box-filter autoware-behavior-velocity-planner
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_2_job_5
+    - stage_2_job_6
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-autoware-downsample-filters ros-lyrical-autoware-crop-box-filter
+        ros-lyrical-autoware-behavior-velocity-planner
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-autoware-downsample-filters ros-lyrical-autoware-crop-box-filter
+          ros-lyrical-autoware-behavior-velocity-planner
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_4_job_9:
+    name: ros2-moveit-ros-planning-interface ros2-moveit-resources-prbt-moveit-config
+      ros2-rqt-bag-plugins ros2-navigation2 ros2-ros-base ros2-autoware-core-planning
+      ros2-autoware-core-perception ros2-livox-ros-driver2 ros2-grid-map-rviz-plugin
+      rosbag2 opennav-following moveit-ros-move-group moveit-ros-benchmarks grid-map-ros
+      autoware-motion-velocity-planner autoware-motion-velocity-obstacle-stop-module
+      autoware-euclidean-cluster-object-detector autoware-core-localization autoware-behavior-velocity-stop-line-module
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_3_job_7
+    - stage_3_job_8
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-ros-planning-interface ros2-moveit-resources-prbt-moveit-config
+        ros2-rqt-bag-plugins ros2-navigation2 ros2-ros-base ros2-autoware-core-planning
+        ros2-autoware-core-perception ros2-livox-ros-driver2 ros2-grid-map-rviz-plugin
+        ros-lyrical-rosbag2 ros-lyrical-opennav-following ros-lyrical-moveit-ros-move-group
+        ros-lyrical-moveit-ros-benchmarks ros-lyrical-grid-map-ros ros-lyrical-autoware-motion-velocity-planner
+        ros-lyrical-autoware-motion-velocity-obstacle-stop-module ros-lyrical-autoware-euclidean-cluster-object-detector
+        ros-lyrical-autoware-core-localization ros-lyrical-autoware-behavior-velocity-stop-line-module
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-ros-planning-interface ros2-moveit-resources-prbt-moveit-config
+          ros2-rqt-bag-plugins ros2-navigation2 ros2-ros-base ros2-autoware-core-planning
+          ros2-autoware-core-perception ros2-livox-ros-driver2 ros2-grid-map-rviz-plugin
+          ros-lyrical-rosbag2 ros-lyrical-opennav-following ros-lyrical-moveit-ros-move-group
+          ros-lyrical-moveit-ros-benchmarks ros-lyrical-grid-map-ros ros-lyrical-autoware-motion-velocity-planner
+          ros-lyrical-autoware-motion-velocity-obstacle-stop-module ros-lyrical-autoware-euclidean-cluster-object-detector
+          ros-lyrical-autoware-core-localization ros-lyrical-autoware-behavior-velocity-stop-line-module
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_5_job_10:
+    name: ros2-moveit-ros-visualization ros2-moveit-resources-prbt-pg70-support ros2-moveit-py
+      ros2-rqt-common-plugins ros2-nav2-bringup ros2-simulation ros2-perception ros2-moveit-hybrid-planning
+      ros2-autoware-core rqt-bag-plugins ros-base navigation2 moveit-ros-planning-interface
+      moveit-resources-prbt-moveit-config livox-ros-driver2 grid-map-rviz-plugin autoware-core-planning
+      autoware-core-perception
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_4_job_9
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-ros-visualization ros2-moveit-resources-prbt-pg70-support
+        ros2-moveit-py ros2-rqt-common-plugins ros2-nav2-bringup ros2-simulation ros2-perception
+        ros2-moveit-hybrid-planning ros2-autoware-core ros-lyrical-rqt-bag-plugins
+        ros-lyrical-ros-base ros-lyrical-navigation2 ros-lyrical-moveit-ros-planning-interface
+        ros-lyrical-moveit-resources-prbt-moveit-config ros-lyrical-livox-ros-driver2
+        ros-lyrical-grid-map-rviz-plugin ros-lyrical-autoware-core-planning ros-lyrical-autoware-core-perception
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-ros-visualization ros2-moveit-resources-prbt-pg70-support
+          ros2-moveit-py ros2-rqt-common-plugins ros2-nav2-bringup ros2-simulation
+          ros2-perception ros2-moveit-hybrid-planning ros2-autoware-core ros-lyrical-rqt-bag-plugins
+          ros-lyrical-ros-base ros-lyrical-navigation2 ros-lyrical-moveit-ros-planning-interface
+          ros-lyrical-moveit-resources-prbt-moveit-config ros-lyrical-livox-ros-driver2
+          ros-lyrical-grid-map-rviz-plugin ros-lyrical-autoware-core-planning ros-lyrical-autoware-core-perception
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_6_job_11:
+    name: ros2-moveit-setup-framework ros2-pilz-industrial-motion-planner ros2-moveit-servo
+      ros2-moveit-task-constructor-core ros2-moveit-ros ros2-desktop simulation rqt-common-plugins
+      perception nav2-bringup moveit-ros-visualization moveit-resources-prbt-pg70-support
+      moveit-py moveit-hybrid-planning autoware-core
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_5_job_10
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-setup-framework ros2-pilz-industrial-motion-planner
+        ros2-moveit-servo ros2-moveit-task-constructor-core ros2-moveit-ros ros2-desktop
+        ros-lyrical-simulation ros-lyrical-rqt-common-plugins ros-lyrical-perception
+        ros-lyrical-nav2-bringup ros-lyrical-moveit-ros-visualization ros-lyrical-moveit-resources-prbt-pg70-support
+        ros-lyrical-moveit-py ros-lyrical-moveit-hybrid-planning ros-lyrical-autoware-core
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-setup-framework ros2-pilz-industrial-motion-planner
+          ros2-moveit-servo ros2-moveit-task-constructor-core ros2-moveit-ros ros2-desktop
+          ros-lyrical-simulation ros-lyrical-rqt-common-plugins ros-lyrical-perception
+          ros-lyrical-nav2-bringup ros-lyrical-moveit-ros-visualization ros-lyrical-moveit-resources-prbt-pg70-support
+          ros-lyrical-moveit-py ros-lyrical-moveit-hybrid-planning ros-lyrical-autoware-core
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_7_job_12:
+    name: ros2-moveit-setup-core-plugins ros2-moveit-setup-controllers ros2-moveit-setup-app-plugins
+      ros2-moveit-setup-srdf-plugins ros2-moveit-planners ros2-moveit-task-constructor-visualization
+      ros2-moveit-task-constructor-capabilities ros2-moveit-ros-trajectory-cache ros2-desktop-full
+      pilz-industrial-motion-planner moveit-task-constructor-core moveit-setup-framework
+      moveit-servo moveit-ros desktop
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_6_job_11
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-setup-core-plugins ros2-moveit-setup-controllers ros2-moveit-setup-app-plugins
+        ros2-moveit-setup-srdf-plugins ros2-moveit-planners ros2-moveit-task-constructor-visualization
+        ros2-moveit-task-constructor-capabilities ros2-moveit-ros-trajectory-cache
+        ros2-desktop-full ros-lyrical-pilz-industrial-motion-planner ros-lyrical-moveit-task-constructor-core
+        ros-lyrical-moveit-setup-framework ros-lyrical-moveit-servo ros-lyrical-moveit-ros
+        ros-lyrical-desktop
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-setup-core-plugins ros2-moveit-setup-controllers
+          ros2-moveit-setup-app-plugins ros2-moveit-setup-srdf-plugins ros2-moveit-planners
+          ros2-moveit-task-constructor-visualization ros2-moveit-task-constructor-capabilities
+          ros2-moveit-ros-trajectory-cache ros2-desktop-full ros-lyrical-pilz-industrial-motion-planner
+          ros-lyrical-moveit-task-constructor-core ros-lyrical-moveit-setup-framework
+          ros-lyrical-moveit-servo ros-lyrical-moveit-ros ros-lyrical-desktop
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_8_job_13:
+    name: ros2-moveit-setup-assistant ros2-ur-moveit-config ros2-moveit-task-constructor-demo
+      ros2-moveit-runtime moveit-task-constructor-visualization moveit-task-constructor-capabilities
+      moveit-setup-srdf-plugins moveit-setup-core-plugins moveit-setup-controllers
+      moveit-setup-app-plugins moveit-ros-trajectory-cache moveit-planners desktop-full
+      ros2-ur-simulation-gz ros2-ur ros2-moveit ur-moveit-config moveit-task-constructor-demo
+      moveit-setup-assistant moveit-runtime ur-simulation-gz ur moveit
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_7_job_12
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-moveit-setup-assistant ros2-ur-moveit-config ros2-moveit-task-constructor-demo
+        ros2-moveit-runtime ros-lyrical-moveit-task-constructor-visualization ros-lyrical-moveit-task-constructor-capabilities
+        ros-lyrical-moveit-setup-srdf-plugins ros-lyrical-moveit-setup-core-plugins
+        ros-lyrical-moveit-setup-controllers ros-lyrical-moveit-setup-app-plugins
+        ros-lyrical-moveit-ros-trajectory-cache ros-lyrical-moveit-planners ros-lyrical-desktop-full
+        ros2-ur-simulation-gz ros2-ur ros2-moveit ros-lyrical-ur-moveit-config ros-lyrical-moveit-task-constructor-demo
+        ros-lyrical-moveit-setup-assistant ros-lyrical-moveit-runtime ros-lyrical-ur-simulation-gz
+        ros-lyrical-ur ros-lyrical-moveit
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-moveit-setup-assistant ros2-ur-moveit-config ros2-moveit-task-constructor-demo
+          ros2-moveit-runtime ros-lyrical-moveit-task-constructor-visualization ros-lyrical-moveit-task-constructor-capabilities
+          ros-lyrical-moveit-setup-srdf-plugins ros-lyrical-moveit-setup-core-plugins
+          ros-lyrical-moveit-setup-controllers ros-lyrical-moveit-setup-app-plugins
+          ros-lyrical-moveit-ros-trajectory-cache ros-lyrical-moveit-planners ros-lyrical-desktop-full
+          ros2-ur-simulation-gz ros2-ur ros2-moveit ros-lyrical-ur-moveit-config ros-lyrical-moveit-task-constructor-demo
+          ros-lyrical-moveit-setup-assistant ros-lyrical-moveit-runtime ros-lyrical-ur-simulation-gz
+          ros-lyrical-ur ros-lyrical-moveit
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+name: build_linux64
+on:
+  push:
+    branches:
+    - buildbranch_linux
