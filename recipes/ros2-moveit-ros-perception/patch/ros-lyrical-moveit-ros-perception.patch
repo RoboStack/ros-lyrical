@@ -1,0 +1,37 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 761d53c8..0467358e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -5,6 +5,15 @@ project(moveit_ros_perception LANGUAGES CXX)
+ find_package(moveit_common REQUIRED)
+ moveit_package()
+ 
++# MSVC reports the pre-C++11 __cplusplus value (199711L) by default
++# regardless of the actual /std: flag, unless this is set -- several
++# files here (e.g. lazy_free_space_updater.hpp) branch on
++# __cplusplus >= 201103L and fall through to removed std::tr1 types
++# without it.
++if(MSVC)
++  add_compile_options(/Zc:__cplusplus)
++endif()
++
+ option(WITH_OPENGL "Build the parts that depend on OpenGL" ON)
+ 
+ if(WITH_OPENGL)
+ 
+diff --git a/semantic_world/src/semantic_world.cpp b/semantic_world/src/semantic_world.cpp
+index fb9b659b..cdddabf4 100644
+--- a/semantic_world/src/semantic_world.cpp
++++ b/semantic_world/src/semantic_world.cpp
+@@ -43,6 +43,10 @@
+ #include <moveit/utils/logger.hpp>
+ // OpenCV
+ #include <opencv2/imgproc/imgproc.hpp>
++#if CV_MAJOR_VERSION >= 5
++// pointPolygonTest moved to the geometry module in OpenCV 5.
++#include <opencv2/geometry.hpp>
++#endif
+ #include <rclcpp/experimental/buffers/intra_process_buffer.hpp>
+ #include <rclcpp/logger.hpp>
+ #include <rclcpp/logging.hpp>
+ 

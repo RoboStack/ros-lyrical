@@ -1,0 +1,159 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ce27aa99..1cecb42e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -44,6 +44,10 @@ ament_auto_add_library(autoware_trajectory SHARED
+   src/utils/velocity.cpp
+ )
+ 
++target_link_libraries(autoware_trajectory
++  fmt::fmt
++)
++
+ if(BUILD_TESTING)
+   ament_auto_find_test_dependencies()
+ 
+diff --git a/include/autoware/trajectory/interpolator/detail/interpolator_common_interface.hpp b/include/autoware/trajectory/interpolator/detail/interpolator_common_interface.hpp
+index e3395088..67faba08 100644
+--- a/include/autoware/trajectory/interpolator/detail/interpolator_common_interface.hpp
++++ b/include/autoware/trajectory/interpolator/detail/interpolator_common_interface.hpp
+@@ -21,6 +21,7 @@
+ 
+ #include <utility>
+ #include <vector>
++#include <algorithm>
+ 
+ namespace autoware::experimental::trajectory::interpolator::detail
+ {
+diff --git a/include/autoware/trajectory/interpolator/lane_ids_interpolator.hpp b/include/autoware/trajectory/interpolator/lane_ids_interpolator.hpp
+index b2ce72bd..35ba18f5 100644
+--- a/include/autoware/trajectory/interpolator/lane_ids_interpolator.hpp
++++ b/include/autoware/trajectory/interpolator/lane_ids_interpolator.hpp
+@@ -21,6 +21,12 @@
+ 
+ #include <vector>
+ 
++#if defined(__GNUC__) && !defined(__clang__)
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wstringop-overflow"
++#pragma GCC diagnostic ignored "-Warray-bounds"
++#endif
++
+ namespace autoware::experimental::trajectory::interpolator
+ {
+ 
+diff --git a/include/autoware/trajectory/interpolator/result.hpp b/include/autoware/trajectory/interpolator/result.hpp
+index 5ea32574..38a4ba9d 100644
+--- a/include/autoware/trajectory/interpolator/result.hpp
++++ b/include/autoware/trajectory/interpolator/result.hpp
+@@ -15,7 +15,7 @@
+ #ifndef AUTOWARE__TRAJECTORY__INTERPOLATOR__RESULT_HPP_
+ #define AUTOWARE__TRAJECTORY__INTERPOLATOR__RESULT_HPP_
+ 
+-#include <tl_expected/expected.hpp>
++#include <tl/expected.hpp>
+ 
+ #include <string>
+ 
+diff --git a/include/autoware/trajectory/utils/pretty_build.hpp b/include/autoware/trajectory/utils/pretty_build.hpp
+index 3f0e756f..46686f99 100644
+--- a/include/autoware/trajectory/utils/pretty_build.hpp
++++ b/include/autoware/trajectory/utils/pretty_build.hpp
+@@ -28,7 +28,7 @@
+ #include <range/v3/view/drop.hpp>
+ #include <range/v3/view/transform.hpp>
+ #include <range/v3/view/zip_with.hpp>
+-#include <tl_expected/expected.hpp>
++#include <tl/expected.hpp>
+ 
+ #include <autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>
+ #include <autoware_planning_msgs/msg/path.hpp>
+diff --git a/include/autoware/trajectory/utils/reference_path.hpp b/include/autoware/trajectory/utils/reference_path.hpp
+index df92ef97..e5a4ca05 100644
+--- a/include/autoware/trajectory/utils/reference_path.hpp
++++ b/include/autoware/trajectory/utils/reference_path.hpp
+@@ -17,7 +17,7 @@
+ 
+ #include "autoware/trajectory/forward.hpp"
+ 
+-#include <tl_expected/expected.hpp>
++#include <tl/expected.hpp>
+ 
+ #include <autoware_internal_planning_msgs/msg/path_with_lane_id.hpp>
+ 
+diff --git a/include/autoware/trajectory/utils/shift.hpp b/include/autoware/trajectory/utils/shift.hpp
+index 552cbed6..2ae854b6 100644
+--- a/include/autoware/trajectory/utils/shift.hpp
++++ b/include/autoware/trajectory/utils/shift.hpp
+@@ -19,7 +19,7 @@
+ #include "autoware/trajectory/forward.hpp"
+ 
+ #include <range/v3/view/zip.hpp>
+-#include <tl_expected/expected.hpp>
++#include <tl/expected.hpp>
+ 
+ #include <string>
+ #include <utility>
+diff --git a/package.xml b/package.xml
+index ce32e58e..3eda3284 100644
+--- a/package.xml
++++ b/package.xml
+@@ -26,10 +26,10 @@
+   <depend>fmt</depend>
+   <depend>geometry_msgs</depend>
+   <depend>lanelet2_core</depend>
++  <depend>libexpected-dev</depend>
+   <depend>rclcpp</depend>
+   <depend>tf2</depend>
+   <depend>tf2_geometry_msgs</depend>
+-  <depend>tl_expected</depend>
+   <depend>yaml-cpp</depend>
+ 
+   <test_depend>ament_cmake_auto</test_depend>
+diff --git a/src/utils/reference_path.cpp b/src/utils/reference_path.cpp
+index b8beb1b8..db8aec3f 100644
+--- a/src/utils/reference_path.cpp
++++ b/src/utils/reference_path.cpp
+@@ -46,6 +46,11 @@ namespace autoware::experimental::trajectory
+ struct UserDefinedWaypoint
+ {
+   UserDefinedWaypoint() = delete;
++  UserDefinedWaypoint(const lanelet::ConstPoint3d & point, const lanelet::Id defined_lanelet_id)
++  : point(point), defined_lanelet_id(defined_lanelet_id)
++  {
++  }
++
+   lanelet::ConstPoint3d point;
+   // NOTE(soblin): this point may not exist on defined_lanelet_id
+   lanelet::Id defined_lanelet_id;
+@@ -56,6 +61,13 @@ using UserDefinedWaypoints = std::vector<UserDefinedWaypoint>;
+ struct ReferencePoint
+ {
+   ReferencePoint() = delete;
++  ReferencePoint(
++    const lanelet::ConstPoint3d & point, const lanelet::Id located_lanelet_id,
++    const std::optional<lanelet::Id> next_lanelet_id = std::nullopt)
++  : point(point), located_lanelet_id(located_lanelet_id), next_lanelet_id(next_lanelet_id)
++  {
++  }
++
+   lanelet::ConstPoint3d point;
+   // NOTE(soblin): this point exists on located_lanelet_id
+   lanelet::Id located_lanelet_id;
+@@ -86,10 +98,12 @@ static std::optional<UserDefinedWaypoints> get_user_defined_waypoint(
+   if (waypoints_linestring.size() < 2) {
+     return std::nullopt;
+   }
+-  return waypoints_linestring | ranges::views::transform([&lanelet](const auto & p) {
+-           return UserDefinedWaypoint{p, lanelet.id()};
+-         }) |
+-         ranges::to<std::vector>();
++  UserDefinedWaypoints waypoints;
++  waypoints.reserve(waypoints_linestring.size());
++  for (const auto & point : waypoints_linestring) {
++    waypoints.emplace_back(point, lanelet.id());
++  }
++  return waypoints;
+ }
+ 
+ bool is_waypoint_inside_lanelet(

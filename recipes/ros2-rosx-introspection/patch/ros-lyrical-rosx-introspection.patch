@@ -1,0 +1,13 @@
+diff --git a/src/ros_utils/message_definition_cache.cpp b/src/ros_utils/message_definition_cache.cpp
+index 5fcb8bf..e833720 100644
+--- a/src/ros_utils/message_definition_cache.cpp
++++ b/src/ros_utils/message_definition_cache.cpp
+@@ -73,7 +73,7 @@ const MessageSpec& MessageDefinitionCache::load_message_spec(const std::string&
+   std::string package = match[1];
+   std::string share_dir;
+ #if AMENT_INDEX_CPP_VERSION_GTE(1, 13, 2)
+-  share_dir = ament_index_cpp::get_package_share_path(package);
++  share_dir = ament_index_cpp::get_package_share_path(package).string();
+ #else
+   share_dir = ament_index_cpp::get_package_share_directory(package);
+ #endif

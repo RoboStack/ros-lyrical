@@ -1,0 +1,12 @@
+diff --git a/include/nav2_behavior_tree/bt_action_server_impl.hpp b/include/nav2_behavior_tree/bt_action_server_impl.hpp
+--- a/include/nav2_behavior_tree/bt_action_server_impl.hpp
++++ b/include/nav2_behavior_tree/bt_action_server_impl.hpp
+@@ -365,7 +365,7 @@ bool BtActionServer<ActionT, NodeT>::loadBehaviorTree(const std::string & bt_xml
+ 
+     for (auto & subtree : tree_.subtrees) {
+       auto & blackboard = subtree->blackboard;
+-      blackboard->template set("node", client_node_);
++      blackboard->template set<nav2::LifecycleNode::SharedPtr>("node", client_node_);
+       blackboard->template set<std::chrono::milliseconds>("server_timeout",
+           default_server_timeout_);
+       blackboard->template set<std::chrono::milliseconds>("cancel_timeout",

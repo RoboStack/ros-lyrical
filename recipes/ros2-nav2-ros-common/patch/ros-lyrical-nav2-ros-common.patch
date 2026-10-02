@@ -1,0 +1,36 @@
+diff --git a/include/nav2_ros_common/node_utils.hpp b/include/nav2_ros_common/node_utils.hpp
+index 333c598..b029d52 100644
+--- a/include/nav2_ros_common/node_utils.hpp
++++ b/include/nav2_ros_common/node_utils.hpp
+@@ -38 +38 @@
+-#else
++#elif !defined(_WIN32)
+@@ -379,0 +380,2 @@ inline void setSoftRealTimePriority()
++#elif defined(_WIN32)
++  throw std::runtime_error("Soft real-time prioritization is not supported on Windows");
+diff --git a/include/nav2_ros_common/validate_messages.hpp b/include/nav2_ros_common/validate_messages.hpp
+index 7fd21e3..8fb8b66 100644
+--- a/include/nav2_ros_common/validate_messages.hpp
++++ b/include/nav2_ros_common/validate_messages.hpp
+@@ -21,0 +22 @@
++#include <limits>
+@@ -85 +86 @@ bool validateMsg(const std::array<double, N> & msg)
+-const int NSEC_PER_SEC = 1e9;  // 1 second = 1e9 nanosecond
++constexpr int NANOSECONDS_PER_SECOND = 1e9;
+@@ -88 +89 @@ bool validateMsg(const builtin_interfaces::msg::Time & msg)
+-  if (msg.nanosec >= NSEC_PER_SEC) {
++  if (msg.nanosec >= NANOSECONDS_PER_SECOND) {
+@@ -189,2 +190,3 @@ bool validateMsg(const nav_msgs::msg::OccupancyGrid & msg)
+-  uint32_t num_cells;
+-  if (__builtin_mul_overflow(msg.info.width, msg.info.height, &num_cells)) {
++  if (msg.info.width != 0 &&
++    msg.info.height > std::numeric_limits<uint32_t>::max() / msg.info.width)
++  {
+@@ -193,0 +196 @@ bool validateMsg(const nav_msgs::msg::OccupancyGrid & msg)
++  const uint32_t num_cells = msg.info.width * msg.info.height;
+@@ -224,2 +227,3 @@ bool validateMsg(const map_msgs::msg::OccupancyGridUpdate & msg)
+-  uint32_t num_cells;
+-  if (__builtin_mul_overflow(msg.width, msg.height, &num_cells)) {
++  if (msg.width != 0 &&
++    msg.height > std::numeric_limits<uint32_t>::max() / msg.width)
++  {
