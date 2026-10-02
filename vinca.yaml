@@ -121,6 +121,7 @@ packages_select_by_deps:
   - gtsam
   - gz_ros2_control
   - gz_ros2_control_demos
+  - imu_complementary_filter
   - imu_tools
   - joy_teleop
   - key_teleop
