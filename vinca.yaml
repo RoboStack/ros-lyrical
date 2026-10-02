@@ -248,6 +248,8 @@ packages_select_by_deps:
       - autoware_pose_initializer  # depends on autoware_motion_utils
       - autoware_qp_interface
       - autoware_trajectory  # depends on autoware_motion_utils
+      - cloudini_lib
+      - cloudini_ros
       - dual-laser-merger
       - ffmpeg_image_transport  # TODO on windows: fix iconv link issue
       - foxglove_compressed_video_transport
