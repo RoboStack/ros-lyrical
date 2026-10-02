@@ -306,6 +306,8 @@ console_bridge_vendor:
 grid_map_octomap:
   add_host: ["octomap"]
   add_run: ["octomap"]
+grid_map_rviz_plugin:
+  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "qt6-main"]
 py_trees:
   add_host: ["hatchling"]
 py_trees_js:
