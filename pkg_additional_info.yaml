@@ -92,6 +92,8 @@ iceoryx_posh:
     max_pin: 'x.x.x'
     # the version on ROS (2.0.6) is outdated w.r.t. the conda-forge one
     override_version: '2.95.8'
+imu_complementary_filter:
+  additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 io_context:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
 lanelet2_projection:
