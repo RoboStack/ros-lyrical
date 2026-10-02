@@ -1016,7 +1016,7 @@ qt:
 qt_main:
   - 5.15
 qt6_main:
-  - '6'
+  - 6.11
 qtkeychain:
   - '0.17'
 rav1e:
@@ -1186,3 +1186,9 @@ lua:
   # Pin back to the last known-good line until upstream fixes it.
 sip:
   - 6.15
+  # conda-forge's newest pyqt6 (6.11.0) still requires qt6-main <6.12, so
+  # packages built against the newly released qt6-main 6.12 can't be installed
+  # together with python_qt_binding (pyqt6). Pin both to 6.11 until pyqt6 is
+  # rebuilt for qt6-main 6.12.
+pyqt6:
+  - 6.11
