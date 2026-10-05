@@ -102,6 +102,10 @@ nav2_smac_planner:
   add_host: ["${{ 'llvm-openmp' if osx }}", "ompl", "libode"]
 nav2_constrained_smoother:
   add_host: ["${{ 'openblas' if win }}", "ceres-solver"]
+spatio_temporal_voxel_layer:
+  add_host: [libgl-devel, libopengl-devel, openvdb]
+openvdb_vendor:
+  add_host: ["openvdb"]
 ompl:
   add_host: ["ompl"]
 pybind11_json_vendor:
