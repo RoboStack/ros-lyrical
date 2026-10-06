@@ -433,6 +433,11 @@ mocap4r2_robot_gt_msgs:
   url: https://github.com/MOCAP4ROS2-Project/mocap4r2.git
   version: 0.0.7
   additional_folder: mocap4r2_robot_gt/mocap4r2_robot_gt_msgs
+ros2_easy_test:  # Until: https://github.com/felixdivo/ros2-easy-test/issues/53
+  rev: 59ce58ef05f39826eaaa50c986eb039729a8c61e
+  url: https://github.com/felixdivo/ros2-easy-test.git
+  version: 0.3.0
+  additional_folder: ros2_easy_test
 rqt_mocap4r2_control:
   tag: 0.0.7
   url: https://github.com/MOCAP4ROS2-Project/mocap4r2.git
