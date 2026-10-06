@@ -101,6 +101,7 @@ packages_select_by_deps:
   - better_launch
   - bond_core
   - bondcpp
+  - can_dbc_parser
   - can_msgs
   - cm_executors
   - data_tamer_cpp  # Requested in https://github.com/RoboStack/ros-humble/issues/325
@@ -178,6 +179,7 @@ packages_select_by_deps:
   - robot-localization
   - ros2_control
   - ros2_controllers
+  - ros2_easy_test
   - ros2_fmt_logger
   - ros2_socketcan_msgs
   - ros_base
