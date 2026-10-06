@@ -103,7 +103,7 @@ nav2_smac_planner:
 nav2_constrained_smoother:
   add_host: ["${{ 'openblas' if win }}", "ceres-solver"]
 spatio_temporal_voxel_layer:
-  add_host: [libgl-devel, libopengl-devel, openvdb]
+  add_host: ["${{ 'libgl-devel' if linux }}", "${{ 'libopengl-devel' if linux }}", "openvdb"]
 openvdb_vendor:
   add_host: ["openvdb"]
 ompl:
