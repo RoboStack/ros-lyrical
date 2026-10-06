@@ -10,9 +10,9 @@ conda_index:
 build_number: 27
 
 mutex_package:
-  name: "ros2-distro-mutex"
-  version: "0.21.0"
-  upper_bound: "x.x"
+  name: ros2-distro-mutex
+  version: 0.21.0
+  upper_bound: x.x
   run_constraints:
     - libboost 1.90.*
     - libboost-devel 1.90.*
@@ -138,6 +138,7 @@ packages_select_by_deps:
   - moveit-task-constructor-demo
   - moveit-visual-tools
   - nav2_bringup
+  - nav2_loopback_sim
   - nav2_minimal_tb3_sim
   - nav2_minimal_tb4_sim
   - navigation2
@@ -192,6 +193,7 @@ packages_select_by_deps:
   - rqt_robot_monitor
   - rqt_runtime_monitor
   - rtabmap
+  - rtest
   - rviz_visual_tools
   - sbg_driver
   - simulation
