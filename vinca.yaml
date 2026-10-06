@@ -190,7 +190,6 @@ packages_select_by_deps:
   - sbg_driver
   - simulation
   - slam_toolbox
-  - spatio_temporal_voxel_layer
   - teleop
   - teleop-tools
   - toppra
