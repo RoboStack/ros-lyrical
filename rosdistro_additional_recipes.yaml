@@ -351,6 +351,10 @@ better_launch:
   url: https://github.com/dfki-ric/better_launch.git
   version: 1.3.0
 # mocap4r2
+can_dbc_parser:
+  rev: a5eb643dbe35928a1538b7d62c0d1077ed48977f
+  url: https://github.com/nobleo/raptor-dbw-ros2.git  # Until: https://github.com/NewEagleRaptor/raptor-dbw-ros2/pull/24
+  version: 1.2.0
 cm_executors:
   tag: 0.9.1
   url: https://github.com/cellumation/cm_executors.git
