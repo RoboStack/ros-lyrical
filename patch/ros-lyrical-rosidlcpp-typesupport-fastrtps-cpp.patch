@@ -1,0 +1,11 @@
+diff --git a/src/rosidlcpp_typesupport_fastrtps_cpp/rosidlcpp_typesupport_fastrtps_cpp.cpp b/src/rosidlcpp_typesupport_fastrtps_cpp/rosidlcpp_typesupport_fastrtps_cpp.cpp
+--- a/src/rosidlcpp_typesupport_fastrtps_cpp/rosidlcpp_typesupport_fastrtps_cpp.cpp
++++ b/src/rosidlcpp_typesupport_fastrtps_cpp/rosidlcpp_typesupport_fastrtps_cpp.cpp
+@@ -23,7 +23,8 @@
+ #include <fmt/core.h>
+ #include <fmt/format.h>
++#include <fmt/ranges.h>
+
+ #include <inja/inja.hpp>
+
+ #include <nlohmann/json_fwd.hpp>
