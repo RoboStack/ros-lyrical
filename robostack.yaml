@@ -26,6 +26,8 @@ autoconf:
   robostack: [autoconf]
 automake:
   robostack: [automake]
+python3-transforms3d:
+  robostack: [transforms3d]
 avahi-daemon:
   robostack: [python-avahi]
 benchmark:
