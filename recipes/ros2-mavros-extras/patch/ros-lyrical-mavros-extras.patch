@@ -1,0 +1,29 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8832292..dbee63e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,11 +10,15 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+   # we dont use add_compile_options with pedantic in message packages
+   # because the Python C extensions dont comply with it
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
++  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcomment")
+ endif()
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcomment")
+ 
+ # Allow GNU extensions (-std=gnu++20)
+ set(CMAKE_C_EXTENSIONS ON)
+ set(CMAKE_CXX_EXTENSIONS ON)
+ 
++if(MSVC)
++  add_compile_definitions(_USE_MATH_DEFINES)
++endif()
++
+ find_package(ament_cmake REQUIRED)
+@@ -168,6 +172,7 @@ target_link_libraries(mavros_extras_plugins PUBLIC
+   tf2_ros::static_transform_broadcaster_node
+   tf2_ros::tf2_ros
+   ${mavros_LIBRARIES}
++  ${GeographicLib_LIBRARIES}
+ )
+ pluginlib_export_plugin_description_file(mavros mavros_plugins.xml)
+ 
