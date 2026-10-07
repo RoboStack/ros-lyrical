@@ -1,0 +1,193 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8e69fa09..24148d30 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,13 +10,17 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+   # we dont use add_compile_options with pedantic in message packages
+   # because the Python C extensions dont comply with it
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
++  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcomment")
+ endif()
+-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wcomment")
+ 
+ # Allow GNU extensions (-std=gnu++20)
+ set(CMAKE_C_EXTENSIONS ON)
+ set(CMAKE_CXX_EXTENSIONS ON)
+ 
++if(MSVC)
++  add_compile_definitions(_USE_MATH_DEFINES)
++endif()
++
+ find_package(ament_cmake REQUIRED)
+ find_package(ament_cmake_python REQUIRED)
+ 
+@@ -125,6 +129,14 @@ add_library(mavros SHARED
+   src/lib/uas_timesync.cpp
+   # [[[end]]] (sum: MjnRb8h5gp)
+ )
++# mavros_plugins (below) has far too many symbols for MSVC's linker to
++# auto-export all of them (LNK1189: library limit of 65535 objects
++# exceeded) -- it's loaded dynamically via pluginlib/class_loader and
++# never linked against directly, so it doesn't need an import library at
++# all. Only the core mavros library (linked by mavros_node and the unit
++# tests below) needs WINDOWS_EXPORT_ALL_SYMBOLS.
++set_target_properties(mavros PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
++target_compile_definitions(mavros PRIVATE MAVROS_BUILDING_DLL)
+ target_link_libraries(mavros PUBLIC
+   ${mavros_msgs_TARGETS}
+   ${sensor_msgs_TARGETS}
+ 
+diff --git a/include/mavros/utils.hpp b/include/mavros/utils.hpp
+index 1f3dc092..bef93350 100644
+--- a/include/mavros/utils.hpp
++++ b/include/mavros/utils.hpp
+@@ -27,14 +27,24 @@
+ #include "mavros_msgs/mavlink_convert.hpp"
+ #include "mavconn/mavlink_dialect.hpp"
+ 
+-// OS X compat: missing error codes
+-#ifdef __APPLE__
++// OS X / Windows compat: missing error codes (Linux-specific errno values
++// used by the FTP plugin's MAVLink-FTP error mapping)
++#if defined(__APPLE__) || defined(_WIN32)
+ #define EBADE 50        /* Invalid exchange */
+ #define EBADFD 81       /* File descriptor in bad state */
+ #define EBADRQC 54      /* Invalid request code */
+ #define EBADSLT 55      /* Invalid slot */
+ #endif
+ 
++// Windows SDK headers define PASSTHROUGH as a numeric macro (used by some
++// print-related APIs), which corrupts the timesync_mode enum below if not
++// undefined first.
++#ifdef _WIN32
++#ifdef PASSTHROUGH
++#undef PASSTHROUGH
++#endif
++#endif
++
+ namespace mavros
+ {
+ namespace utils
+ 
+diff --git a/include/mavros/mavros_uas.hpp b/include/mavros/mavros_uas.hpp
+index c1d10b1e..15d50971 100644
+--- a/include/mavros/mavros_uas.hpp
++++ b/include/mavros/mavros_uas.hpp
+@@ -53,6 +53,20 @@
+ #include "mavros/frame_tf.hpp"
+ #include "mavros/uas_executor.hpp"
+ 
++// egm96_5 is a static data member shared across the mavros DLL boundary
++// (defined in uas_data.cpp, used by mavros_plugins) -- MSVC's
++// WINDOWS_EXPORT_ALL_SYMBOLS only auto-exports functions, not data, so
++// this needs an explicit dllexport/dllimport toggle on Windows.
++#ifdef _WIN32
++#ifdef MAVROS_BUILDING_DLL
++#define MAVROS_UAS_DATA_EXPORT __declspec(dllexport)
++#else
++#define MAVROS_UAS_DATA_EXPORT __declspec(dllimport)
++#endif
++#else
++#define MAVROS_UAS_DATA_EXPORT
++#endif
++
+ namespace mavros
+ {
+ namespace uas
+@@ -158,7 +172,7 @@ public:
+    *
+    * That class loads egm96_5 dataset to RAM, it is about 24 MiB.
+    */
+-  static std::shared_ptr<GeographicLib::Geoid> egm96_5;
++  static MAVROS_UAS_DATA_EXPORT std::shared_ptr<GeographicLib::Geoid> egm96_5;
+ 
+   /**
+    * @brief Conversion from height above geoid (AMSL)
+ 
+diff --git a/src/lib/mavros_uas.cpp b/src/lib/mavros_uas.cpp
+index 9a00f720..b6005641 100644
+--- a/src/lib/mavros_uas.cpp
++++ b/src/lib/mavros_uas.cpp
+@@ -11,7 +11,52 @@
+  * @author Vladimir Ermakov <vooon341@gmail.com>
+  */
+ 
++#ifdef _WIN32
++// Windows has no <fnmatch.h>; provide a minimal case-insensitive glob
++// matcher supporting '*' and '?', sufficient for the plugin
++// blacklist/whitelist patterns matched below.
++#include <cctype>
++#define FNM_NOMATCH 1
++#define FNM_CASEFOLD 0
++static int fnmatch(const char * pattern, const char * str, int)
++{
++  while (*pattern) {
++    if (*pattern == '*') {
++      while (*pattern == '*') {
++        ++pattern;
++      }
++      if (!*pattern) {
++        return 0;
++      }
++      while (*str) {
++        if (fnmatch(pattern, str, 0) == 0) {
++          return 0;
++        }
++        ++str;
++      }
++      return FNM_NOMATCH;
++    } else if (*pattern == '?') {
++      if (!*str) {
++        return FNM_NOMATCH;
++      }
++      ++pattern;
++      ++str;
++    } else {
++      if (!*str ||
++        std::tolower(static_cast<unsigned char>(*pattern)) !=
++        std::tolower(static_cast<unsigned char>(*str)))
++      {
++        return FNM_NOMATCH;
++      }
++      ++pattern;
++      ++str;
++    }
++  }
++  return *str ? FNM_NOMATCH : 0;
++}
++#else
+ #include <fnmatch.h>
++#endif
+ #include <cmath>
+ #include <string>
+ #include <vector>
+ 
+diff --git a/src/plugins/sys_time.cpp b/src/plugins/sys_time.cpp
+index 42bd903e..7a015e5e 100644
+--- a/src/plugins/sys_time.cpp
++++ b/src/plugins/sys_time.cpp
+@@ -14,6 +14,7 @@
+  * https://github.com/mavlink/mavros/tree/master/LICENSE.md
+  */
+ 
++#include <chrono>
+ #include <string>
+ #include <vector>
+ 
+@@ -546,10 +547,11 @@ private:
+ 
+   uint64_t get_monotonic_now(void)
+   {
+-    struct timespec spec;
+-    clock_gettime(CLOCK_MONOTONIC, &spec);
+-
+-    return spec.tv_sec * 1000000000ULL + spec.tv_nsec;
++    // std::chrono::steady_clock is a portable monotonic clock available on
++    // all platforms, unlike POSIX clock_gettime()/CLOCK_MONOTONIC (not
++    // available on Windows).
++    auto now = std::chrono::steady_clock::now().time_since_epoch();
++    return std::chrono::duration_cast<std::chrono::nanoseconds>(now).count();
+   }
+ };
+ 
+ 
