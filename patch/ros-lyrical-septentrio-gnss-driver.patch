@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 66dec47..0ad6caa 100644
+index bf6c60d..3668dd5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -1,8 +1,11 @@
@@ -17,18 +17,18 @@ index 66dec47..0ad6caa 100644
  if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
  message(STATUS "Setting build type to Release as none was specified.")
 diff --git a/include/septentrio_gnss_driver/abstraction/typedefs.hpp b/include/septentrio_gnss_driver/abstraction/typedefs.hpp
-index 69f7b2c..25ec2c7 100644
+index f05da0e..601a244 100644
 --- a/include/septentrio_gnss_driver/abstraction/typedefs.hpp
 +++ b/include/septentrio_gnss_driver/abstraction/typedefs.hpp
-@@ -40,9 +40,11 @@
- // tf2 includes
- #ifdef ROS2_VER_N520
- #include <tf2_ros/transform_broadcaster.hpp>
-+#include <tf2_ros/buffer.hpp>
- #include <tf2_ros/transform_listener.hpp>
+@@ -43,6 +43,11 @@
  #else
  #include <tf2_ros/transform_broadcaster.h>
-+#include <tf2_ros/buffer.h>
- #include <tf2_ros/transform_listener.h>
  #endif
- #ifdef ROS2_VER_N250
++#if __has_include(<tf2_ros/buffer.hpp>)
++#include <tf2_ros/buffer.hpp>
++#else
++#include <tf2_ros/buffer.h>
++#endif
+ #if __has_include(<tf2_ros/transform_listener.hpp>)
+ #include <tf2_ros/transform_listener.hpp>
+ #else
