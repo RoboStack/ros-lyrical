@@ -178,6 +178,7 @@ packages_select_by_deps:
   - robot-localization
   - ros2_control
   - ros2_controllers
+  - ros2_easy_test
   - ros2_fmt_logger
   - ros2_socketcan_msgs
   - ros_base
@@ -214,6 +215,7 @@ packages_select_by_deps:
   # These packages are only built on Linux as they depend on Linux-specific API
   - if: linux
     then:
+      - can_dbc_parser
       - libcamera
       - mujoco_ros2_control  # Isaac ROS deploy / Unitree G1 simulation
       - nobleo_socketcan_bridge  # Depends on socketcan
