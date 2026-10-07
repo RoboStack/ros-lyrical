@@ -1,0 +1,369 @@
+jobs:
+  stage_0_job_0:
+    name: ros2-cascade-lifecycle-msgs ros2-ament-pclint ros2-mavlink ros2-async-web-server-cpp
+      ros2-joy-linux ros2-ublox-ubx-msgs ros2-ublox-ubx-interfaces ros2-system-modes-msgs
+      ros2-rosgraph-monitor-msgs ros2-rclc ros2-polygon-utils ros2-color-util ros2-microstrain-inertial-msgs
+      ros2-mavros-msgs ros2-robotiq-description ros2-event-camera-msgs ros2-motion-capture-tracking-interfaces
+      ros2-cartographer-ros-msgs ros2-cartographer ros2-urg-node-msgs ros2-urg-c ros2-laser-proc
+      ros2-ntrip-client-node ros2-sick-safetyscanners-base ros2-rviz-2d-overlay-msgs
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-cascade-lifecycle-msgs ros2-ament-pclint ros2-mavlink ros2-async-web-server-cpp
+        ros2-joy-linux ros2-ublox-ubx-msgs ros2-ublox-ubx-interfaces ros2-system-modes-msgs
+        ros2-rosgraph-monitor-msgs ros2-rclc ros2-polygon-utils ros2-color-util ros2-microstrain-inertial-msgs
+        ros2-mavros-msgs ros2-robotiq-description ros2-event-camera-msgs ros2-motion-capture-tracking-interfaces
+        ros2-cartographer-ros-msgs ros2-cartographer ros2-urg-node-msgs ros2-urg-c
+        ros2-laser-proc ros2-ntrip-client-node ros2-sick-safetyscanners-base ros2-rviz-2d-overlay-msgs
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-cascade-lifecycle-msgs ros2-ament-pclint ros2-mavlink
+          ros2-async-web-server-cpp ros2-joy-linux ros2-ublox-ubx-msgs ros2-ublox-ubx-interfaces
+          ros2-system-modes-msgs ros2-rosgraph-monitor-msgs ros2-rclc ros2-polygon-utils
+          ros2-color-util ros2-microstrain-inertial-msgs ros2-mavros-msgs ros2-robotiq-description
+          ros2-event-camera-msgs ros2-motion-capture-tracking-interfaces ros2-cartographer-ros-msgs
+          ros2-cartographer ros2-urg-node-msgs ros2-urg-c ros2-laser-proc ros2-ntrip-client-node
+          ros2-sick-safetyscanners-base ros2-rviz-2d-overlay-msgs
+        BUILD_TARGET: osx-arm64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_0_job_1:
+    name: ros2-rosbag2-performance-benchmarking-msgs ros2-automatika-ros-sugar ros2-imu-transformer
+      ros2-geodesy ros2-zed-msgs ros2-visp ros2-vision-msgs-rviz-plugins ros2-udp-driver
+      ros2-turtle-tf2-py ros2-turtle-tf2-cpp ros2-spacenav ros2-rqt-robot-steering
+      ros2-rqt-robot-dashboard ros2-rqt-moveit ros2-rqt-joint-trajectory-controller
+      ros2-rqt-controller-manager ros2-robotiq-controllers ros2-radar-msgs ros2-picknik-ament-copyright
+      ros2-ntrip-client ros2-microstrain-inertial-description ros2-marker-msgs ros2-irobot-create-msgs
+      ros2-geometry-tutorials ros2-bno055
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-rosbag2-performance-benchmarking-msgs ros2-automatika-ros-sugar
+        ros2-imu-transformer ros2-geodesy ros2-zed-msgs ros2-visp ros2-vision-msgs-rviz-plugins
+        ros2-udp-driver ros2-turtle-tf2-py ros2-turtle-tf2-cpp ros2-spacenav ros2-rqt-robot-steering
+        ros2-rqt-robot-dashboard ros2-rqt-moveit ros2-rqt-joint-trajectory-controller
+        ros2-rqt-controller-manager ros2-robotiq-controllers ros2-radar-msgs ros2-picknik-ament-copyright
+        ros2-ntrip-client ros2-microstrain-inertial-description ros2-marker-msgs ros2-irobot-create-msgs
+        ros2-geometry-tutorials ros2-bno055
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-rosbag2-performance-benchmarking-msgs ros2-automatika-ros-sugar
+          ros2-imu-transformer ros2-geodesy ros2-zed-msgs ros2-visp ros2-vision-msgs-rviz-plugins
+          ros2-udp-driver ros2-turtle-tf2-py ros2-turtle-tf2-cpp ros2-spacenav ros2-rqt-robot-steering
+          ros2-rqt-robot-dashboard ros2-rqt-moveit ros2-rqt-joint-trajectory-controller
+          ros2-rqt-controller-manager ros2-robotiq-controllers ros2-radar-msgs ros2-picknik-ament-copyright
+          ros2-ntrip-client ros2-microstrain-inertial-description ros2-marker-msgs
+          ros2-irobot-create-msgs ros2-geometry-tutorials ros2-bno055
+        BUILD_TARGET: osx-arm64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_2:
+    name: ros2-rclcpp-cascade-lifecycle ros2-ament-cmake-pclint ros2-libmavconn ros2-web-video-server
+      ros2-ublox-nav-sat-fix-hp-node ros2-ublox-dgnss-node ros2-system-modes ros2-rmw-stats-shim
+      ros2-rclc-parameter ros2-rclc-lifecycle ros2-microstrain-inertial-driver ros2-event-camera-codecs
+      ros2-cartographer-ros ros2-urg-node ros2-rviz-2d-overlay-plugins ros2-rosbag2-performance-benchmarking
+      ros2-rclpy-cascade-lifecycle ros2-motion-capture-tracking ros2-microstrain-inertial-rqt
+      ros2-geographic-info ros2-automatika-embodied-agents zed-msgs visp vision-msgs-rviz-plugins
+      urg-node-msgs
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    - stage_0_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-rclcpp-cascade-lifecycle ros2-ament-cmake-pclint ros2-libmavconn
+        ros2-web-video-server ros2-ublox-nav-sat-fix-hp-node ros2-ublox-dgnss-node
+        ros2-system-modes ros2-rmw-stats-shim ros2-rclc-parameter ros2-rclc-lifecycle
+        ros2-microstrain-inertial-driver ros2-event-camera-codecs ros2-cartographer-ros
+        ros2-urg-node ros2-rviz-2d-overlay-plugins ros2-rosbag2-performance-benchmarking
+        ros2-rclpy-cascade-lifecycle ros2-motion-capture-tracking ros2-microstrain-inertial-rqt
+        ros2-geographic-info ros2-automatika-embodied-agents ros-lyrical-zed-msgs
+        ros-lyrical-visp ros-lyrical-vision-msgs-rviz-plugins ros-lyrical-urg-node-msgs
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-rclcpp-cascade-lifecycle ros2-ament-cmake-pclint ros2-libmavconn
+          ros2-web-video-server ros2-ublox-nav-sat-fix-hp-node ros2-ublox-dgnss-node
+          ros2-system-modes ros2-rmw-stats-shim ros2-rclc-parameter ros2-rclc-lifecycle
+          ros2-microstrain-inertial-driver ros2-event-camera-codecs ros2-cartographer-ros
+          ros2-urg-node ros2-rviz-2d-overlay-plugins ros2-rosbag2-performance-benchmarking
+          ros2-rclpy-cascade-lifecycle ros2-motion-capture-tracking ros2-microstrain-inertial-rqt
+          ros2-geographic-info ros2-automatika-embodied-agents ros-lyrical-zed-msgs
+          ros-lyrical-visp ros-lyrical-vision-msgs-rviz-plugins ros-lyrical-urg-node-msgs
+        BUILD_TARGET: osx-arm64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_3:
+    name: urg-c udp-driver ublox-ubx-msgs ublox-ubx-interfaces turtle-tf2-py turtle-tf2-cpp
+      system-modes-msgs spacenav sick-safetyscanners-base rviz-2d-overlay-msgs rqt-robot-steering
+      rqt-robot-dashboard rqt-moveit rqt-joint-trajectory-controller rqt-controller-manager
+      rosgraph-monitor-msgs rosbag2-performance-benchmarking-msgs robotiq-description
+      robotiq-controllers rclc radar-msgs polygon-utils picknik-ament-copyright ntrip-client-node
+      ntrip-client
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    - stage_0_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-urg-c ros-lyrical-udp-driver ros-lyrical-ublox-ubx-msgs
+        ros-lyrical-ublox-ubx-interfaces ros-lyrical-turtle-tf2-py ros-lyrical-turtle-tf2-cpp
+        ros-lyrical-system-modes-msgs ros-lyrical-spacenav ros-lyrical-sick-safetyscanners-base
+        ros-lyrical-rviz-2d-overlay-msgs ros-lyrical-rqt-robot-steering ros-lyrical-rqt-robot-dashboard
+        ros-lyrical-rqt-moveit ros-lyrical-rqt-joint-trajectory-controller ros-lyrical-rqt-controller-manager
+        ros-lyrical-rosgraph-monitor-msgs ros-lyrical-rosbag2-performance-benchmarking-msgs
+        ros-lyrical-robotiq-description ros-lyrical-robotiq-controllers ros-lyrical-rclc
+        ros-lyrical-radar-msgs ros-lyrical-polygon-utils ros-lyrical-picknik-ament-copyright
+        ros-lyrical-ntrip-client-node ros-lyrical-ntrip-client
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-urg-c ros-lyrical-udp-driver ros-lyrical-ublox-ubx-msgs
+          ros-lyrical-ublox-ubx-interfaces ros-lyrical-turtle-tf2-py ros-lyrical-turtle-tf2-cpp
+          ros-lyrical-system-modes-msgs ros-lyrical-spacenav ros-lyrical-sick-safetyscanners-base
+          ros-lyrical-rviz-2d-overlay-msgs ros-lyrical-rqt-robot-steering ros-lyrical-rqt-robot-dashboard
+          ros-lyrical-rqt-moveit ros-lyrical-rqt-joint-trajectory-controller ros-lyrical-rqt-controller-manager
+          ros-lyrical-rosgraph-monitor-msgs ros-lyrical-rosbag2-performance-benchmarking-msgs
+          ros-lyrical-robotiq-description ros-lyrical-robotiq-controllers ros-lyrical-rclc
+          ros-lyrical-radar-msgs ros-lyrical-polygon-utils ros-lyrical-picknik-ament-copyright
+          ros-lyrical-ntrip-client-node ros-lyrical-ntrip-client
+        BUILD_TARGET: osx-arm64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_4:
+    name: motion-capture-tracking-interfaces microstrain-inertial-msgs microstrain-inertial-description
+      mavros-msgs mavlink marker-msgs laser-proc joy-linux irobot-create-msgs imu-transformer
+      geometry-tutorials geodesy event-camera-msgs color-util cascade-lifecycle-msgs
+      cartographer-ros-msgs cartographer bno055 automatika-ros-sugar async-web-server-cpp
+      ament-pclint
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    - stage_0_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-motion-capture-tracking-interfaces ros-lyrical-microstrain-inertial-msgs
+        ros-lyrical-microstrain-inertial-description ros-lyrical-mavros-msgs ros-lyrical-mavlink
+        ros-lyrical-marker-msgs ros-lyrical-laser-proc ros-lyrical-joy-linux ros-lyrical-irobot-create-msgs
+        ros-lyrical-imu-transformer ros-lyrical-geometry-tutorials ros-lyrical-geodesy
+        ros-lyrical-event-camera-msgs ros-lyrical-color-util ros-lyrical-cascade-lifecycle-msgs
+        ros-lyrical-cartographer-ros-msgs ros-lyrical-cartographer ros-lyrical-bno055
+        ros-lyrical-automatika-ros-sugar ros-lyrical-async-web-server-cpp ros-lyrical-ament-pclint
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-motion-capture-tracking-interfaces ros-lyrical-microstrain-inertial-msgs
+          ros-lyrical-microstrain-inertial-description ros-lyrical-mavros-msgs ros-lyrical-mavlink
+          ros-lyrical-marker-msgs ros-lyrical-laser-proc ros-lyrical-joy-linux ros-lyrical-irobot-create-msgs
+          ros-lyrical-imu-transformer ros-lyrical-geometry-tutorials ros-lyrical-geodesy
+          ros-lyrical-event-camera-msgs ros-lyrical-color-util ros-lyrical-cascade-lifecycle-msgs
+          ros-lyrical-cartographer-ros-msgs ros-lyrical-cartographer ros-lyrical-bno055
+          ros-lyrical-automatika-ros-sugar ros-lyrical-async-web-server-cpp ros-lyrical-ament-pclint
+        BUILD_TARGET: osx-arm64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_5:
+    name: ros2-apex-test-tools ros2-mavros ros2-ublox-dgnss ros2-rclc-examples ros2-microstrain-inertial-examples
+      ros2-event-camera-renderer web-video-server urg-node ublox-nav-sat-fix-hp-node
+      ublox-dgnss-node system-modes rviz-2d-overlay-plugins rosbag2-performance-benchmarking
+      rmw-stats-shim rclpy-cascade-lifecycle rclcpp-cascade-lifecycle rclc-parameter
+      rclc-lifecycle motion-capture-tracking microstrain-inertial-rqt microstrain-inertial-driver
+      libmavconn geographic-info event-camera-codecs cartographer-ros
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_2
+    - stage_1_job_3
+    - stage_1_job_4
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-apex-test-tools ros2-mavros ros2-ublox-dgnss ros2-rclc-examples
+        ros2-microstrain-inertial-examples ros2-event-camera-renderer ros-lyrical-web-video-server
+        ros-lyrical-urg-node ros-lyrical-ublox-nav-sat-fix-hp-node ros-lyrical-ublox-dgnss-node
+        ros-lyrical-system-modes ros-lyrical-rviz-2d-overlay-plugins ros-lyrical-rosbag2-performance-benchmarking
+        ros-lyrical-rmw-stats-shim ros-lyrical-rclpy-cascade-lifecycle ros-lyrical-rclcpp-cascade-lifecycle
+        ros-lyrical-rclc-parameter ros-lyrical-rclc-lifecycle ros-lyrical-motion-capture-tracking
+        ros-lyrical-microstrain-inertial-rqt ros-lyrical-microstrain-inertial-driver
+        ros-lyrical-libmavconn ros-lyrical-geographic-info ros-lyrical-event-camera-codecs
+        ros-lyrical-cartographer-ros
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-apex-test-tools ros2-mavros ros2-ublox-dgnss ros2-rclc-examples
+          ros2-microstrain-inertial-examples ros2-event-camera-renderer ros-lyrical-web-video-server
+          ros-lyrical-urg-node ros-lyrical-ublox-nav-sat-fix-hp-node ros-lyrical-ublox-dgnss-node
+          ros-lyrical-system-modes ros-lyrical-rviz-2d-overlay-plugins ros-lyrical-rosbag2-performance-benchmarking
+          ros-lyrical-rmw-stats-shim ros-lyrical-rclpy-cascade-lifecycle ros-lyrical-rclcpp-cascade-lifecycle
+          ros-lyrical-rclc-parameter ros-lyrical-rclc-lifecycle ros-lyrical-motion-capture-tracking
+          ros-lyrical-microstrain-inertial-rqt ros-lyrical-microstrain-inertial-driver
+          ros-lyrical-libmavconn ros-lyrical-geographic-info ros-lyrical-event-camera-codecs
+          ros-lyrical-cartographer-ros
+        BUILD_TARGET: osx-arm64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_6:
+    name: automatika-embodied-agents ament-cmake-pclint
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_2
+    - stage_1_job_3
+    - stage_1_job_4
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros-lyrical-automatika-embodied-agents ros-lyrical-ament-cmake-pclint
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-automatika-embodied-agents ros-lyrical-ament-cmake-pclint
+        BUILD_TARGET: osx-arm64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_3_job_7:
+    name: ros2-mavros-extras ublox-dgnss rclc-examples microstrain-inertial-examples
+      mavros event-camera-renderer apex-test-tools mavros-extras
+    runs-on: macos-15
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_2_job_5
+    - stage_2_job_6
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-mavros-extras ros-lyrical-ublox-dgnss ros-lyrical-rclc-examples
+        ros-lyrical-microstrain-inertial-examples ros-lyrical-mavros ros-lyrical-event-camera-renderer
+        ros-lyrical-apex-test-tools ros-lyrical-mavros-extras
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-mavros-extras ros-lyrical-ublox-dgnss ros-lyrical-rclc-examples
+          ros-lyrical-microstrain-inertial-examples ros-lyrical-mavros ros-lyrical-event-camera-renderer
+          ros-lyrical-apex-test-tools ros-lyrical-mavros-extras
+        BUILD_TARGET: osx-arm64
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+name: build_osx_arm64
+on:
+  push:
+    branches:
+    - buildbranch_osx_arm64

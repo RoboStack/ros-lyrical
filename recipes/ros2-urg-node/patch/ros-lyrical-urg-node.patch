@@ -1,0 +1,13 @@
+diff --git a/src/urg_c_wrapper.cpp b/src/urg_c_wrapper.cpp
+index 10d2ed3..6d7499d 100644
+--- a/src/urg_c_wrapper.cpp
++++ b/src/urg_c_wrapper.cpp
+@@ -33,6 +33,8 @@
+ 
+ #include <urg_node/urg_c_wrapper.hpp>
+ 
++#include <unistd.h>
++
+ #include <chrono>
+ #include <cinttypes>
+ #include <limits>

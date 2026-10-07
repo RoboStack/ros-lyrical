@@ -1,0 +1,25 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0000000..0000000 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -34,13 +34,13 @@
+ target_include_directories(mode PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+   $<INSTALL_INTERFACE:include>)
+-ament_target_dependencies(mode
+-  "rclcpp"
+-  "rcl_lifecycle"
+-  "rclcpp_lifecycle"
+-  "rosidl_typesupport_cpp"
+-  "lifecycle_msgs"
+-  "system_modes_msgs"
++target_link_libraries(mode
++  ${rclcpp_TARGETS}
++  ${rcl_lifecycle_TARGETS}
++  ${rclcpp_lifecycle_TARGETS}
++  ${rosidl_typesupport_cpp_TARGETS}
++  ${lifecycle_msgs_TARGETS}
++  ${system_modes_msgs_TARGETS}
+ )
+ 
+ # Causes the visibility macros to use dllexport rather than dllimport,

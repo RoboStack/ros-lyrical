@@ -1,0 +1,77 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 30c9811..abea531 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -77,7 +77,7 @@ macro(generateMavlink_v10 definitions)
+         message(STATUS "processing v1.0: ${definitionAbsPath}")
+         add_custom_command(
+             OUTPUT include/v1.0/${definition}/${definition}.h
+-            COMMAND /usr/bin/env PYTHONPATH="${CMAKE_SOURCE_DIR}:$ENV{PYTHONPATH}"
++            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH="${CMAKE_SOURCE_DIR}:$ENV{PYTHONPATH}"
+                 ${Python_EXECUTABLE} ${mavgen_path} --lang=C --wire-protocol=1.0
+                 --output=include/v1.0 ${definitionAbsPath}
+             DEPENDS ${definitionAbsPath} ${common_xml_path} ${mavgen_path}
+@@ -96,10 +96,10 @@ macro(generateMavlink_v20 definitions)
+         add_custom_command(
+             OUTPUT ${definition}-v2.0-cxx-stamp
+             #OUTPUT include/v2.0/${definition}/${definition}.hpp
+-            COMMAND /usr/bin/env PYTHONPATH="${CMAKE_SOURCE_DIR}:$ENV{PYTHONPATH}"
++            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH="${CMAKE_SOURCE_DIR}:$ENV{PYTHONPATH}"
+                 ${Python_EXECUTABLE} ${mavgen_path} --lang=C++11 --wire-protocol=2.0
+                 --output=include/v2.0 ${definitionAbsPath}
+-            COMMAND touch ${definition}-v2.0-cxx-stamp
++            COMMAND ${CMAKE_COMMAND} -E touch ${definition}-v2.0-cxx-stamp
+             DEPENDS ${definitionAbsPath} ${common_xml_path} ${mavgen_path}
+             )
+         add_custom_target(${definition}.xml-v2.0
+diff --git a/pymavlink/generator/CPP11/include_v2.0/msgmap.hpp b/pymavlink/generator/CPP11/include_v2.0/msgmap.hpp
+index a3956aa..91ce908 100644
+--- a/pymavlink/generator/CPP11/include_v2.0/msgmap.hpp
++++ b/pymavlink/generator/CPP11/include_v2.0/msgmap.hpp
+@@ -6,6 +6,19 @@
+ #include <sys/endian.h>
+ #elif __APPLE__
+ #include <machine/endian.h>
++#elif defined(_WIN32)
++// Windows has no <endian.h>, and every Windows target (x86, x64, ARM64) is
++// little-endian, so the little-endian <-> host conversions are no-ops.
++#include <cstdint>
++inline uint16_t htole16(uint16_t x) { return x; }
++inline uint32_t htole32(uint32_t x) { return x; }
++inline uint64_t htole64(uint64_t x) { return x; }
++inline uint16_t le16toh(uint16_t x) { return x; }
++inline uint32_t le32toh(uint32_t x) { return x; }
++inline uint64_t le64toh(uint64_t x) { return x; }
++// Also no POSIX ssize_t on MSVC.
++#include <cstddef>
++typedef ptrdiff_t ssize_t;
+ #else
+ #include <endian.h>
+ #endif
+diff --git a/pymavlink/generator/CPP11/include_v2.0/message.hpp b/pymavlink/generator/CPP11/include_v2.0/message.hpp
+index 4d6d424..c095ee7 100644
+--- a/pymavlink/generator/CPP11/include_v2.0/message.hpp
++++ b/pymavlink/generator/CPP11/include_v2.0/message.hpp
+@@ -1,6 +1,22 @@
+ 
+ #pragma once
+ 
++#ifdef _WIN32
++// windows.h (pulled in transitively by asio/winsock on Windows) #defines
++// several plain object-like macros (ERROR from wingdi.h, NO_ERROR from
++// winerror.h, ...) that collide with enumerator names used throughout the
++// generated dialect headers (e.g. UAVCAN_NODE_HEALTH::ERROR,
++// MAV_PARAM_ERROR::NO_ERROR in common.hpp) -- the preprocessor rewrites
++// them before the compiler ever sees an enum. Undefine them here, before
++// any generated header's enums are parsed.
++#ifdef ERROR
++#undef ERROR
++#endif
++#ifdef NO_ERROR
++#undef NO_ERROR
++#endif
++#endif
++
+ #include <array>
+ #include <cassert>
+ #include <cstring>
