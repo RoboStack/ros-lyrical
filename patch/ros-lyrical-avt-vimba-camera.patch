@@ -32,7 +32,7 @@ diff --git a/src/avt_vimba_camera.cpp b/src/avt_vimba_camera.cpp
 index 0000000..0000000 100644
 --- a/src/avt_vimba_camera.cpp
 +++ b/src/avt_vimba_camera.cpp
-@@ -72,8 +72,9 @@
+@@ -72,8 +72,10 @@
      return;
  
    frame_id_ = frame_id;
@@ -40,7 +40,8 @@ index 0000000..0000000 100644
 -      new camera_info_manager::CameraInfoManager(nh_.get(), frame_id, camera_info_url));
 +  info_man_ = std::make_shared<camera_info_manager::CameraInfoManager>(
 +      nh_->get_node_base_interface(), nh_->get_node_services_interface(),
-+      nh_->get_node_logging_interface(), frame_id, camera_info_url);
++      nh_->get_node_logging_interface(), frame_id, camera_info_url,
++      rclcpp::SystemDefaultsQoS());
    updater_.broadcast(0, "Starting device with IP:" + ip_str + " or GUID:" + guid_str);
  
    // Determine which camera to use. Try IP first
