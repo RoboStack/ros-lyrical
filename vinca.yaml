@@ -169,6 +169,7 @@ packages_select_by_deps:
   - pick_ik
   - picknik_ament_copyright
   - pilz_industrial_motion_planner
+  - plotjuggler
   - plotjuggler_msgs
   - point_cloud_transport_py
   - polygon_msgs
@@ -357,7 +358,6 @@ packages_select_by_deps:
       - odom_to_tf_ros2
       - ouster_ros  # TODO on windows: cannot open pcl_io.lib
       - pinocchio
-      - plotjuggler  # Windows patch needs a refresh for 3.17.x DLL exports
       - plotjuggler-ros
       - point_cloud_transport_plugins  # Not yet supported on Windows
       - pointcloud-to-laserscan
