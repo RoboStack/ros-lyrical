@@ -1,0 +1,48 @@
+diff --git a/include/webots_ros2_control/Ros2ControlSystem.hpp b/include/webots_ros2_control/Ros2ControlSystem.hpp
+index 1a938e2..917049f 100644
+--- a/include/webots_ros2_control/Ros2ControlSystem.hpp
++++ b/include/webots_ros2_control/Ros2ControlSystem.hpp
+@@ -52,11 +52,12 @@ namespace webots_ros2_control {
+     Ros2ControlSystem();
+     void init(webots_ros2_driver::WebotsNode *node, const hardware_interface::HardwareInfo &info) override;
+ 
+-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init(
+-      const hardware_interface::HardwareInfo &info) override;
+ #if HARDWARE_INTERFACE_VERSION_MAJOR > 5 || (HARDWARE_INTERFACE_VERSION_MAJOR == 5 && HARDWARE_INTERFACE_VERSION_MINOR >= 3)
+     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init(
+       const hardware_interface::HardwareComponentInterfaceParams &params) override;
++#else
++    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_init(
++      const hardware_interface::HardwareInfo &info) override;
+ #endif
+     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn on_activate(
+       const rclcpp_lifecycle::State & /*previous_state*/) override;
+diff --git a/src/Ros2ControlSystem.cpp b/src/Ros2ControlSystem.cpp
+index df6c8c1..ba4b742 100644
+--- a/src/Ros2ControlSystem.cpp
++++ b/src/Ros2ControlSystem.cpp
+@@ -90,18 +90,19 @@ namespace webots_ros2_control {
+     }
+   }
+ 
++#if HARDWARE_INTERFACE_VERSION_MAJOR > 5 || (HARDWARE_INTERFACE_VERSION_MAJOR == 5 && HARDWARE_INTERFACE_VERSION_MINOR >= 3)
+   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Ros2ControlSystem::on_init(
+-    const hardware_interface::HardwareInfo &info) {
+-    if (hardware_interface::SystemInterface::on_init(info) !=
++    const hardware_interface::HardwareComponentInterfaceParams &params) {
++    if (hardware_interface::SystemInterface::on_init(params) !=
+         rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS) {
+       return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::ERROR;
+     }
+     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+   }
+-#if HARDWARE_INTERFACE_VERSION_MAJOR > 5 || (HARDWARE_INTERFACE_VERSION_MAJOR == 5 && HARDWARE_INTERFACE_VERSION_MINOR >= 3)
++#else
+   rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn Ros2ControlSystem::on_init(
+-    const hardware_interface::HardwareComponentInterfaceParams &params) {
+-    if (hardware_interface::SystemInterface::on_init(params) !=
++    const hardware_interface::HardwareInfo &info) {
++    if (hardware_interface::SystemInterface::on_init(info) !=
+         rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS) {
+       return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::ERROR;
+     }

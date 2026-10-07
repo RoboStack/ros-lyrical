@@ -1,0 +1,26 @@
+diff --git a/src/streamers/image_transport_streamer.cpp b/src/streamers/image_transport_streamer.cpp
+index 5369276..b706528 100644
+--- a/src/streamers/image_transport_streamer.cpp
++++ b/src/streamers/image_transport_streamer.cpp
+@@ -118,7 +118,7 @@ void ImageTransportStreamerBase::start()
+     return;
+   }
+ 
+-  const image_transport::TransportHints hints(node.get(), default_transport_);
++  const image_transport::TransportHints hints(*node, default_transport_);
+   auto tnat = node->get_topic_names_and_types();
+   inactive_ = true;
+   for (auto topic_and_types : tnat) {
+@@ -148,9 +148,10 @@ void ImageTransportStreamerBase::start()
+ 
+   // Create subscriber
+   image_sub_ = image_transport::create_subscription(
+-    node.get(), topic_,
++    *node, topic_,
+     std::bind(&ImageTransportStreamerBase::image_callback, this, std::placeholders::_1),
+-    default_transport_, qos_profile.value());
++    default_transport_,
++    rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.value().history, 1), qos_profile.value()));
+ }
+ 
+ #pragma GCC diagnostic pop

@@ -1,0 +1,34 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 66dec47..0ad6caa 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,8 +1,11 @@
+ cmake_minimum_required(VERSION 3.10)
+ project(septentrio_gnss_driver)
+ 
+-## Compile as C++17
+-add_compile_options(-std=c++17)
++# rclcpp_components' class_loader now uses C++20 concepts (requires/concept/
++# std::ranges) on rolling. This unconditional -std=c++17 override came after
++# ament's own -std=gnu++20 default on the compile line, so being last it won,
++# breaking any translation unit that pulls in class_loader headers. Let
++# ament's default C++ standard apply instead of forcing C++17.
+ 
+ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+ message(STATUS "Setting build type to Release as none was specified.")
+diff --git a/include/septentrio_gnss_driver/abstraction/typedefs.hpp b/include/septentrio_gnss_driver/abstraction/typedefs.hpp
+index 69f7b2c..25ec2c7 100644
+--- a/include/septentrio_gnss_driver/abstraction/typedefs.hpp
++++ b/include/septentrio_gnss_driver/abstraction/typedefs.hpp
+@@ -40,9 +40,11 @@
+ // tf2 includes
+ #ifdef ROS2_VER_N520
+ #include <tf2_ros/transform_broadcaster.hpp>
++#include <tf2_ros/buffer.hpp>
+ #include <tf2_ros/transform_listener.hpp>
+ #else
+ #include <tf2_ros/transform_broadcaster.h>
++#include <tf2_ros/buffer.h>
+ #include <tf2_ros/transform_listener.h>
+ #endif
+ #ifdef ROS2_VER_N250

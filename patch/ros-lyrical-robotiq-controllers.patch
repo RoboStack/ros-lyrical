@@ -1,0 +1,47 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5e955f0..1feb6c6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,6 +10,14 @@ find_package(ament_cmake REQUIRED)
+ find_package(controller_interface REQUIRED)
+ find_package(std_srvs REQUIRED)
+ 
++# ament_target_dependencies() was removed from ament_cmake_target_dependencies;
++# link against each dependency's exported <pkg>_TARGETS instead.
++macro(link_ament_dependencies target)
++  foreach(_ament_dep ${ARGN})
++    target_link_libraries(${target} ${${_ament_dep}_TARGETS})
++  endforeach()
++endmacro()
++
+ set(THIS_PACKAGE_INCLUDE_DEPENDS
+   controller_interface
+   std_srvs
+@@ -25,9 +33,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
+   include
+ )
+ 
+-ament_target_dependencies(${PROJECT_NAME}
+-  ${THIS_PACKAGE_INCLUDE_DEPENDS}
+-)
++link_ament_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
+ 
+ pluginlib_export_plugin_description_file(controller_interface controller_plugins.xml)
+ 
+diff --git a/src/robotiq_activation_controller.cpp b/src/robotiq_activation_controller.cpp
+index 03c4fa8..b8ebb82 100644
+--- a/src/robotiq_activation_controller.cpp
++++ b/src/robotiq_activation_controller.cpp
+@@ -106,10 +106,10 @@ bool RobotiqActivationController::reactivateGripper(
+   command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].set_value(ASYNC_WAITING);
+   command_interfaces_[REACTIVATE_GRIPPER_CMD].set_value(1.0);
+ 
+-  while (command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_value() == ASYNC_WAITING) {
++  while (command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_optional<double>().value_or(ASYNC_WAITING) == ASYNC_WAITING) {
+     std::this_thread::sleep_for(std::chrono::milliseconds(50));
+   }
+-  resp->success = command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_value();
++  resp->success = command_interfaces_[REACTIVATE_GRIPPER_RESPONSE].get_optional<double>().value_or(0.0);
+ 
+   return resp->success;
+ }

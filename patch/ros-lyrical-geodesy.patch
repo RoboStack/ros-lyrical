@@ -1,0 +1,19 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ba4a7cb..7893874 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,8 +32,12 @@ ament_python_install_package(${PROJECT_NAME} PACKAGE_DIR src/${PROJECT_NAME})
+ 
+ # build C++ coordinate conversion library
+ add_library(geoconv STATIC src/conv/utm_conversions.cpp)
+-ament_target_dependencies(geoconv 
+-  ${dependencies}
++target_link_libraries(geoconv PUBLIC
++  angles::angles
++  ${geographic_msgs_TARGETS}
++  ${geometry_msgs_TARGETS}
++  ${sensor_msgs_TARGETS}
++  ${unique_identifier_msgs_TARGETS}
+ )
+ 
+ install(DIRECTORY include/${PROJECT_NAME}/

@@ -1,0 +1,175 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d1ac767..c7c2a5f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -16,7 +16,7 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+ endif()
+ 
+ # find dependencies
+-find_package(Qt5 REQUIRED COMPONENTS Widgets Core)
++find_package(Qt6 REQUIRED COMPONENTS Widgets Core)
+ find_package(yaml_cpp_vendor REQUIRED)
+ 
+ find_package(ament_cmake REQUIRED)
+@@ -45,7 +45,7 @@ set(vision_msgs_rviz_plugins_headers_to_moc
+ )
+ 
+ foreach(header "${vision_msgs_rviz_plugins_headers_to_moc}")
+-  qt5_wrap_cpp(vision_msgs_rviz_plugins_moc_files "${header}")
++  qt6_wrap_cpp(vision_msgs_rviz_plugins_moc_files "${header}")
+ endforeach()
+ 
+ 
+@@ -67,13 +67,15 @@ add_library(${PROJECT_NAME} SHARED
+ target_include_directories(${PROJECT_NAME} PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+-  ${Qt5Widgets_INCLUDE_DIRS}
+ )
+ 
+ target_link_libraries(${PROJECT_NAME} PUBLIC
+   rviz_ogre_vendor::OgreMain
+   rviz_ogre_vendor::OgreOverlay
+   rviz_common::rviz_common
++  rviz_default_plugins::rviz_default_plugins
++  Qt6::Core
++  Qt6::Widgets
+ )
+ 
+ 
+diff --git a/include/vision_msgs_rviz_plugins/bounding_box_3d.hpp b/include/vision_msgs_rviz_plugins/bounding_box_3d.hpp
+index ef60eea..27cc3fb 100644
+--- a/include/vision_msgs_rviz_plugins/bounding_box_3d.hpp
++++ b/include/vision_msgs_rviz_plugins/bounding_box_3d.hpp
+@@ -16,6 +16,7 @@
+ #define VISION_MSGS_RVIZ_PLUGINS__BOUNDING_BOX_3D_HPP_
+ 
+ #include <QWidget>
++#include <chrono>
+ #include <memory>
+ #include <rviz_common/display.hpp>
+ #include <rviz_common/properties/bool_property.hpp>
+@@ -52,7 +53,7 @@ public:
+   BOUNDING_BOX_3D_DISPLAY_HPP_PUBLIC
+   void load(const rviz_common::Config & config) override;
+   BOUNDING_BOX_3D_DISPLAY_HPP_PUBLIC
+-  void update(float wall_dt, float ros_dt) override;
++  void update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt) override;
+   BOUNDING_BOX_3D_DISPLAY_HPP_PUBLIC
+   void reset() override;
+ 
+diff --git a/include/vision_msgs_rviz_plugins/bounding_box_3d_array.hpp b/include/vision_msgs_rviz_plugins/bounding_box_3d_array.hpp
+index cd2b84c..5c5ffd0 100644
+--- a/include/vision_msgs_rviz_plugins/bounding_box_3d_array.hpp
++++ b/include/vision_msgs_rviz_plugins/bounding_box_3d_array.hpp
+@@ -16,6 +16,7 @@
+ #define VISION_MSGS_RVIZ_PLUGINS__BOUNDING_BOX_3D_ARRAY_HPP_
+ 
+ #include <QWidget>
++#include <chrono>
+ #include <memory>
+ #include <rviz_common/display.hpp>
+ #include <rviz_common/properties/bool_property.hpp>
+@@ -54,7 +55,7 @@ public:
+   BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
+   void load(const rviz_common::Config & config) override;
+   BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
+-  void update(float wall_dt, float ros_dt) override;
++  void update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt) override;
+   BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
+   void reset() override;
+ 
+diff --git a/include/vision_msgs_rviz_plugins/detection_3d.hpp b/include/vision_msgs_rviz_plugins/detection_3d.hpp
+index bc6ad9b..0975e09 100644
+--- a/include/vision_msgs_rviz_plugins/detection_3d.hpp
++++ b/include/vision_msgs_rviz_plugins/detection_3d.hpp
+@@ -16,6 +16,7 @@
+ #define VISION_MSGS_RVIZ_PLUGINS__DETECTION_3D_HPP_
+ 
+ #include <QWidget>
++#include <chrono>
+ #include <memory>
+ #include <rviz_common/display.hpp>
+ #include <rviz_common/properties/bool_property.hpp>
+@@ -53,7 +54,7 @@ public:
+   DETECTION_3D_DISPLAY_HPP_PUBLIC
+   void load(const rviz_common::Config & config) override;
+   DETECTION_3D_DISPLAY_HPP_PUBLIC
+-  void update(float wall_dt, float ros_dt) override;
++  void update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt) override;
+   DETECTION_3D_DISPLAY_HPP_PUBLIC
+   void reset() override;
+ 
+diff --git a/include/vision_msgs_rviz_plugins/detection_3d_array.hpp b/include/vision_msgs_rviz_plugins/detection_3d_array.hpp
+index d2b2b50..9ba0e8e 100644
+--- a/include/vision_msgs_rviz_plugins/detection_3d_array.hpp
++++ b/include/vision_msgs_rviz_plugins/detection_3d_array.hpp
+@@ -16,6 +16,7 @@
+ #define VISION_MSGS_RVIZ_PLUGINS__DETECTION_3D_ARRAY_HPP_
+ 
+ #include <QWidget>
++#include <chrono>
+ #include <memory>
+ #include <rviz_common/display.hpp>
+ #include <rviz_common/properties/bool_property.hpp>
+@@ -57,7 +58,7 @@ public:
+   DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
+   void load(const rviz_common::Config & config) override;
+   DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
+-  void update(float wall_dt, float ros_dt) override;
++  void update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt) override;
+   DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
+   void reset() override;
+ 
+diff --git a/src/bounding_box_3d.cpp b/src/bounding_box_3d.cpp
+index daf52a5..286bcec 100644
+--- a/src/bounding_box_3d.cpp
++++ b/src/bounding_box_3d.cpp
+@@ -77,7 +77,7 @@ void BoundingBox3DDisplay::processMessage(
+   }
+ }
+ 
+-void BoundingBox3DDisplay::update(float wall_dt, float ros_dt)
++void BoundingBox3DDisplay::update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt)
+ {
+   m_marker_common->update(wall_dt, ros_dt);
+ }
+diff --git a/src/bounding_box_3d_array.cpp b/src/bounding_box_3d_array.cpp
+index f03ea64..7920cbd 100644
+--- a/src/bounding_box_3d_array.cpp
++++ b/src/bounding_box_3d_array.cpp
+@@ -77,7 +77,7 @@ void BoundingBox3DArrayDisplay::processMessage(
+   }
+ }
+ 
+-void BoundingBox3DArrayDisplay::update(float wall_dt, float ros_dt)
++void BoundingBox3DArrayDisplay::update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt)
+ {
+   m_marker_common->update(wall_dt, ros_dt);
+ }
+diff --git a/src/detection_3d.cpp b/src/detection_3d.cpp
+index 69a6016..03d8ebb 100644
+--- a/src/detection_3d.cpp
++++ b/src/detection_3d.cpp
+@@ -81,7 +81,7 @@ void Detection3DDisplay::processMessage(
+   }
+ }
+ 
+-void Detection3DDisplay::update(float wall_dt, float ros_dt)
++void Detection3DDisplay::update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt)
+ {
+   m_marker_common->update(wall_dt, ros_dt);
+ }
+diff --git a/src/detection_3d_array.cpp b/src/detection_3d_array.cpp
+index b4c1cc5..7bdb041 100644
+--- a/src/detection_3d_array.cpp
++++ b/src/detection_3d_array.cpp
+@@ -81,7 +81,7 @@ void Detection3DArrayDisplay::processMessage(
+   }
+ }
+ 
+-void Detection3DArrayDisplay::update(float wall_dt, float ros_dt)
++void Detection3DArrayDisplay::update(std::chrono::nanoseconds wall_dt, std::chrono::nanoseconds ros_dt)
+ {
+   m_marker_common->update(wall_dt, ros_dt);
+ }

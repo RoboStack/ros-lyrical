@@ -1,0 +1,46 @@
+diff --git a/include/VimbaC/Include/VmbCommonTypes.h b/include/VimbaC/Include/VmbCommonTypes.h
+index 0000000..0000000 100644
+--- a/include/VimbaC/Include/VmbCommonTypes.h
++++ b/include/VimbaC/Include/VmbCommonTypes.h
+@@ -237,9 +237,9 @@
+         VmbPixelFormatYuv411              = VmbPixelColor | VmbPixelOccupy12Bit | 0x001E,  // YUV 411 with 8 bits (GEV:YUV411Packed)
+         VmbPixelFormatYuv422              = VmbPixelColor | VmbPixelOccupy16Bit | 0x001F,  // YUV 422 with 8 bits (GEV:YUV422Packed)
+         VmbPixelFormatYuv444              = VmbPixelColor | VmbPixelOccupy24Bit | 0x0020,  // YUV 444 with 8 bits (GEV:YUV444Packed)
+-        VmbPixelFormatYCbCr411_8_CbYYCrYY = VmbPixelColor | VmbPixelOccupy12Bit | 0x003C,  // Y´CbCr 411 with 8 bits (PFNC:YCbCr411_8_CbYYCrYY) - identical to VmbPixelFormatYuv411
+-        VmbPixelFormatYCbCr422_8_CbYCrY   = VmbPixelColor | VmbPixelOccupy16Bit | 0x0043,  // Y´CbCr 422 with 8 bits (PFNC:YCbCr422_8_CbYCrY) - identical to VmbPixelFormatYuv422
+-        VmbPixelFormatYCbCr8_CbYCr        = VmbPixelColor | VmbPixelOccupy24Bit | 0x003A,  // Y´CbCr 444 with 8 bits (PFNC:YCbCr8_CbYCr) - identical to VmbPixelFormatYuv444
++        VmbPixelFormatYCbCr411_8_CbYYCrYY = VmbPixelColor | VmbPixelOccupy12Bit | 0x003C,  // Y'CbCr 411 with 8 bits (PFNC:YCbCr411_8_CbYYCrYY) - identical to VmbPixelFormatYuv411
++        VmbPixelFormatYCbCr422_8_CbYCrY   = VmbPixelColor | VmbPixelOccupy16Bit | 0x0043,  // Y'CbCr 422 with 8 bits (PFNC:YCbCr422_8_CbYCrY) - identical to VmbPixelFormatYuv422
++        VmbPixelFormatYCbCr8_CbYCr        = VmbPixelColor | VmbPixelOccupy24Bit | 0x003A,  // Y'CbCr 444 with 8 bits (PFNC:YCbCr8_CbYCr) - identical to VmbPixelFormatYuv444
+         VmbPixelFormatLast,
+     } VmbPixelFormatType;
+     typedef VmbUint32_t VmbPixelFormat_t;       // Type for the pixel format; for values see VmbPixelFormatType
+diff --git a/src/mono_camera_node.cpp b/src/mono_camera_node.cpp
+index 0000000..0000000 100644
+--- a/src/mono_camera_node.cpp
++++ b/src/mono_camera_node.cpp
+@@ -37,7 +37,7 @@
+ MonoCameraNode::MonoCameraNode() : Node("camera"), api_(this->get_logger()), cam_(std::shared_ptr<rclcpp::Node>(dynamic_cast<rclcpp::Node * >(this)))
+ {
+   // Set the image publisher before streaming
+-  camera_info_pub_ = image_transport::create_camera_publisher(this, "~/image", rmw_qos_profile_system_default);
++  camera_info_pub_ = image_transport::create_camera_publisher(*this, "~/image", rclcpp::SystemDefaultsQoS());
+ 
+   // Set the frame callback
+   cam_.setCallback(std::bind(&avt_vimba_camera::MonoCameraNode::frameCallback, this, std::placeholders::_1));
+diff --git a/src/avt_vimba_camera.cpp b/src/avt_vimba_camera.cpp
+index 0000000..0000000 100644
+--- a/src/avt_vimba_camera.cpp
++++ b/src/avt_vimba_camera.cpp
+@@ -72,8 +72,9 @@
+     return;
+ 
+   frame_id_ = frame_id;
+-  info_man_ = std::shared_ptr<camera_info_manager::CameraInfoManager>(
+-      new camera_info_manager::CameraInfoManager(nh_.get(), frame_id, camera_info_url));
++  info_man_ = std::make_shared<camera_info_manager::CameraInfoManager>(
++      nh_->get_node_base_interface(), nh_->get_node_services_interface(),
++      nh_->get_node_logging_interface(), frame_id, camera_info_url);
+   updater_.broadcast(0, "Starting device with IP:" + ip_str + " or GUID:" + guid_str);
+ 
+   // Determine which camera to use. Try IP first

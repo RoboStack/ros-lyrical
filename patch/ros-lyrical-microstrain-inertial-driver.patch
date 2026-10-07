@@ -1,0 +1,162 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 35e036fa..db513f68 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,6 +1,14 @@
+ cmake_minimum_required(VERSION 3.5)
+ project(microstrain_inertial_driver)
+ 
++# Windows headers pulled in transitively by the MIP SDK's serial-port code
++# define min/max as function-like macros unless NOMINMAX is set first,
++# which corrupts any std::chrono::duration::max()/min() call downstream
++# (rcpputils/time.hpp, included via rclcpp) with cryptic syntax errors.
++if(WIN32)
++  add_compile_definitions(NOMINMAX)
++endif()
++
+ # C++ 14 required
+ set(CMAKE_CXX_STANDARD 14)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+@@ -187,6 +195,14 @@ set(COMMON_INC_FILES
+ )
+ set(COMMON_FILES ${COMMON_SRC_FILES} ${COMMON_INC_FILES})
+ 
++# ament_target_dependencies() was removed from ament_cmake_target_dependencies;
++# link against each dependency's exported <pkg>_TARGETS instead.
++macro(link_ament_dependencies target)
++  foreach(_ament_dep ${ARGN})
++    target_link_libraries(${target} ${${_ament_dep}_TARGETS})
++  endforeach()
++endmacro()
++
+ set(AMENT_COMMON_DEPENDENCIES
+   rclcpp
+   rclcpp_lifecycle
+@@ -215,9 +231,7 @@ set(NODE_INC_FILES
+ )
+ set(NODE_FILES ${NODE_SRC_FILES} ${NODE_INC_FILES})
+ add_executable(${NODE_NAME} ${NODE_FILES} ${COMMON_FILES})
+-ament_target_dependencies(${NODE_NAME}
+-  ${AMENT_COMMON_DEPENDENCIES}
+-)
++link_ament_dependencies(${NODE_NAME} ${AMENT_COMMON_DEPENDENCIES})
+ 
+ # Lifecycle node
+ set(LIFECYCLE_NAME ${PROJECT_NAME}_lifecycle_node)
+@@ -231,12 +245,13 @@ set(LIFECYCLE_INC_FILES
+ set(LIFECYCLE_FILES ${LIFECYCLE_SRC_FILES} ${LIFECYCLE_INC_FILES})
+ add_executable(${LIFECYCLE_NAME} ${LIFECYCLE_FILES} ${COMMON_FILES})
+ target_compile_definitions(${LIFECYCLE_NAME} PUBLIC MICROSTRAIN_LIFECYCLE)
+-ament_target_dependencies(${LIFECYCLE_NAME}
+-  ${AMENT_COMMON_DEPENDENCIES}
+-)
++link_ament_dependencies(${LIFECYCLE_NAME} ${AMENT_COMMON_DEPENDENCIES})
+ 
+ # Annoying, but the ROS types don't match up with the MIP types for floats and doubles, so ignore those warnings for now
+-set_source_files_properties(${COMMON_SRC_DIR}/services.cpp PROPERTIES COMPILE_OPTIONS "-Wno-narrowing")
++# (GCC/Clang-only flag; MSVC doesn't error on narrowing conversions by default anyway)
++if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
++  set_source_files_properties(${COMMON_SRC_DIR}/services.cpp PROPERTIES COMPILE_OPTIONS "-Wno-narrowing")
++endif()
+ 
+ # Tell the code the version of the driver that is being build
+ add_definitions(-DMICROSTRAIN_DRIVER_VERSION="${DRIVER_GIT_VERSION}")
+ 
+diff --git a/microstrain_inertial_driver_common/include/microstrain_inertial_driver_common/utils/ros_compat.h b/microstrain_inertial_driver_common/include/microstrain_inertial_driver_common/utils/ros_compat.h
+index f1fe0879..5b866134 100644
+--- a/microstrain_inertial_driver_common/include/microstrain_inertial_driver_common/utils/ros_compat.h
++++ b/microstrain_inertial_driver_common/include/microstrain_inertial_driver_common/utils/ros_compat.h
+@@ -779,7 +779,7 @@ inline TransformListenerType createTransformListener(TransformBufferType buffer)
+  */
+ inline StaticTransformBroadcasterType createStaticTransformBroadcaster(RosNodeType* node)
+ {
+-  return std::make_shared<tf2_ros::StaticTransformBroadcaster>(node);
++  return std::make_shared<tf2_ros::StaticTransformBroadcaster>(*node);
+ }
+ 
+ /**
+@@ -789,7 +789,7 @@ inline StaticTransformBroadcasterType createStaticTransformBroadcaster(RosNodeTy
+  */
+ inline TransformBroadcasterType createTransformBroadcaster(RosNodeType* node)
+ {
+-  return std::make_shared<tf2_ros::TransformBroadcaster>(node);
++  return std::make_shared<tf2_ros::TransformBroadcaster>(*node);
+ }
+ 
+ /**
+diff --git a/src/microstrain_inertial_driver.cpp b/src/microstrain_inertial_driver.cpp
+index e679866b..eaea4f15 100644
+--- a/src/microstrain_inertial_driver.cpp
++++ b/src/microstrain_inertial_driver.cpp
+@@ -18,7 +18,7 @@
+ #include <vector>
+ #include <algorithm>
+ 
+-#include <tf2/LinearMath/Transform.h>
++#include <tf2/LinearMath/Transform.hpp>
+ 
+ #include "lifecycle_msgs/msg/transition.hpp"
+ 
+diff --git a/src/microstrain_inertial_driver_lifecycle.cpp b/src/microstrain_inertial_driver_lifecycle.cpp
+index 1e2a6757..f77bb1d9 100644
+--- a/src/microstrain_inertial_driver_lifecycle.cpp
++++ b/src/microstrain_inertial_driver_lifecycle.cpp
+@@ -18,7 +18,7 @@
+ #include <vector>
+ #include <algorithm>
+ 
+-#include <tf2/LinearMath/Transform.h>
++#include <tf2/LinearMath/Transform.hpp>
+ 
+ #include "lifecycle_msgs/msg/transition.hpp"
+ 
+diff --git a/include/microstrain_inertial_driver/microstrain_inertial_driver.h b/include/microstrain_inertial_driver/microstrain_inertial_driver.h
+index 8e9c2f0e..63edec08 100644
+--- a/include/microstrain_inertial_driver/microstrain_inertial_driver.h
++++ b/include/microstrain_inertial_driver/microstrain_inertial_driver.h
+@@ -14,7 +14,9 @@
+ #define _MICROSTRAIN_INERTIAL_DRIVER_MICROSTRAIN_INERTIAL_DRIVER_H
+ 
+ #include <cstdio>
++#ifndef _WIN32
+ #include <unistd.h>
++#endif
+ #include <time.h>
+ #include <iostream>
+ #include <fstream>
+ 
+diff --git a/include/microstrain_inertial_driver/microstrain_inertial_driver_lifecycle.h b/include/microstrain_inertial_driver/microstrain_inertial_driver_lifecycle.h
+index c8ef84e9..931163c2 100644
+--- a/include/microstrain_inertial_driver/microstrain_inertial_driver_lifecycle.h
++++ b/include/microstrain_inertial_driver/microstrain_inertial_driver_lifecycle.h
+@@ -14,7 +14,9 @@
+ #define _MICROSTRAIN_INERTIAL_DRIVER_MICROSTRAIN_INERTIAL_DRIVER_LIFECYCLE_H
+ 
+ #include <cstdio>
++#ifndef _WIN32
+ #include <unistd.h>
++#endif
+ #include <time.h>
+ #include <iostream>
+ #include <fstream>
+ 
+diff --git a/microstrain_inertial_driver_common/src/utils/mip/ros_connection.cpp b/microstrain_inertial_driver_common/src/utils/mip/ros_connection.cpp
+index e2eae441..826b8c24 100644
+--- a/microstrain_inertial_driver_common/src/utils/mip/ros_connection.cpp
++++ b/microstrain_inertial_driver_common/src/utils/mip/ros_connection.cpp
+@@ -10,6 +10,14 @@
+ 
+ #include <sys/stat.h>
+ 
++#ifdef _WIN32
++// POSIX localtime_r() has no Windows equivalent; localtime_s() is the
++// closest match, but takes its arguments in the opposite order (struct tm*
++// destination first, time_t* source second) and returns errno_t instead of
++// struct tm*, which the single call site below doesn't check anyway.
++#define localtime_r(timep, result) localtime_s(result, timep)
++#endif
++
+ #include <vector>
+ #include <chrono>
+ #include <string>
+ 
