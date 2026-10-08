@@ -1,0 +1,489 @@
+jobs:
+  stage_0_job_0:
+    name: ros2-cascade-lifecycle-msgs ros2-mavlink ros2-joy-linux ros2-rosgraph-monitor-msgs
+      ros2-rclc ros2-polygon-utils ros2-microstrain-inertial-msgs ros2-mavros-msgs
+      ros2-robotiq-description ros2-motion-capture-tracking-interfaces ros2-rviz-2d-overlay-msgs
+      ros2-plotjuggler-msgs ros2-plotjuggler ros2-rqt-robot-steering ros2-rqt-robot-dashboard
+      ros2-rqt-moveit ros2-rqt-controller-manager ros2-robotiq-controllers ros2-radar-msgs
+      ros2-picknik-ament-copyright ros2-ntrip-client ros2-microstrain-inertial-description
+      ros2-marker-msgs ros2-irobot-create-msgs
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+    needs: []
+    env:
+      CONDA_BLD_PATH: C:\\bld\\
+      VINCA_CUSTOM_CMAKE_BUILD_DIR: C:\\x\\
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - uses: egor-tensin/cleanup-path@v5
+      with:
+        dirs: C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin;C:\Program Files\Git\cmd;C:\Program
+          Files\Git\mingw64\bin
+    - shell: cmd
+      run: |
+        set "CI=true"
+
+        :: 4 cores available on GHA: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
+        :: CPU_COUNT is passed through conda build: https://github.com/conda/conda-build/pull/1149
+        set CPU_COUNT=4
+
+        set PYTHONUNBUFFERED=1
+
+        call setup_x64
+
+        :: Set the conda-build working directory to a smaller path
+        if "%CONDA_BLD_PATH%" == "" (
+            set "CONDA_BLD_PATH=C:\\bld\\"
+        )
+
+        :: Hosted runners may have libcrypto*.dll & libssl*.dll under
+        :: C:\\Windows\\System32, which should not be there (no vendor dlls in windows folder).
+        :: They would be found before the openssl libs of the conda environment, so we delete them.
+        if defined CI (
+            DEL C:\\Windows\\System32\\libcrypto-1_1-x64.dll || (Echo Ignoring failure to delete C:\\Windows\\System32\\libcrypto-1_1-x64.dll)
+            DEL C:\\Windows\\System32\\libssl-1_1-x64.dll || (Echo Ignoring failure to delete C:\\Windows\\System32\\libssl-1_1-x64.dll)
+        )
+
+        :: Make paths like C:\\hostedtoolcache\\windows\\Ruby\\2.5.7\\x64\\bin garbage
+        set "PATH=%PATH:ostedtoolcache=%"
+      name: conda-forge build setup
+    - shell: cmd
+      run: |
+        setlocal EnableExtensions EnableDelayedExpansion
+
+        set CONDA_BLD_PATH=C:\bld
+        echo "PATH is %PATH%"
+
+        rmdir /Q/S C:\Strawberry\
+        rmdir /Q/S "C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\"
+
+        set "FEEDSTOCK_ROOT=%cd%"
+
+        mkdir %CONDA_BLD_PATH%
+
+        :: git's background auto-maintenance can hold (and then delete) a lock file in a
+        :: cached source clone while rattler-build copies it, failing the build.
+        git config --global maintenance.auto false
+
+        :: Enable long path names on Windows
+        reg add HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /v LongPathsEnabled /t REG_DWORD /d 1 /f
+
+        for %%X in (%CURRENT_RECIPES%) do (
+            echo "BUILDING RECIPE %%X"
+            cd %FEEDSTOCK_ROOT%\recipes\%%X\
+            pixi run -v rattler-build build --recipe %FEEDSTOCK_ROOT%\recipes\%%X\ ^
+                -m %FEEDSTOCK_ROOT%\conda_build_config.yaml ^
+                -c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge ^
+                --output-dir %CONDA_BLD_PATH%
+
+            if errorlevel 1 exit 1
+            rem -m %FEEDSTOCK_ROOT%\.ci_support\conda_forge_pinnings.yaml
+        )
+
+        :: Check if .conda files exist in the win-64 directory
+        if exist "%CONDA_BLD_PATH%\win-64\*.conda" (
+            echo Found .conda files, starting upload...
+            rem Upload packages one-by-one to avoid rattler-upload returning after the first
+            rem package skipped by --skip-existing.
+            for %%F in ("%CONDA_BLD_PATH%\win-64\*.conda") do (
+                echo Uploading %%~fF
+                pixi run upload "%%~fF" --skip-existing
+                if errorlevel 1 exit 1
+            )
+        ) else (
+            echo Warning: No .conda files found in %CONDA_BLD_PATH%\win-64
+            echo This might be due to all the packages being skipped
+        )
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-cascade-lifecycle-msgs ros2-mavlink ros2-joy-linux ros2-rosgraph-monitor-msgs
+          ros2-rclc ros2-polygon-utils ros2-microstrain-inertial-msgs ros2-mavros-msgs
+          ros2-robotiq-description ros2-motion-capture-tracking-interfaces ros2-rviz-2d-overlay-msgs
+          ros2-plotjuggler-msgs ros2-plotjuggler ros2-rqt-robot-steering ros2-rqt-robot-dashboard
+          ros2-rqt-moveit ros2-rqt-controller-manager ros2-robotiq-controllers ros2-radar-msgs
+          ros2-picknik-ament-copyright ros2-ntrip-client ros2-microstrain-inertial-description
+          ros2-marker-msgs ros2-irobot-create-msgs
+        PYTHONUNBUFFERED: 1
+      name: Build ros2-cascade-lifecycle-msgs ros2-mavlink ros2-joy-linux ros2-rosgraph-monitor-msgs
+        ros2-rclc ros2-polygon-utils ros2-microstrain-inertial-msgs ros2-mavros-msgs
+        ros2-robotiq-description ros2-motion-capture-tracking-interfaces ros2-rviz-2d-overlay-msgs
+        ros2-plotjuggler-msgs ros2-plotjuggler ros2-rqt-robot-steering ros2-rqt-robot-dashboard
+        ros2-rqt-moveit ros2-rqt-controller-manager ros2-robotiq-controllers ros2-radar-msgs
+        ros2-picknik-ament-copyright ros2-ntrip-client ros2-microstrain-inertial-description
+        ros2-marker-msgs ros2-irobot-create-msgs
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_1:
+    name: ros2-rclcpp-cascade-lifecycle ros2-libmavconn ros2-rmw-stats-shim ros2-rclc-parameter
+      ros2-rclc-lifecycle ros2-microstrain-inertial-driver ros2-rclpy-cascade-lifecycle
+      ros2-motion-capture-tracking ros2-microstrain-inertial-rqt rviz-2d-overlay-msgs
+      rqt-robot-steering rqt-robot-dashboard rqt-moveit rqt-controller-manager rosgraph-monitor-msgs
+      robotiq-description robotiq-controllers rclc radar-msgs polygon-utils plotjuggler-msgs
+      plotjuggler picknik-ament-copyright ntrip-client motion-capture-tracking-interfaces
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    env:
+      CONDA_BLD_PATH: C:\\bld\\
+      VINCA_CUSTOM_CMAKE_BUILD_DIR: C:\\x\\
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - uses: egor-tensin/cleanup-path@v5
+      with:
+        dirs: C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin;C:\Program Files\Git\cmd;C:\Program
+          Files\Git\mingw64\bin
+    - shell: cmd
+      run: |
+        set "CI=true"
+
+        :: 4 cores available on GHA: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
+        :: CPU_COUNT is passed through conda build: https://github.com/conda/conda-build/pull/1149
+        set CPU_COUNT=4
+
+        set PYTHONUNBUFFERED=1
+
+        call setup_x64
+
+        :: Set the conda-build working directory to a smaller path
+        if "%CONDA_BLD_PATH%" == "" (
+            set "CONDA_BLD_PATH=C:\\bld\\"
+        )
+
+        :: Hosted runners may have libcrypto*.dll & libssl*.dll under
+        :: C:\\Windows\\System32, which should not be there (no vendor dlls in windows folder).
+        :: They would be found before the openssl libs of the conda environment, so we delete them.
+        if defined CI (
+            DEL C:\\Windows\\System32\\libcrypto-1_1-x64.dll || (Echo Ignoring failure to delete C:\\Windows\\System32\\libcrypto-1_1-x64.dll)
+            DEL C:\\Windows\\System32\\libssl-1_1-x64.dll || (Echo Ignoring failure to delete C:\\Windows\\System32\\libssl-1_1-x64.dll)
+        )
+
+        :: Make paths like C:\\hostedtoolcache\\windows\\Ruby\\2.5.7\\x64\\bin garbage
+        set "PATH=%PATH:ostedtoolcache=%"
+      name: conda-forge build setup
+    - shell: cmd
+      run: |
+        setlocal EnableExtensions EnableDelayedExpansion
+
+        set CONDA_BLD_PATH=C:\bld
+        echo "PATH is %PATH%"
+
+        rmdir /Q/S C:\Strawberry\
+        rmdir /Q/S "C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\"
+
+        set "FEEDSTOCK_ROOT=%cd%"
+
+        mkdir %CONDA_BLD_PATH%
+
+        :: git's background auto-maintenance can hold (and then delete) a lock file in a
+        :: cached source clone while rattler-build copies it, failing the build.
+        git config --global maintenance.auto false
+
+        :: Enable long path names on Windows
+        reg add HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /v LongPathsEnabled /t REG_DWORD /d 1 /f
+
+        for %%X in (%CURRENT_RECIPES%) do (
+            echo "BUILDING RECIPE %%X"
+            cd %FEEDSTOCK_ROOT%\recipes\%%X\
+            pixi run -v rattler-build build --recipe %FEEDSTOCK_ROOT%\recipes\%%X\ ^
+                -m %FEEDSTOCK_ROOT%\conda_build_config.yaml ^
+                -c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge ^
+                --output-dir %CONDA_BLD_PATH%
+
+            if errorlevel 1 exit 1
+            rem -m %FEEDSTOCK_ROOT%\.ci_support\conda_forge_pinnings.yaml
+        )
+
+        :: Check if .conda files exist in the win-64 directory
+        if exist "%CONDA_BLD_PATH%\win-64\*.conda" (
+            echo Found .conda files, starting upload...
+            rem Upload packages one-by-one to avoid rattler-upload returning after the first
+            rem package skipped by --skip-existing.
+            for %%F in ("%CONDA_BLD_PATH%\win-64\*.conda") do (
+                echo Uploading %%~fF
+                pixi run upload "%%~fF" --skip-existing
+                if errorlevel 1 exit 1
+            )
+        ) else (
+            echo Warning: No .conda files found in %CONDA_BLD_PATH%\win-64
+            echo This might be due to all the packages being skipped
+        )
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-rclcpp-cascade-lifecycle ros2-libmavconn ros2-rmw-stats-shim
+          ros2-rclc-parameter ros2-rclc-lifecycle ros2-microstrain-inertial-driver
+          ros2-rclpy-cascade-lifecycle ros2-motion-capture-tracking ros2-microstrain-inertial-rqt
+          ros-lyrical-rviz-2d-overlay-msgs ros-lyrical-rqt-robot-steering ros-lyrical-rqt-robot-dashboard
+          ros-lyrical-rqt-moveit ros-lyrical-rqt-controller-manager ros-lyrical-rosgraph-monitor-msgs
+          ros-lyrical-robotiq-description ros-lyrical-robotiq-controllers ros-lyrical-rclc
+          ros-lyrical-radar-msgs ros-lyrical-polygon-utils ros-lyrical-plotjuggler-msgs
+          ros-lyrical-plotjuggler ros-lyrical-picknik-ament-copyright ros-lyrical-ntrip-client
+          ros-lyrical-motion-capture-tracking-interfaces
+        PYTHONUNBUFFERED: 1
+      name: Build ros2-rclcpp-cascade-lifecycle ros2-libmavconn ros2-rmw-stats-shim
+        ros2-rclc-parameter ros2-rclc-lifecycle ros2-microstrain-inertial-driver ros2-rclpy-cascade-lifecycle
+        ros2-motion-capture-tracking ros2-microstrain-inertial-rqt ros-lyrical-rviz-2d-overlay-msgs
+        ros-lyrical-rqt-robot-steering ros-lyrical-rqt-robot-dashboard ros-lyrical-rqt-moveit
+        ros-lyrical-rqt-controller-manager ros-lyrical-rosgraph-monitor-msgs ros-lyrical-robotiq-description
+        ros-lyrical-robotiq-controllers ros-lyrical-rclc ros-lyrical-radar-msgs ros-lyrical-polygon-utils
+        ros-lyrical-plotjuggler-msgs ros-lyrical-plotjuggler ros-lyrical-picknik-ament-copyright
+        ros-lyrical-ntrip-client ros-lyrical-motion-capture-tracking-interfaces
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_2:
+    name: microstrain-inertial-msgs microstrain-inertial-description mavros-msgs mavlink
+      marker-msgs joy-linux irobot-create-msgs cascade-lifecycle-msgs
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    env:
+      CONDA_BLD_PATH: C:\\bld\\
+      VINCA_CUSTOM_CMAKE_BUILD_DIR: C:\\x\\
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - uses: egor-tensin/cleanup-path@v5
+      with:
+        dirs: C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin;C:\Program Files\Git\cmd;C:\Program
+          Files\Git\mingw64\bin
+    - shell: cmd
+      run: |
+        set "CI=true"
+
+        :: 4 cores available on GHA: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
+        :: CPU_COUNT is passed through conda build: https://github.com/conda/conda-build/pull/1149
+        set CPU_COUNT=4
+
+        set PYTHONUNBUFFERED=1
+
+        call setup_x64
+
+        :: Set the conda-build working directory to a smaller path
+        if "%CONDA_BLD_PATH%" == "" (
+            set "CONDA_BLD_PATH=C:\\bld\\"
+        )
+
+        :: Hosted runners may have libcrypto*.dll & libssl*.dll under
+        :: C:\\Windows\\System32, which should not be there (no vendor dlls in windows folder).
+        :: They would be found before the openssl libs of the conda environment, so we delete them.
+        if defined CI (
+            DEL C:\\Windows\\System32\\libcrypto-1_1-x64.dll || (Echo Ignoring failure to delete C:\\Windows\\System32\\libcrypto-1_1-x64.dll)
+            DEL C:\\Windows\\System32\\libssl-1_1-x64.dll || (Echo Ignoring failure to delete C:\\Windows\\System32\\libssl-1_1-x64.dll)
+        )
+
+        :: Make paths like C:\\hostedtoolcache\\windows\\Ruby\\2.5.7\\x64\\bin garbage
+        set "PATH=%PATH:ostedtoolcache=%"
+      name: conda-forge build setup
+    - shell: cmd
+      run: |
+        setlocal EnableExtensions EnableDelayedExpansion
+
+        set CONDA_BLD_PATH=C:\bld
+        echo "PATH is %PATH%"
+
+        rmdir /Q/S C:\Strawberry\
+        rmdir /Q/S "C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\"
+
+        set "FEEDSTOCK_ROOT=%cd%"
+
+        mkdir %CONDA_BLD_PATH%
+
+        :: git's background auto-maintenance can hold (and then delete) a lock file in a
+        :: cached source clone while rattler-build copies it, failing the build.
+        git config --global maintenance.auto false
+
+        :: Enable long path names on Windows
+        reg add HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /v LongPathsEnabled /t REG_DWORD /d 1 /f
+
+        for %%X in (%CURRENT_RECIPES%) do (
+            echo "BUILDING RECIPE %%X"
+            cd %FEEDSTOCK_ROOT%\recipes\%%X\
+            pixi run -v rattler-build build --recipe %FEEDSTOCK_ROOT%\recipes\%%X\ ^
+                -m %FEEDSTOCK_ROOT%\conda_build_config.yaml ^
+                -c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge ^
+                --output-dir %CONDA_BLD_PATH%
+
+            if errorlevel 1 exit 1
+            rem -m %FEEDSTOCK_ROOT%\.ci_support\conda_forge_pinnings.yaml
+        )
+
+        :: Check if .conda files exist in the win-64 directory
+        if exist "%CONDA_BLD_PATH%\win-64\*.conda" (
+            echo Found .conda files, starting upload...
+            rem Upload packages one-by-one to avoid rattler-upload returning after the first
+            rem package skipped by --skip-existing.
+            for %%F in ("%CONDA_BLD_PATH%\win-64\*.conda") do (
+                echo Uploading %%~fF
+                pixi run upload "%%~fF" --skip-existing
+                if errorlevel 1 exit 1
+            )
+        ) else (
+            echo Warning: No .conda files found in %CONDA_BLD_PATH%\win-64
+            echo This might be due to all the packages being skipped
+        )
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros-lyrical-microstrain-inertial-msgs ros-lyrical-microstrain-inertial-description
+          ros-lyrical-mavros-msgs ros-lyrical-mavlink ros-lyrical-marker-msgs ros-lyrical-joy-linux
+          ros-lyrical-irobot-create-msgs ros-lyrical-cascade-lifecycle-msgs
+        PYTHONUNBUFFERED: 1
+      name: Build ros-lyrical-microstrain-inertial-msgs ros-lyrical-microstrain-inertial-description
+        ros-lyrical-mavros-msgs ros-lyrical-mavlink ros-lyrical-marker-msgs ros-lyrical-joy-linux
+        ros-lyrical-irobot-create-msgs ros-lyrical-cascade-lifecycle-msgs
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_3:
+    name: ros2-mavros ros2-microstrain-inertial-examples rmw-stats-shim rclpy-cascade-lifecycle
+      rclcpp-cascade-lifecycle rclc-parameter rclc-lifecycle motion-capture-tracking
+      microstrain-inertial-rqt microstrain-inertial-driver libmavconn ros2-mavros-extras
+      microstrain-inertial-examples mavros mavros-extras
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_1
+    - stage_1_job_2
+    env:
+      CONDA_BLD_PATH: C:\\bld\\
+      VINCA_CUSTOM_CMAKE_BUILD_DIR: C:\\x\\
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - uses: egor-tensin/cleanup-path@v5
+      with:
+        dirs: C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin;C:\Program Files\Git\cmd;C:\Program
+          Files\Git\mingw64\bin
+    - shell: cmd
+      run: |
+        set "CI=true"
+
+        :: 4 cores available on GHA: https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners/about-github-hosted-runners
+        :: CPU_COUNT is passed through conda build: https://github.com/conda/conda-build/pull/1149
+        set CPU_COUNT=4
+
+        set PYTHONUNBUFFERED=1
+
+        call setup_x64
+
+        :: Set the conda-build working directory to a smaller path
+        if "%CONDA_BLD_PATH%" == "" (
+            set "CONDA_BLD_PATH=C:\\bld\\"
+        )
+
+        :: Hosted runners may have libcrypto*.dll & libssl*.dll under
+        :: C:\\Windows\\System32, which should not be there (no vendor dlls in windows folder).
+        :: They would be found before the openssl libs of the conda environment, so we delete them.
+        if defined CI (
+            DEL C:\\Windows\\System32\\libcrypto-1_1-x64.dll || (Echo Ignoring failure to delete C:\\Windows\\System32\\libcrypto-1_1-x64.dll)
+            DEL C:\\Windows\\System32\\libssl-1_1-x64.dll || (Echo Ignoring failure to delete C:\\Windows\\System32\\libssl-1_1-x64.dll)
+        )
+
+        :: Make paths like C:\\hostedtoolcache\\windows\\Ruby\\2.5.7\\x64\\bin garbage
+        set "PATH=%PATH:ostedtoolcache=%"
+      name: conda-forge build setup
+    - shell: cmd
+      run: |
+        setlocal EnableExtensions EnableDelayedExpansion
+
+        set CONDA_BLD_PATH=C:\bld
+        echo "PATH is %PATH%"
+
+        rmdir /Q/S C:\Strawberry\
+        rmdir /Q/S "C:\Program Files (x86)\Windows Kits\10\Include\10.0.17763.0\"
+
+        set "FEEDSTOCK_ROOT=%cd%"
+
+        mkdir %CONDA_BLD_PATH%
+
+        :: git's background auto-maintenance can hold (and then delete) a lock file in a
+        :: cached source clone while rattler-build copies it, failing the build.
+        git config --global maintenance.auto false
+
+        :: Enable long path names on Windows
+        reg add HKLM\SYSTEM\CurrentControlSet\Control\FileSystem /v LongPathsEnabled /t REG_DWORD /d 1 /f
+
+        for %%X in (%CURRENT_RECIPES%) do (
+            echo "BUILDING RECIPE %%X"
+            cd %FEEDSTOCK_ROOT%\recipes\%%X\
+            pixi run -v rattler-build build --recipe %FEEDSTOCK_ROOT%\recipes\%%X\ ^
+                -m %FEEDSTOCK_ROOT%\conda_build_config.yaml ^
+                -c https://prefix.dev/robostack-lyrical -c https://prefix.dev/conda-forge ^
+                --output-dir %CONDA_BLD_PATH%
+
+            if errorlevel 1 exit 1
+            rem -m %FEEDSTOCK_ROOT%\.ci_support\conda_forge_pinnings.yaml
+        )
+
+        :: Check if .conda files exist in the win-64 directory
+        if exist "%CONDA_BLD_PATH%\win-64\*.conda" (
+            echo Found .conda files, starting upload...
+            rem Upload packages one-by-one to avoid rattler-upload returning after the first
+            rem package skipped by --skip-existing.
+            for %%F in ("%CONDA_BLD_PATH%\win-64\*.conda") do (
+                echo Uploading %%~fF
+                pixi run upload "%%~fF" --skip-existing
+                if errorlevel 1 exit 1
+            )
+        ) else (
+            echo Warning: No .conda files found in %CONDA_BLD_PATH%\win-64
+            echo This might be due to all the packages being skipped
+        )
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-mavros ros2-microstrain-inertial-examples ros-lyrical-rmw-stats-shim
+          ros-lyrical-rclpy-cascade-lifecycle ros-lyrical-rclcpp-cascade-lifecycle
+          ros-lyrical-rclc-parameter ros-lyrical-rclc-lifecycle ros-lyrical-motion-capture-tracking
+          ros-lyrical-microstrain-inertial-rqt ros-lyrical-microstrain-inertial-driver
+          ros-lyrical-libmavconn ros2-mavros-extras ros-lyrical-microstrain-inertial-examples
+          ros-lyrical-mavros ros-lyrical-mavros-extras
+        PYTHONUNBUFFERED: 1
+      name: Build ros2-mavros ros2-microstrain-inertial-examples ros-lyrical-rmw-stats-shim
+        ros-lyrical-rclpy-cascade-lifecycle ros-lyrical-rclcpp-cascade-lifecycle ros-lyrical-rclc-parameter
+        ros-lyrical-rclc-lifecycle ros-lyrical-motion-capture-tracking ros-lyrical-microstrain-inertial-rqt
+        ros-lyrical-microstrain-inertial-driver ros-lyrical-libmavconn ros2-mavros-extras
+        ros-lyrical-microstrain-inertial-examples ros-lyrical-mavros ros-lyrical-mavros-extras
+    permissions:
+      id-token: write
+      attestations: write
+name: build_win
+on:
+  push:
+    branches:
+    - buildbranch_win
