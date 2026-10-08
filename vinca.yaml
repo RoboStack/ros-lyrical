@@ -224,7 +224,6 @@ packages_select_by_deps:
   - ros_gz
   - ros_gz_interfaces
   - ros_workspace
-  - rosbag2_performance_benchmarking
   - rosbag2_storage_mcap
   - rosbridge_suite
   - rosgraph_monitor_msgs
@@ -364,6 +363,7 @@ packages_select_by_deps:
       - point_cloud_transport_plugins  # Not yet supported on Windows
       - pointcloud-to-laserscan
       - rclc_examples  # MSVC C2055 on rcl_timer_t in callback signatures; root cause unresolved, already excluded on humble too
+      - rosbag2_performance_benchmarking  # its _msgs' Python typesupport hits MSVC C1083 on win-64
       - rplidar_ros
       - rqt_action
       - rqt_bag
