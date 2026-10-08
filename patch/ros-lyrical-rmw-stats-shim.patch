@@ -1,8 +1,21 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 8dbdc3b..c2fba66 100644
+index 2d6e10f..5d10e0b 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -31,6 +31,7 @@ find_package(rmw REQUIRED)
+@@ -21,7 +21,11 @@ endif()
+ 
+ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+   add_compile_options(-Wall -Wextra -Wpedantic)
+-  add_link_options("-Wl,--no-undefined")
++  # --no-undefined is a GNU ld long option; Apple's ld doesn't understand it
++  # even though Clang matches this branch on macOS too.
++  if(NOT APPLE)
++    add_link_options("-Wl,--no-undefined")
++  endif()
+ endif()
+ 
+ find_package(ament_cmake REQUIRED)
+@@ -31,6 +35,7 @@ find_package(rmw REQUIRED)
  find_package(rosgraph_monitor_msgs REQUIRED)
  find_package(rosidl_runtime_cpp REQUIRED)
  find_package(rosidl_typesupport_cpp REQUIRED)
@@ -10,10 +23,11 @@ index 8dbdc3b..c2fba66 100644
  
  add_library(${PROJECT_NAME} SHARED
    src/shim.cpp
-@@ -46,6 +47,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
+@@ -45,6 +50,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
    rmw::rmw
    rosidl_runtime_cpp::rosidl_runtime_cpp
    rosidl_typesupport_cpp::rosidl_typesupport_cpp
 +  Threads::Threads
    ${rosgraph_monitor_msgs_TARGETS}
  )
+ 

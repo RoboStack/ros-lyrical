@@ -1,0 +1,30 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1f913c1..52dbf3e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -32,17 +32,14 @@ find_package(tinyxml2_vendor REQUIRED)
+ find_package(TinyXML2 REQUIRED)
+ find_package(yaml-cpp REQUIRED)
+ 
+-if($ENV{ROS_DISTRO} MATCHES "humble")
+-  find_package(Python 3.10 EXACT REQUIRED COMPONENTS Development)
+-elseif($ENV{ROS_DISTRO} MATCHES "iron")
+-  find_package(Python 3.10 EXACT REQUIRED COMPONENTS Development)
+-elseif($ENV{ROS_DISTRO} MATCHES "jazzy")
+-  find_package(Python 3.12 EXACT REQUIRED COMPONENTS Development)
+-elseif($ENV{ROS_DISTRO} MATCHES "kilted")
+-  find_package(Python 3.12 EXACT REQUIRED COMPONENTS Development)
+-elseif($ENV{ROS_DISTRO} MATCHES "rolling")
+-  find_package(Python 3.12 EXACT REQUIRED COMPONENTS Development)
+-endif()
++# Upstream hardcodes an EXACT Python version per ROS_DISTRO matching whatever
++# Python Ubuntu ships for that distro's release. conda-forge's Python version
++# moves independently (currently 3.14 for rolling, not the 3.12 upstream
++# expects), so the EXACT match fails to find conda's Python and CMake falls
++# back to the system Python headers instead, which lack the Debian
++# multiarch pyconfig.h. Just find whatever Python 3 is active in the build
++# environment instead of hardcoding a version tied to Ubuntu's release.
++find_package(Python 3 REQUIRED COMPONENTS Development)
+ 
+ add_custom_target(compile-lib-controller ALL
+   COMMAND ${CMAKE_COMMAND} -E env "WEBOTS_HOME=${CMAKE_CURRENT_SOURCE_DIR}/webots" make release -f Makefile > /dev/null 2>&1

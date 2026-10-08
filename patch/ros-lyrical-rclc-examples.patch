@@ -1,0 +1,105 @@
+diff --git a/src/example_executor.c b/src/example_executor.c
+index cf40fda..0b6d8df 100644
+--- a/src/example_executor.c
++++ b/src/example_executor.c
+@@ -36,7 +36,7 @@ void my_subscriber_callback(const void * msgin)
+   }
+ }
+ 
+-void my_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
++void my_timer_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   rcl_ret_t rc;
+   RCLC_UNUSED(last_call_time);
+diff --git a/src/example_executor_only_rcl.c b/src/example_executor_only_rcl.c
+index a72202d..2837bf7 100644
+--- a/src/example_executor_only_rcl.c
++++ b/src/example_executor_only_rcl.c
+@@ -36,7 +36,7 @@ void my_subscriber_callback(const void * msgin)
+   }
+ }
+ 
+-void my_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
++void my_timer_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   rcl_ret_t rc;
+   RCLC_UNUSED(last_call_time);
+diff --git a/src/example_executor_trigger.c b/src/example_executor_trigger.c
+index 400260e..3cb0dac 100644
+--- a/src/example_executor_trigger.c
++++ b/src/example_executor_trigger.c
+@@ -136,7 +136,7 @@ void my_int_subscriber_callback(const void * msgin)
+ 
+ #define RCLC_UNUSED(x) (void)x
+ 
+-void my_timer_string_callback(rcl_timer_t * timer, int64_t last_call_time)
++void my_timer_string_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   rcl_ret_t rc;
+   rcl_allocator_t allocator = rcl_get_default_allocator();
+@@ -164,7 +164,7 @@ void my_timer_string_callback(rcl_timer_t * timer, int64_t last_call_time)
+   }
+ }
+ 
+-void my_timer_int_callback(rcl_timer_t * timer, int64_t last_call_time)
++void my_timer_int_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   rcl_ret_t rc;
+   RCLC_UNUSED(last_call_time);
+diff --git a/src/example_parameter_server.c b/src/example_parameter_server.c
+index 94fd8db..b125cd1 100644
+--- a/src/example_parameter_server.c
++++ b/src/example_parameter_server.c
+@@ -24,7 +24,7 @@
+ 
+ rclc_parameter_server_t param_server;
+ 
+-void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
++void timer_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   (void) timer;
+   (void) last_call_time;
+diff --git a/src/example_pingpong.cpp b/src/example_pingpong.cpp
+index 69fdfc7..ae19c5c 100644
+--- a/src/example_pingpong.cpp
++++ b/src/example_pingpong.cpp
+@@ -55,7 +55,7 @@ public:
+ 
+ /***************************** PING NODE CALLBACKS ***********************************/
+ 
+-void ping_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
++void ping_timer_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   rcl_ret_t rc;
+   RCLC_UNUSED(last_call_time);
+@@ -99,7 +99,7 @@ void ping_subscription_callback(const void * msgin)
+   }
+ }
+ 
+-void pong_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
++void pong_timer_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   rcl_ret_t rc;
+   RCLC_UNUSED(last_call_time);
+diff --git a/src/example_short_timer_long_subscription.c b/src/example_short_timer_long_subscription.c
+index 746b037..bfab2b6 100644
+--- a/src/example_short_timer_long_subscription.c
++++ b/src/example_short_timer_long_subscription.c
+@@ -41,7 +41,7 @@ void my_subscriber_callback(const void * msgin)
+   }
+ }
+ 
+-void my_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
++void my_timer_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   rcl_ret_t rc;
+   RCLC_UNUSED(last_call_time);
+@@ -60,7 +60,7 @@ void my_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
+   }
+ }
+ 
+-void short_timer_callback(rcl_timer_t * timer, int64_t last_call_time)
++void short_timer_callback(rcl_timer_t * timer, int64_t last_call_time, uintptr_t)
+ {
+   RCLC_UNUSED(timer);
+   RCLC_UNUSED(last_call_time);

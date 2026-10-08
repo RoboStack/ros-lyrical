@@ -3,7 +3,7 @@ index 6b650f1b..67ac7a9f 100644
 --- a/3rdparty/Qt-Advanced-Docking/CMakeLists.txt
 +++ b/3rdparty/Qt-Advanced-Docking/CMakeLists.txt
 @@ -67,7 +67,9 @@ target_link_libraries(qt_advanced_docking PUBLIC Qt5::Core Qt5::Gui Qt5::Widgets
- 
+
  if(UNIX AND NOT APPLE)
      target_link_libraries(qt_advanced_docking PUBLIC Qt5::X11Extras)
 -        target_link_libraries(qt_advanced_docking PRIVATE xcb)
@@ -11,7 +11,7 @@ index 6b650f1b..67ac7a9f 100644
 +    target_link_libraries(qt_advanced_docking PRIVATE ${XCB_LIBRARIES})
 +    target_include_directories(qt_advanced_docking SYSTEM PUBLIC ${XCB_INCLUDE_DIRS})
  endif()
- 
+
  set_target_properties(qt_advanced_docking PROPERTIES
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 385b7899..b1d6f2ab 100644
@@ -28,132 +28,199 @@ index 385b7899..b1d6f2ab 100644
 -    Qt5::OpenGL
      Qt5::WebSockets
      )
- 
-@@ -216,6 +214,7 @@ target_link_libraries(plotjuggler_base
-     PUBLIC
-         plotjuggler_qwt
-     PRIVATE
-+        ${QT_LINK_LIBRARIES}
-         lua::lua
-         sol2::sol2
+
+@@ -243,6 +241,22 @@ else()
+                                       ${PLOTJUGGLER_BASE_MOCS})
+ endif()
+
++if(WIN32)
++  # plotjuggler_base has no dllexport annotations at all. As a shared
++  # library on Windows with nothing explicitly exported, link.exe does
++  # not produce an import .lib, so every consumer (plotjuggler_app, every
++  # plotjuggler_plugins/* plugin) fails with LNK1181 "cannot open input
++  # file ...plotjuggler_base.lib" even though plotjuggler_base.dll itself
++  # built fine. Auto-export everything, same as every other Windows
++  # shared-library target fixed this session.
++  set_target_properties(plotjuggler_base PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
++  # WINDOWS_EXPORT_ALL_SYMBOLS only auto-exports functions, not the
++  # static data members (like Qt MOC's staticMetaObject) that every
++  # Q_OBJECT class here needs -- see PJ_BASE_EXPORT usage in
++  # plotjuggler_base/include/PlotJuggler/pj_export.h and friends.
++  target_compile_definitions(plotjuggler_base PRIVATE PJ_BASE_BUILDING_DLL)
++endif()
++
+ set(PJ_PLUGIN_INSTALL_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${PJ_PLUGINS_DIRECTORY}")
+
+ target_include_directories(
+
+diff --git a/3rdparty/qwt/src/CMakeLists.txt b/3rdparty/qwt/src/CMakeLists.txt
+index 51e6f088..8971ecab 100644
+--- a/3rdparty/qwt/src/CMakeLists.txt
++++ b/3rdparty/qwt/src/CMakeLists.txt
+@@ -201,6 +201,7 @@ target_link_libraries(plotjuggler_qwt
+     Qt5::Widgets
+     Qt5::Concurrent
+     Qt5::Svg
++    Qt5::Xml
      )
-diff --git a/plotjuggler_plugins/ParserProtobuf/CMakeLists.txt b/plotjuggler_plugins/ParserProtobuf/CMakeLists.txt
-index 588c69ba..ab94a3df 100644
---- a/plotjuggler_plugins/ParserProtobuf/CMakeLists.txt
-+++ b/plotjuggler_plugins/ParserProtobuf/CMakeLists.txt
-@@ -1,13 +1,6 @@
--if(BUILDING_WITH_CONAN)
--    message(STATUS "Finding Protobuf with conan")
--    set(Protobuf_LIBS protobuf::libprotobuf)
--else()
--    message(STATUS "Finding Protobuf without package managers")
--    find_package(Protobuf QUIET)
--    set(Protobuf_LIBS ${Protobuf_LIBRARIES})
--endif()
-+set(Protobuf_LIBS protobuf::libprotobuf)
  
--find_package(Protobuf QUIET)
-+find_package(Protobuf QUIET CONFIG)
+ target_compile_definitions(plotjuggler_qwt PUBLIC QWT_MOC_INCLUDE)
+diff --git a/plotjuggler_base/include/PlotJuggler/statepublisher_base.h b/plotjuggler_base/include/PlotJuggler/statepublisher_base.h
+index 6b4bb61..b5e0e47 100644
+--- a/plotjuggler_base/include/PlotJuggler/statepublisher_base.h
++++ b/plotjuggler_base/include/PlotJuggler/statepublisher_base.h
+@@ -14,10 +14,11 @@
+ #include <functional>
+ #include "PlotJuggler/plotdata.h"
+ #include "PlotJuggler/pj_plugin.h"
++#include "PlotJuggler/pj_export.h"
  
- if( Protobuf_FOUND)
- 
-diff --git a/plotjuggler_plugins/ParserProtobuf/error_collectors.cpp b/plotjuggler_plugins/ParserProtobuf/error_collectors.cpp
-index 761e0b73..b7ce4129 100644
---- a/plotjuggler_plugins/ParserProtobuf/error_collectors.cpp
-+++ b/plotjuggler_plugins/ParserProtobuf/error_collectors.cpp
-@@ -2,38 +2,38 @@
- #include <QMessageBox>
- #include <QDebug>
- 
--void FileErrorCollector::AddError(const std::string& filename, int line, int,
--                                  const std::string& message)
-+void FileErrorCollector::RecordError(const absl::string_view filename, int line, int,
-+                                  const absl::string_view message)
+ namespace PJ
  {
-   auto msg = QString("File: [%1] Line: [%2] Message: %3\n\n")
--                 .arg(QString::fromStdString(filename))
-+                 .arg(QString::fromStdString(std::string(filename)))
-                  .arg(line)
--                 .arg(QString::fromStdString(message));
-+                 .arg(QString::fromStdString(std::string(message)));
- 
-   _errors.push_back(msg);
- }
- 
--void FileErrorCollector::AddWarning(const std::string& filename, int line, int,
--                                    const std::string& message)
-+void FileErrorCollector::RecordWarning(const absl::string_view filename, int line, int,
-+                                    const absl::string_view message)
+-class StatePublisher : public PlotJugglerPlugin
++class PJ_BASE_EXPORT StatePublisher : public PlotJugglerPlugin
  {
-   auto msg = QString("Warning [%1] line %2: %3")
--                 .arg(QString::fromStdString(filename))
-+                 .arg(QString::fromStdString(std::string(filename)))
-                  .arg(line)
--                 .arg(QString::fromStdString(message));
-+                 .arg(QString::fromStdString(std::string(message)));
-   qDebug() << msg;
- }
+   Q_OBJECT
  
--void IoErrorCollector::AddError(int line, google::protobuf::io::ColumnNumber,
--                                const std::string& message)
-+void IoErrorCollector::RecordError(int line, google::protobuf::io::ColumnNumber,
-+                                const absl::string_view message)
+
+diff --git a/plotjuggler_base/include/PlotJuggler/datastreamer_base.h b/plotjuggler_base/include/PlotJuggler/datastreamer_base.h
+index 04f70f5..0c3f28f 100644
+--- a/plotjuggler_base/include/PlotJuggler/datastreamer_base.h
++++ b/plotjuggler_base/include/PlotJuggler/datastreamer_base.h
+@@ -12,6 +12,7 @@
+ #include "PlotJuggler/plotdata.h"
+ #include "PlotJuggler/pj_plugin.h"
+ #include "PlotJuggler/messageparser_base.h"
++#include "PlotJuggler/pj_export.h"
+ 
+ namespace PJ
  {
-   _errors.push_back(
--      QString("Line: [%1] Message: %2\n").arg(line).arg(QString::fromStdString(message)));
-+      QString("Line: [%1] Message: %2\n").arg(line).arg(QString::fromStdString(std::string(message))));
- }
- 
--void IoErrorCollector::AddWarning(int line, google::protobuf::io::ColumnNumber column,
--                                  const std::string& message)
-+void IoErrorCollector::RecordWarning(int line, google::protobuf::io::ColumnNumber column,
-+                                  const absl::string_view message)
+@@ -22,7 +23,7 @@ namespace PJ
+  * dataMap(), which share its elements with the main application, must be protected
+  * using the mutex().
+  */
+-class DataStreamer : public PlotJugglerPlugin
++class PJ_BASE_EXPORT DataStreamer : public PlotJugglerPlugin
  {
-   qDebug() << QString("Line: [%1] Message: %2\n")
-                   .arg(line)
--                  .arg(QString::fromStdString(message));
-+                  .arg(QString::fromStdString(std::string(message)));
- }
-diff --git a/plotjuggler_plugins/ParserProtobuf/error_collectors.h b/plotjuggler_plugins/ParserProtobuf/error_collectors.h
-index 8abfa5e0..7afe1fea 100644
---- a/plotjuggler_plugins/ParserProtobuf/error_collectors.h
-+++ b/plotjuggler_plugins/ParserProtobuf/error_collectors.h
-@@ -3,17 +3,18 @@
- 
- #include <google/protobuf/io/tokenizer.h>
- #include <google/protobuf/compiler/importer.h>
-+#include <absl/strings/string_view.h>
- 
- #include <QStringList>
- 
- class IoErrorCollector : public google::protobuf::io::ErrorCollector
- {
+   Q_OBJECT
  public:
--  void AddError(int line, google::protobuf::io::ColumnNumber column,
--                const std::string& message);
-+  void RecordError(int line, google::protobuf::io::ColumnNumber column,
-+                const absl::string_view message) override;
+
+diff --git a/plotjuggler_base/include/PlotJuggler/transform_function.h b/plotjuggler_base/include/PlotJuggler/transform_function.h
+index a04de1d..0059b90 100644
+--- a/plotjuggler_base/include/PlotJuggler/transform_function.h
++++ b/plotjuggler_base/include/PlotJuggler/transform_function.h
+@@ -12,6 +12,7 @@
+ #include <functional>
+ #include "PlotJuggler/plotdata.h"
+ #include "PlotJuggler/pj_plugin.h"
++#include "PlotJuggler/pj_export.h"
  
--  void AddWarning(int line, google::protobuf::io::ColumnNumber column,
--                  const std::string& message);
-+  void RecordWarning(int line, google::protobuf::io::ColumnNumber column,
-+                  const absl::string_view message) override;
- 
-   const QStringList& errors()
-   {
-@@ -27,11 +28,11 @@ private:
- class FileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
+ namespace PJ
  {
+@@ -19,7 +20,7 @@ namespace PJ
+  * Contrariwise to other plugins, multiple instances of the this class might be created.
+  * For this reason, a TransformFactory is also defined
+  */
+-class TransformFunction : public PlotJugglerPlugin
++class PJ_BASE_EXPORT TransformFunction : public PlotJugglerPlugin
+ {
+   Q_OBJECT
+ 
+@@ -85,7 +86,7 @@ protected:
+ using TransformsMap = std::unordered_map<std::string, std::shared_ptr<TransformFunction>>;
+ 
+ /// Simplified version with Single input and Single output
+-class TransformFunction_SISO : public TransformFunction
++class PJ_BASE_EXPORT TransformFunction_SISO : public TransformFunction
+ {
+   Q_OBJECT
  public:
--  void AddError(const std::string& filename, int line, int,
--                const std::string& message) override;
-+  void RecordError(const absl::string_view filename, int line, int,
-+                const absl::string_view message) override;
+
+diff --git a/plotjuggler_base/include/PlotJuggler/plotwidget_base.h b/plotjuggler_base/include/PlotJuggler/plotwidget_base.h
+index 5591fa1..95342b3 100644
+--- a/plotjuggler_base/include/PlotJuggler/plotwidget_base.h
++++ b/plotjuggler_base/include/PlotJuggler/plotwidget_base.h
+@@ -11,6 +11,7 @@
+ #include <QWidget>
+ #include "plotdata.h"
+ #include "timeseries_qwt.h"
++#include "PlotJuggler/pj_export.h"
  
--  void AddWarning(const std::string& filename, int line, int,
--                  const std::string& message) override;
-+  void RecordWarning(const absl::string_view filename, int line, int,
-+                  const absl::string_view message) override;
+ class QwtPlot;
+ class QwtPlotCurve;
+@@ -43,7 +44,7 @@ inline double dotWidthValue(LineWidth line_width)
+   return (lineWidthValue(line_width) * 1.5) + 2.0;
+ }
  
-   const QStringList& errors()
-   {
+-class PlotWidgetBase : public QWidget
++class PJ_BASE_EXPORT PlotWidgetBase : public QWidget
+ {
+   Q_OBJECT
+ 
+
+diff --git a/plotjuggler_base/include/PlotJuggler/range_slider.h b/plotjuggler_base/include/PlotJuggler/range_slider.h
+index 38e6766..a2682ec 100644
+--- a/plotjuggler_base/include/PlotJuggler/range_slider.h
++++ b/plotjuggler_base/include/PlotJuggler/range_slider.h
+@@ -7,7 +7,9 @@
+ 
+ #include <functional>
+ 
+-class RangeSlider : public QWidget
++#include "PlotJuggler/pj_export.h"
++
++class PJ_BASE_EXPORT RangeSlider : public QWidget
+ {
+   Q_OBJECT
+   Q_ENUMS(RangeSliderTypes)
+
+diff --git a/plotjuggler_base/include/PlotJuggler/toolbox_base.h b/plotjuggler_base/include/PlotJuggler/toolbox_base.h
+index bc7b3d6..4ce5f51 100644
+--- a/plotjuggler_base/include/PlotJuggler/toolbox_base.h
++++ b/plotjuggler_base/include/PlotJuggler/toolbox_base.h
+@@ -14,10 +14,11 @@
+ #include "PlotJuggler/pj_plugin.h"
+ #include "PlotJuggler/transform_function.h"
+ #include "PlotJuggler/messageparser_base.h"
++#include "PlotJuggler/pj_export.h"
+ 
+ namespace PJ
+ {
+-class ToolboxPlugin : public PlotJugglerPlugin
++class PJ_BASE_EXPORT ToolboxPlugin : public PlotJugglerPlugin
+ {
+   Q_OBJECT
+ 
+
+diff --git a/plotjuggler_base/include/PlotJuggler/pj_export.h b/plotjuggler_base/include/PlotJuggler/pj_export.h
+new file mode 100644
+index 0000000..35cd616
+--- /dev/null
++++ b/plotjuggler_base/include/PlotJuggler/pj_export.h
+@@ -0,0 +1,25 @@
++/*
++ * This Source Code Form is subject to the terms of the Mozilla Public
++ * License, v. 2.0. If a copy of the MPL was not distributed with this
++ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
++ */
++
++#ifndef PJ_EXPORT_H
++#define PJ_EXPORT_H
++
++// WINDOWS_EXPORT_ALL_SYMBOLS only auto-exports functions, not the static
++// data members (like Qt MOC's staticMetaObject) that every Q_OBJECT class
++// in plotjuggler_base needs. Apply this macro to the whole class
++// declaration of each Q_OBJECT class so both the vtable and the
++// MOC-generated staticMetaObject get exported/imported together.
++#if defined(_WIN32)
++#if defined(PJ_BASE_BUILDING_DLL)
++#define PJ_BASE_EXPORT __declspec(dllexport)
++#else
++#define PJ_BASE_EXPORT __declspec(dllimport)
++#endif
++#else
++#define PJ_BASE_EXPORT
++#endif
++
++#endif  // PJ_EXPORT_H
+

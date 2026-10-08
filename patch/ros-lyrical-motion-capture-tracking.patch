@@ -1,0 +1,117 @@
+diff --git a/src/motion_capture_tracking_node.cpp b/src/motion_capture_tracking_node.cpp
+index ace9626..5d99a63 100644
+--- a/src/motion_capture_tracking_node.cpp
++++ b/src/motion_capture_tracking_node.cpp
+@@ -199,7 +199,7 @@ int main(int argc, char **argv)
+   tracker.setLogWarningCallback(std::bind(logWarn, node->get_logger(), std::placeholders::_1));
+ 
+   // prepare TF broadcaster
+-  tf2_ros::TransformBroadcaster tfbroadcaster(node);
++  tf2_ros::TransformBroadcaster tfbroadcaster(*node);
+   std::vector<geometry_msgs::msg::TransformStamped> transforms;
+ 
+   pcl::PointCloud<pcl::PointXYZ>::Ptr markers(new pcl::PointCloud<pcl::PointXYZ>);
+diff --git a/deps/libmotioncapture/deps/vrpn/quat/CMakeLists.txt b/deps/libmotioncapture/deps/vrpn/quat/CMakeLists.txt
+index e6009d9d..037befcc 100644
+--- a/deps/libmotioncapture/deps/vrpn/quat/CMakeLists.txt
++++ b/deps/libmotioncapture/deps/vrpn/quat/CMakeLists.txt
+@@ -13,6 +13,11 @@ set(QUATLIB_HEADER quat.h)
+ 
+ # Build the library itself and declare what bits need to be installed
+ add_library(quat ${QUATLIB_SOURCES} ${QUATLIB_HEADER})
++# vrpn (the sibling library one level up) links against this library
++# directly, so it needs an import .lib on Windows -- this SHARED library
++# has no dllexport-annotated symbols, so without this MSVC produces the
++# .dll but no .lib (LNK1181: cannot open input file).
++set_target_properties(quat PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ if(UNIX)
+ 	target_link_libraries(quat -lm)
+ endif()
+ 
+diff --git a/deps/libmotioncapture/deps/vrpn/CMakeLists.txt b/deps/libmotioncapture/deps/vrpn/CMakeLists.txt
+index 41ce8558..31f6d711 100644
+--- a/deps/libmotioncapture/deps/vrpn/CMakeLists.txt
++++ b/deps/libmotioncapture/deps/vrpn/CMakeLists.txt
+@@ -1353,6 +1353,10 @@ endif()
+ 
+ if(VRPN_BUILD_CLIENT_LIBRARY)
+ 	add_library(vrpn ${VRPN_CLIENT_SOURCES} ${VRPN_CLIENT_PUBLIC_HEADERS})
++	# libmotioncapture (one level up) links against this library directly,
++	# so it needs an import .lib on Windows -- same missing-dllexport-symbols
++	# issue already fixed for the sibling quat library.
++	set_target_properties(vrpn PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ 	target_link_libraries(vrpn ${EXTRA_LIBS})
+ 	set(VRPN_CLIENT_LIBRARY vrpn)
+ 
+ 
+diff --git a/deps/libmotioncapture/CMakeLists.txt b/deps/libmotioncapture/CMakeLists.txt
+index 61a4af9f..215732db 100644
+--- a/deps/libmotioncapture/CMakeLists.txt
++++ b/deps/libmotioncapture/CMakeLists.txt
+@@ -19,7 +19,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ 
+ find_package(Threads REQUIRED)
+-find_package(Boost) # for optitrack
++find_package(Boost COMPONENTS filesystem) # filesystem needed for a transitive Windows link; also for optitrack
+ add_definitions(
+   -DBOOST_DATE_TIME_NO_LIB
+   -DBOOST_REGEX_NO_LIB
+@@ -234,6 +234,10 @@ include_directories(
+ add_library(libmotioncapture
+   ${my_files}
+ )
++# motion_capture_tracking_node (the top-level ROS node) links against this
++# library directly, so it needs an import .lib on Windows -- same
++# missing-dllexport-symbols issue already fixed for quat/vrpn.
++set_target_properties(libmotioncapture PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ 
+ ## Specify libraries to link a library or executable target against
+ target_link_directories(libmotioncapture PUBLIC
+@@ -243,6 +247,13 @@ target_link_libraries(libmotioncapture
+   Eigen3::Eigen
+   ${my_libraries}
+ )
++# vicon-datastream-sdk's Boost::thread pulls in an unqualified
++# "boost_filesystem" reference on Windows that only resolves correctly
++# once Boost::filesystem's own imported target (with its library search
++# directory) is also linked here.
++if(Boost_FILESYSTEM_FOUND)
++  target_link_libraries(libmotioncapture Boost::filesystem)
++endif()
+ set_property(TARGET libmotioncapture PROPERTY POSITION_INDEPENDENT_CODE ON)
+ 
+ if (LIBMOTIONCAPTURE_BUILD_PYTHON_BINDINGS)
+ 
+diff --git a/deps/librigidbodytracker/CMakeLists.txt b/deps/librigidbodytracker/CMakeLists.txt
+index c23b4ee3..4a4b5981 100644
+--- a/deps/librigidbodytracker/CMakeLists.txt
++++ b/deps/librigidbodytracker/CMakeLists.txt
+@@ -24,6 +24,10 @@ include_directories(
+ add_library(librigidbodytracker
+   src/rigid_body_tracker.cpp
+ )
++# motion_capture_tracking_node (the top-level ROS node) links against this
++# library directly, so it needs an import .lib on Windows -- same
++# missing-dllexport-symbols issue already fixed for quat/vrpn/libmotioncapture.
++set_target_properties(librigidbodytracker PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ target_link_libraries(librigidbodytracker
+   ${PCL_LIBRARIES}
+ )
+ 
+diff --git a/deps/libmotioncapture/deps/qualisys_cpp_sdk/CMakeLists.txt b/deps/libmotioncapture/deps/qualisys_cpp_sdk/CMakeLists.txt
+index ea440917..97b65b28 100644
+--- a/deps/libmotioncapture/deps/qualisys_cpp_sdk/CMakeLists.txt
++++ b/deps/libmotioncapture/deps/qualisys_cpp_sdk/CMakeLists.txt
+@@ -9,6 +9,10 @@ add_library(${PROJECT_NAME}
+         RTPacket.cpp
+         RTProtocol.cpp
+ )
++# libmotioncapture (one level up) links against this library directly, so
++# it needs an import .lib on Windows -- same missing-dllexport-symbols
++# issue already fixed for quat/vrpn/libmotioncapture/librigidbodytracker.
++set_target_properties(${PROJECT_NAME} PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ target_include_directories(${PROJECT_NAME} PUBLIC
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}>
+ 

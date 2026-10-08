@@ -1,0 +1,42 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0000000..0000000 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -37,6 +37,7 @@
+   "msg/RawMicroScanData.msg"
+   "msg/ScanPoint.msg"
+   "srv/FieldData.srv"
++  "srv/StatusOverview.srv"
+   DEPENDENCIES sensor_msgs
+  )
+ 
+diff --git a/srv/StatusOverview.srv b/srv/StatusOverview.srv
+new file mode 100644
+index 0000000..0000000
+--- /dev/null
++++ b/srv/StatusOverview.srv
+@@ -0,0 +1,23 @@
++---
++
++string version_c_version
++uint8 version_major_version_number
++uint8 version_minor_version_number
++uint8 version_release_number
++
++uint8 device_state
++uint8 config_state
++uint8 application_state
++uint32 current_time_power_on_count
++
++string current_time
++# for devices without real time clock, also provide the raw time information
++uint32 current_time_time
++uint16 current_time_date
++
++uint32 error_info_code
++
++string error_info_time
++# for devices without real time clock, also provide the raw time information
++uint32 error_info_time_time
++uint16 error_info_time_date
+\ No newline at end of file
