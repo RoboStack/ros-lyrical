@@ -22659,18 +22659,22 @@ rtest:
   - ament_clang_tidy
   - ament_cmake
   - ament_cmake_copyright
+  - ament_cmake_gmock
   - ament_cmake_ros
   - ament_lint_auto
   - ament_lint_common
+  - example_interfaces
   - rcl
   - rcl_action
   - rclcpp
   - rclcpp_action
   - ros_environment
+  - std_msgs
+  - std_srvs
   repository: https://github.com/Beam-and-Spyrosoft/rtest
-  tag: release/lyrical/rtest/0.2.4-1
+  tag: release/lyrical/rtest/0.2.5-1
   url: https://github.com/ros2-gbp/rtest-release.git
-  version: 0.2.4
+  version: 0.2.5
 rti_connext_dds_cmake_module:
   dependencies:
   - ament_cmake
