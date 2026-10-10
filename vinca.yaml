@@ -337,8 +337,6 @@ packages_select_by_deps:
       - navmap_rviz_plugin
       - navmap_tools
       - py_binding_tools
-      - realsense2_camera
-      - realsense2_description
       - rmf_demos
       - rosidlcpp  # 'from_chars' is unavailable
       - sdl2_vendor
@@ -420,6 +418,8 @@ packages_select_by_deps:
       - point_cloud_transport_plugins  # Not yet supported on Windows
       - pointcloud-to-laserscan
       - rclc_examples  # MSVC C2055 on rcl_timer_t in callback signatures; root cause unresolved, already excluded on humble too
+      - realsense2_camera
+      - realsense2_description
       - rosbag2_performance_benchmarking  # its _msgs' Python typesupport hits MSVC C1083 on win-64
       - rplidar_ros
       - rqt_action
