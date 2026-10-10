@@ -1,0 +1,190 @@
+jobs:
+  stage_0_job_0:
+    name: ros2-yaets ros2-easynav-interfaces ros2-navmap-ros-interfaces ros2-navmap-core
+      ros2-easynav-common ros2-easynav-support-py ros2-navmap-ros yaets navmap-ros-interfaces
+      navmap-core easynav-interfaces ros2-easynav-sensors ros2-easynav-simple-common
+      ros2-easynav-costmap-common ros2-easynav-tools ros2-navmap-rviz-plugin ros2-navmap-examples
+      navmap-ros easynav-support-py easynav-common
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs: []
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-yaets ros2-easynav-interfaces ros2-navmap-ros-interfaces ros2-navmap-core
+        ros2-easynav-common ros2-easynav-support-py ros2-navmap-ros ros-lyrical-yaets
+        ros-lyrical-navmap-ros-interfaces ros-lyrical-navmap-core ros-lyrical-easynav-interfaces
+        ros2-easynav-sensors ros2-easynav-simple-common ros2-easynav-costmap-common
+        ros2-easynav-tools ros2-navmap-rviz-plugin ros2-navmap-examples ros-lyrical-navmap-ros
+        ros-lyrical-easynav-support-py ros-lyrical-easynav-common
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-yaets ros2-easynav-interfaces ros2-navmap-ros-interfaces
+          ros2-navmap-core ros2-easynav-common ros2-easynav-support-py ros2-navmap-ros
+          ros-lyrical-yaets ros-lyrical-navmap-ros-interfaces ros-lyrical-navmap-core
+          ros-lyrical-easynav-interfaces ros2-easynav-sensors ros2-easynav-simple-common
+          ros2-easynav-costmap-common ros2-easynav-tools ros2-navmap-rviz-plugin ros2-navmap-examples
+          ros-lyrical-navmap-ros ros-lyrical-easynav-support-py ros-lyrical-easynav-common
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_1_job_1:
+    name: ros2-easynav-core navmap-rviz-plugin navmap-examples easynav-tools easynav-simple-common
+      easynav-sensors easynav-costmap-common ros2-easynav-planner ros2-easynav-maps-manager
+      ros2-easynav-localizer ros2-easynav-controller ros2-easynav-bonxai-maps-manager
+      ros2-easynav-vff-controller ros2-easynav-simple-planner ros2-easynav-simple-maps-manager
+      ros2-easynav-simple-controller ros2-easynav-serest-controller ros2-easynav-routes-maps-manager
+      ros2-easynav-octomap-maps-manager ros2-easynav-navmap-planner ros2-easynav-navmap-maps-manager
+      ros2-easynav-costmap-planner ros2-easynav-costmap-maps-manager easynav-core
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_0_job_0
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-easynav-core ros-lyrical-navmap-rviz-plugin ros-lyrical-navmap-examples
+        ros-lyrical-easynav-tools ros-lyrical-easynav-simple-common ros-lyrical-easynav-sensors
+        ros-lyrical-easynav-costmap-common ros2-easynav-planner ros2-easynav-maps-manager
+        ros2-easynav-localizer ros2-easynav-controller ros2-easynav-bonxai-maps-manager
+        ros2-easynav-vff-controller ros2-easynav-simple-planner ros2-easynav-simple-maps-manager
+        ros2-easynav-simple-controller ros2-easynav-serest-controller ros2-easynav-routes-maps-manager
+        ros2-easynav-octomap-maps-manager ros2-easynav-navmap-planner ros2-easynav-navmap-maps-manager
+        ros2-easynav-costmap-planner ros2-easynav-costmap-maps-manager ros-lyrical-easynav-core
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-easynav-core ros-lyrical-navmap-rviz-plugin ros-lyrical-navmap-examples
+          ros-lyrical-easynav-tools ros-lyrical-easynav-simple-common ros-lyrical-easynav-sensors
+          ros-lyrical-easynav-costmap-common ros2-easynav-planner ros2-easynav-maps-manager
+          ros2-easynav-localizer ros2-easynav-controller ros2-easynav-bonxai-maps-manager
+          ros2-easynav-vff-controller ros2-easynav-simple-planner ros2-easynav-simple-maps-manager
+          ros2-easynav-simple-controller ros2-easynav-serest-controller ros2-easynav-routes-maps-manager
+          ros2-easynav-octomap-maps-manager ros2-easynav-navmap-planner ros2-easynav-navmap-maps-manager
+          ros2-easynav-costmap-planner ros2-easynav-costmap-maps-manager ros-lyrical-easynav-core
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_2_job_2:
+    name: ros2-easynav-system ros2-easynav-simple-localizer ros2-easynav-navmap-localizer
+      ros2-easynav-fusion-localizer ros2-easynav-costmap-localizer easynav-vff-controller
+      easynav-simple-planner easynav-simple-maps-manager easynav-simple-controller
+      easynav-serest-controller easynav-routes-maps-manager easynav-planner easynav-octomap-maps-manager
+      easynav-navmap-planner easynav-navmap-maps-manager easynav-maps-manager easynav-localizer
+      easynav-costmap-planner easynav-costmap-maps-manager easynav-controller easynav-bonxai-maps-manager
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_1_job_1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-easynav-system ros2-easynav-simple-localizer ros2-easynav-navmap-localizer
+        ros2-easynav-fusion-localizer ros2-easynav-costmap-localizer ros-lyrical-easynav-vff-controller
+        ros-lyrical-easynav-simple-planner ros-lyrical-easynav-simple-maps-manager
+        ros-lyrical-easynav-simple-controller ros-lyrical-easynav-serest-controller
+        ros-lyrical-easynav-routes-maps-manager ros-lyrical-easynav-planner ros-lyrical-easynav-octomap-maps-manager
+        ros-lyrical-easynav-navmap-planner ros-lyrical-easynav-navmap-maps-manager
+        ros-lyrical-easynav-maps-manager ros-lyrical-easynav-localizer ros-lyrical-easynav-costmap-planner
+        ros-lyrical-easynav-costmap-maps-manager ros-lyrical-easynav-controller ros-lyrical-easynav-bonxai-maps-manager
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-easynav-system ros2-easynav-simple-localizer ros2-easynav-navmap-localizer
+          ros2-easynav-fusion-localizer ros2-easynav-costmap-localizer ros-lyrical-easynav-vff-controller
+          ros-lyrical-easynav-simple-planner ros-lyrical-easynav-simple-maps-manager
+          ros-lyrical-easynav-simple-controller ros-lyrical-easynav-serest-controller
+          ros-lyrical-easynav-routes-maps-manager ros-lyrical-easynav-planner ros-lyrical-easynav-octomap-maps-manager
+          ros-lyrical-easynav-navmap-planner ros-lyrical-easynav-navmap-maps-manager
+          ros-lyrical-easynav-maps-manager ros-lyrical-easynav-localizer ros-lyrical-easynav-costmap-planner
+          ros-lyrical-easynav-costmap-maps-manager ros-lyrical-easynav-controller
+          ros-lyrical-easynav-bonxai-maps-manager
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+  stage_3_job_3:
+    name: ros2-easynav-regulated-pp-controller ros2-easynav-mppi-controller ros2-easynav-mpc-controller
+      ros2-easynav easynav-system easynav-simple-localizer easynav-navmap-localizer
+      easynav-fusion-localizer easynav-costmap-localizer easynav-regulated-pp-controller
+      easynav-mppi-controller easynav-mpc-controller easynav
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    needs:
+    - stage_2_job_2
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+    - name: Setup pixi
+      uses: prefix-dev/setup-pixi@v0
+      with:
+        pixi-version: latest
+        cache: 'true'
+        log-level: v
+        frozen: 'true'
+    - name: Build ros2-easynav-regulated-pp-controller ros2-easynav-mppi-controller
+        ros2-easynav-mpc-controller ros2-easynav ros-lyrical-easynav-system ros-lyrical-easynav-simple-localizer
+        ros-lyrical-easynav-navmap-localizer ros-lyrical-easynav-fusion-localizer
+        ros-lyrical-easynav-costmap-localizer ros-lyrical-easynav-regulated-pp-controller
+        ros-lyrical-easynav-mppi-controller ros-lyrical-easynav-mpc-controller ros-lyrical-easynav
+      env:
+        ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
+        CURRENT_RECIPES: ros2-easynav-regulated-pp-controller ros2-easynav-mppi-controller
+          ros2-easynav-mpc-controller ros2-easynav ros-lyrical-easynav-system ros-lyrical-easynav-simple-localizer
+          ros-lyrical-easynav-navmap-localizer ros-lyrical-easynav-fusion-localizer
+          ros-lyrical-easynav-costmap-localizer ros-lyrical-easynav-regulated-pp-controller
+          ros-lyrical-easynav-mppi-controller ros-lyrical-easynav-mpc-controller ros-lyrical-easynav
+        BUILD_TARGET: ''
+      run: |
+        export CI=github
+        export GIT_BRANCH=${GITHUB_REF_NAME}
+        export FEEDSTOCK_NAME=${GITHUB_REPOSITORY##*/}
+        .scripts/build_unix.sh --target $BUILD_TARGET
+    permissions:
+      id-token: write
+      attestations: write
+name: build_linux64
+on:
+  push:
+    branches:
+    - buildbranch_linux
