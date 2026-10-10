@@ -269,7 +269,6 @@ packages_select_by_deps:
       - mujoco_ros2_control  # Isaac ROS deploy / Unitree G1 simulation
       - nobleo_socketcan_bridge  # Depends on socketcan
       - ros2_socketcan  # Depends on socketcan
-      - rosgraph_monitor
       - usb_cam  # Depends on v4l
 
   # These packages are currently only build on Linux,
@@ -421,6 +420,7 @@ packages_select_by_deps:
       - pointcloud-to-laserscan
       - rclc_examples  # MSVC C2055 on rcl_timer_t in callback signatures; root cause unresolved, already excluded on humble too
       - rosbag2_performance_benchmarking  # its _msgs' Python typesupport hits MSVC C1083 on win-64
+      - rosgraph_monitor
       - rplidar_ros
       - rqt_action
       - rqt_bag
