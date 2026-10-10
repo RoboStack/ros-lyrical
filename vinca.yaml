@@ -329,7 +329,6 @@ packages_select_by_deps:
       - easynav_system
       - easynav_tools
       - easynav_vff_controller
-      - livox_ros_driver2
       - navmap_core
       - navmap_examples
       - navmap_ros
@@ -399,6 +398,7 @@ packages_select_by_deps:
       - joint_state_publisher
       - joy
       - laser-segmentation
+      - livox_ros_driver2
       - mobile_robot_simulator
       - mocap4r2_control
       - mocap4r2_control_msgs
