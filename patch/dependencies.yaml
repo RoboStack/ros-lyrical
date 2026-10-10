@@ -297,6 +297,7 @@ camera_calibration:
   add_run: ["libopencv * *qt6*"]
 livox_ros_driver2:
   add_host: ["livox-sdk2"]
+  add_run: ["livox-sdk2"]
 spdlog_vendor:
   add_host: ["spdlog"]
   add_run: ["spdlog"]
