@@ -239,6 +239,7 @@ packages_select_by_deps:
   - rqt_robot_steering
   - rqt_runtime_monitor
   - rtabmap
+  - rtabmap_ros
   - rtcm_msgs
   - rtest
   - rviz_2d_overlay_msgs
