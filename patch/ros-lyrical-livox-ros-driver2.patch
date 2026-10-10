@@ -1,5 +1,5 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 99a8ccc..b59e949 100644
+index 99a8ccc..221b2c1 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -1,4 +1,6 @@
@@ -17,3 +17,12 @@ index 99a8ccc..b59e949 100644
  
    # Default to C99
    if(NOT CMAKE_C_STANDARD)
+@@ -246,7 +249,7 @@ else(ROS_EDITION STREQUAL "ROS2")
+   )
+ 
+   ## make sure the livox_lidar_sdk_shared library is installed
+-  find_library(LIVOX_LIDAR_SDK_LIBRARY liblivox_lidar_sdk_shared.so /usr/local/lib REQUIRED)
++  find_library(LIVOX_LIDAR_SDK_LIBRARY NAMES livox_lidar_sdk_shared PATHS /usr/local/lib REQUIRED)
+ 
+   ##
+   find_path(LIVOX_LIDAR_SDK_INCLUDE_DIR

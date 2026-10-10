@@ -244,6 +244,8 @@ gz_gui_vendor:
 gz_sim_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK"
   build_number: 28
+livox_ros_driver2:
+  build_number: 28
 rqt_plot:
   build_number: 28
 rqt_py_common:
