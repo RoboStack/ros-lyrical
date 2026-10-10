@@ -1,0 +1,13 @@
+diff --git a/src/CoreWrapper.cpp b/src/CoreWrapper.cpp
+index c1fb75b..bb732d6 100644
+--- a/src/CoreWrapper.cpp
++++ b/src/CoreWrapper.cpp
+@@ -1474,7 +1474,7 @@ void CoreWrapper::commonMultiCameraCallbackImpl(
+ 		cv::Mat leftMono;
+ 		if(rgb.channels() == 3)
+ 		{
+-			cv::cvtColor(rgb, leftMono, CV_BGR2GRAY);
++			cv::cvtColor(rgb, leftMono, cv::COLOR_BGR2GRAY);
+ 		}
+ 		else
+ 		{
