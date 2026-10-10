@@ -1,3 +1,17 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 4dc4190..ed08e21 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -9,8 +9,7 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+   # issues #1285 #1288
+   find_library(
+     builtin_interfaces__rosidl_generator_c_LIB NAMES builtin_interfaces__rosidl_generator_c
+-    PATHS "/opt/ros/$ENV{ROS_DISTRO}/lib"
+-    NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED
++    REQUIRED
+   )
+ endif()
+ 
 diff --git a/include/rtabmap_conversions/MsgConversion.h b/include/rtabmap_conversions/MsgConversion.h
 index 4e82e38..6f657f3 100644
 --- a/include/rtabmap_conversions/MsgConversion.h
