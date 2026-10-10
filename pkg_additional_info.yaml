@@ -272,3 +272,5 @@ tf_transformations:
   build_number: 28
 turtlesim:
   build_number: 28
+livox_ros_driver2:
+  build_number: 28
