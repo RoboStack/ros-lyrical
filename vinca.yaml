@@ -385,6 +385,7 @@ packages_select_by_deps:
       - event_camera_renderer
       - ffmpeg_image_transport  # TODO on windows: fix iconv link issue
       - foxglove_compressed_video_transport
+      - fuse
       - geodesy
       - geographic_info
       - geometry_tutorials
