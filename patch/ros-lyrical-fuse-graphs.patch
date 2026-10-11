@@ -1,0 +1,16 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1b0ac27..43fab5b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -45,7 +45,10 @@ include(boost-extras.cmake)
+ # /nix/store/b7hvml0m3qmqraz1022fwvyyg6fc1vdy-gcc-12.2.0/include/c++/12.2.0/bits/std_function.h:267:7: note: by argument 2 of type ‘const std::_Any_data&’ to ‘static bool std::_Function_handler<_Res(_ArgTypes ...), _Functor>::_M_manager(std::_Any_data&, const std::_Any_data&, std::_Manager_operation) [with _Res = const fuse_core::Variable&; _Functor = fuse_graphs::HashGraph::getVariables() const::<lambda(const std::unordered_map<boost::uuids::uuid, std::shared_ptr<fuse_core::Variable>, boost::hash<boost::uuids::uuid> >::value_type&)>; _ArgTypes = {const std::pair<const boost::uuids::uuid, std::shared_ptr<fuse_core::Variable> >&}]’ declared here
+ #   267 |       _M_manager(_Any_data& __dest, const _Any_data& __source,
+ #       |       ^~~~~~~~~~
+-add_compile_options(-Wall -Werror -Wno-maybe-uninitialized)
++add_compile_options(-Wall -Werror)
++if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
++  add_compile_options(-Wno-maybe-uninitialized)
++endif()
+ 
+ ## fuse_graphs library
+ add_library(${PROJECT_NAME}
