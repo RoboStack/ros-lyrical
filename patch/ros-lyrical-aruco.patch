@@ -1,0 +1,503 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ee3c69a..9ed1af6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "${NEW_CXX_FLAGS}")
+ # find dependencies
+ find_package(ament_cmake)
+ find_package(Eigen3 REQUIRED)
+-find_package(OpenCV 4.2.0 REQUIRED)
++find_package(OpenCV REQUIRED)
+ 
+ add_library(${PROJECT_NAME}
+   SHARED
+@@ -48,7 +48,7 @@ target_include_directories(
+   ${EIGEN3_INCLUDE_DIRS}
+ )
+ 
+-target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES})
++target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBRARIES} Eigen3::Eigen)
+ 
+ #############
+ ## Install ##
+diff --git a/src/aruco/cameraparameters.cpp b/src/aruco/cameraparameters.cpp
+index cb6f440..2d38d96 100755
+--- a/src/aruco/cameraparameters.cpp
++++ b/src/aruco/cameraparameters.cpp
+@@ -15,7 +15,7 @@ Copyright 2020 Rafael Muñoz Salinas. All rights reserved.
+ */
+ #include "cameraparameters.h"
+ 
+-#include <opencv2/calib3d/calib3d.hpp>
++#include <opencv2/calib3d.hpp>
+ #include <opencv2/core/core.hpp>
+ 
+ #include <fstream>
+@@ -84,11 +84,11 @@ void CameraParameters::setParams(cv::Mat cameraMatrix, cv::Mat distorsionCoeff,
+   }
+ 
+   if (cameraMatrix.rows != 3 || cameraMatrix.cols != 3)
+-    throw cv::Exception(9000, "invalid input cameraMatrix", "CameraParameters::setParams",
++    throw cv::Exception(static_cast<cv::Error::Code>(9000), "invalid input cameraMatrix", "CameraParameters::setParams",
+                         __FILE__, __LINE__);
+   cameraMatrix.convertTo(CameraMatrix, CV_32FC1);
+   if (distorsionCoeff.total() < 4 || distorsionCoeff.total() >= 7)
+-    throw cv::Exception(9000, "invalid input distorsionCoeff",
++    throw cv::Exception(static_cast<cv::Error::Code>(9000), "invalid input distorsionCoeff",
+                         "CameraParameters::setParams", __FILE__, __LINE__);
+   cv::Mat auxD;
+ 
+@@ -128,12 +128,12 @@ cv::Point3f CameraParameters::getCameraLocation(const cv::Mat &Rvec, const cv::M
+ void CameraParameters::saveToFile(string path, bool inXML)
+ {
+   if (!isValid())
+-    throw cv::Exception(9006, "invalid object", "CameraParameters::saveToFile", __FILE__, __LINE__);
++    throw cv::Exception(static_cast<cv::Error::Code>(9006), "invalid object", "CameraParameters::saveToFile", __FILE__, __LINE__);
+   if (!inXML)
+   {
+     ofstream file(path.c_str());
+     if (!file)
+-      throw cv::Exception(9006, "could not open file:" + path,
++      throw cv::Exception(static_cast<cv::Error::Code>(9006), "could not open file:" + path,
+                           "CameraParameters::saveToFile", __FILE__, __LINE__);
+     file << "# Aruco 1.0 CameraParameters" << endl;
+     file << "fx = " << CameraMatrix.at<float>(0, 0) << endl;
+@@ -166,7 +166,7 @@ void CameraParameters::saveToFile(string path, bool inXML)
+ void CameraParameters::resize(cv::Size size)
+ {
+   if (!isValid())
+-    throw cv::Exception(9007, "invalid object", "CameraParameters::resize", __FILE__, __LINE__);
++    throw cv::Exception(static_cast<cv::Error::Code>(9007), "invalid object", "CameraParameters::resize", __FILE__, __LINE__);
+   if (size == CamSize)
+     return;
+   // now, read the camera size
+@@ -205,7 +205,7 @@ void CameraParameters::readFromXMLFile(string filePath)
+   {
+     fs["Camera_Matrix"] >> MCamera;
+     if (MCamera.cols == 0 || MCamera.rows == 0)
+-      throw cv::Exception(9007, "File :" + filePath + " does not contains valid camera matrix",
++      throw cv::Exception(static_cast<cv::Error::Code>(9007), "File :" + filePath + " does not contains valid camera matrix",
+                           "CameraParameters::readFromXML", __FILE__, __LINE__);
+   }
+ 
+@@ -214,7 +214,7 @@ void CameraParameters::readFromXMLFile(string filePath)
+     fs["image_Width"] >> w;
+     fs["image_Height"] >> h;
+     if (w == -1 || h == 0)
+-      throw cv::Exception(9007, "File :" + filePath + " does not contains valid camera dimensions",
++      throw cv::Exception(static_cast<cv::Error::Code>(9007), "File :" + filePath + " does not contains valid camera dimensions",
+                           "CameraParameters::readFromXML", __FILE__, __LINE__);
+   }
+   if (MCamera.type() != CV_32FC1)
+@@ -226,7 +226,7 @@ void CameraParameters::readFromXMLFile(string filePath)
+   {
+     fs["Distortion_Coefficients"] >> MDist;
+     if (MDist.total() < 4)
+-      throw cv::Exception(9007, "File :" + filePath + " does not contains valid distortion_coefficients",
++      throw cv::Exception(static_cast<cv::Error::Code>(9007), "File :" + filePath + " does not contains valid distortion_coefficients",
+                           "CameraParameters::readFromXML", __FILE__, __LINE__);
+   }
+   // convert to 32 and get the 4 first elements only
+@@ -253,7 +253,7 @@ void CameraParameters::glGetProjectionMatrix(cv::Size orgImgSize, cv::Size size,
+     std::cerr << "CameraParameters::glGetProjectionMatrix :: The camera has distortion coefficients "
+               << __FILE__ << " " << __LINE__ << endl;
+   if (isValid() == false)
+-    throw cv::Exception(9100, "invalid camera parameters",
++    throw cv::Exception(static_cast<cv::Error::Code>(9100), "invalid camera parameters",
+                         "CameraParameters::glGetProjectionMatrix", __FILE__, __LINE__);
+ 
+   // Deterime the rsized info
+@@ -305,7 +305,7 @@ void CameraParameters::argConvGLcpara2(double cparam[3][4], int width, int heigh
+   cparam[2][2] *= -1.0;
+ 
+   if (arParamDecompMat(cparam, icpara, trans) < 0)
+-    throw cv::Exception(9002, "parameter error", "MarkerDetector::argConvGLcpara2",
++    throw cv::Exception(static_cast<cv::Error::Code>(9002), "parameter error", "MarkerDetector::argConvGLcpara2",
+                         __FILE__, __LINE__);
+ 
+   for (i = 0; i < 3; i++)
+diff --git a/src/aruco/cvdrawingutils.cpp b/src/aruco/cvdrawingutils.cpp
+index 37484df..0a0bf19 100755
+--- a/src/aruco/cvdrawingutils.cpp
++++ b/src/aruco/cvdrawingutils.cpp
+@@ -13,7 +13,7 @@ Copyright 2020 Rafael Muñoz Salinas. All rights reserved.
+     You should have received a copy of the GNU General Public License
+     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+-#include <opencv2/calib3d/calib3d.hpp>
++#include <opencv2/calib3d.hpp>
+ #include <opencv2/imgproc/imgproc.hpp>
+ #include "cvdrawingutils.h"
+ #include "cameraparameters.h"
+diff --git a/src/aruco/dictionary.cpp b/src/aruco/dictionary.cpp
+index c399c57..d227fdb 100755
+--- a/src/aruco/dictionary.cpp
++++ b/src/aruco/dictionary.cpp
+@@ -3314,7 +3314,7 @@ Dictionary Dictionary::loadPredefined(DICT_TYPES type)
+     }
+     break;
+     case CUSTOM:
+-      throw cv::Exception(-1, "CUSTOM type is only set by loading from file",
++      throw cv::Exception(static_cast<cv::Error::Code>(-1), "CUSTOM type is only set by loading from file",
+                           "Dictionary::loadPredefined", "dictionary.h", -1);
+       break;
+     case ALL_DICTS:
+@@ -3327,7 +3327,7 @@ Dictionary Dictionary::loadPredefined(DICT_TYPES type)
+     break;
+ 
+     default:
+-      throw cv::Exception(9001, "Invalid Dictionary type requested",
++      throw cv::Exception(static_cast<cv::Error::Code>(9001), "Invalid Dictionary type requested",
+                           "Dictionary::loadPredefined", __FILE__, __LINE__);
+   };
+   return d;
+@@ -3524,7 +3524,7 @@ Dictionary::DICT_TYPES Dictionary::getTypeFromString(std::string str)
+   else
+     return CUSTOM;
+ 
+-  //    throw cv::Exception(9001, "Invalid string <"+str+"> to convert to Dictionary
++  //    throw cv::Exception(static_cast<cv::Error::Code>(9001), "Invalid string <"+str+"> to convert to Dictionary
+   //    type", "Dictionary::getTypeFromString", __FILE__, __LINE__);
+ }
+ 
+@@ -3545,7 +3545,7 @@ MarkerMap Dictionary::createMarkerMap(cv::Size gridSize, int MarkerSize, int Mar
+                                       const std::vector<int> &ids, bool chess_board)
+ {
+   if (gridSize.height * gridSize.width != int(ids.size()))
+-    throw cv::Exception(9001, "gridSize != ids.size()Invalid ",
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "gridSize != ids.size()Invalid ",
+                         "Dictionary::createMarkerMap", __FILE__, __LINE__);
+   MarkerMap TInfo;
+ 
+@@ -3586,7 +3586,7 @@ MarkerMap Dictionary::createMarkerMap(cv::Size gridSize, int MarkerSize, int Mar
+         if (toWrite)
+         {
+           if (CurMarkerIdx >= int(ids.size()))
+-            throw cv::Exception(999, " FiducidalMarkers::createMarkerMapImage_ChessMarkerMap",
++            throw cv::Exception(static_cast<cv::Error::Code>(999), " FiducidalMarkers::createMarkerMapImage_ChessMarkerMap",
+                                 "INTERNAL ERROR. REWRITE THIS!!", __FILE__, __LINE__);
+           TInfo.push_back(Marker3DInfo(ids[CurMarkerIdx++]));
+           /// \todo use const auto &
+diff --git a/src/aruco/fractaldetector.cpp b/src/aruco/fractaldetector.cpp
+index 56db5a1..42277ed 100755
+--- a/src/aruco/fractaldetector.cpp
++++ b/src/aruco/fractaldetector.cpp
+@@ -14,7 +14,7 @@ Copyright 2020 Rafael Muñoz Salinas. All rights reserved.
+     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+ #include "fractaldetector.h"
+-#include "opencv2/calib3d/calib3d.hpp"
++#include "opencv2/calib3d.hpp"
+ #include "cvdrawingutils.h"
+ #include <algorithm>
+ #include "aruco_cvversioning.h"
+diff --git a/src/aruco/fractallabelers/fractalmarkerset.cpp b/src/aruco/fractallabelers/fractalmarkerset.cpp
+index 75f1f1c..4b1b502 100755
+--- a/src/aruco/fractallabelers/fractalmarkerset.cpp
++++ b/src/aruco/fractallabelers/fractalmarkerset.cpp
+@@ -252,12 +252,12 @@ FractalMarkerSet FractalMarkerSet::loadPredefined(CONF_TYPES type)
+     }
+     break;
+     case CUSTOM:
+-      throw cv::Exception(-1, "CUSTOM type is only set by loading from file",
++      throw cv::Exception(static_cast<cv::Error::Code>(-1), "CUSTOM type is only set by loading from file",
+                           "FractalMarkerSet::loadPredefined", "fractalmarkerset.h", -1);
+       break;
+ 
+     default:
+-      throw cv::Exception(9001, "Invalid Dictionary type requested",
++      throw cv::Exception(static_cast<cv::Error::Code>(9001), "Invalid Dictionary type requested",
+                           "Dictionary::loadPredefined", __FILE__, __LINE__);
+   }
+   return fms;
+@@ -585,7 +585,7 @@ FractalMarkerSet FractalMarkerSet::readFromFile(std::string path)
+   }
+   catch (std::exception &ex)
+   {
+-    throw cv::Exception(81818, "FractalMarkerSet::readFromFile",
++    throw cv::Exception(static_cast<cv::Error::Code>(81818), "FractalMarkerSet::readFromFile",
+                         ex.what() + std::string(" file=)") + path, __FILE__, __LINE__);
+   }
+ 
+@@ -621,7 +621,7 @@ FractalMarkerSet FractalMarkerSet::readFromFile(std::string path)
+       std::vector<float> coordinates3d;
+       (*itp) >> coordinates3d;
+       if (coordinates3d.size() != 3)
+-        throw cv::Exception(81818, "FractalMarkerSet::readFromFile",
++        throw cv::Exception(static_cast<cv::Error::Code>(81818), "FractalMarkerSet::readFromFile",
+                             "invalid file type 3", __FILE__, __LINE__);
+       cv::Point3f point(coordinates3d[0], coordinates3d[1], coordinates3d[2]);
+       corners.push_back(point);
+@@ -725,7 +725,7 @@ bool FractalMarkerSet::isFractalMarker(cv::Mat &m, int nbits, int &markerid)
+ FractalMarkerSet FractalMarkerSet::convertToMeters(float fractalSizeM)
+ {
+   if (!(isExpressedInPixels() || isNormalize()))
+-    throw cv::Exception(-1, "The FractalMarkers are not expressed in pixels",
++    throw cv::Exception(static_cast<cv::Error::Code>(-1), "The FractalMarkers are not expressed in pixels",
+                         "FractalMarkerSet::convertToMeters", __FILE__, __LINE__);
+ 
+   FractalMarkerSet BInfo(*this);
+@@ -748,7 +748,7 @@ FractalMarkerSet FractalMarkerSet::convertToMeters(float fractalSizeM)
+ FractalMarkerSet FractalMarkerSet::normalize()
+ {
+   if (!(isExpressedInPixels() || isExpressedInMeters()))
+-    throw cv::Exception(-1, "The FractalMarkers are not expressed in pixels or meters",
++    throw cv::Exception(static_cast<cv::Error::Code>(-1), "The FractalMarkers are not expressed in pixels or meters",
+                         "FractalMarkerSet::convertToMeters", __FILE__, __LINE__);
+ 
+   FractalMarkerSet BInfo(*this);
+@@ -786,7 +786,7 @@ std::map<int, std::vector<cv::Point3f>> FractalMarkerSet::getInnerCorners()
+ cv::Mat FractalMarkerSet::getFractalMarkerImage(int pixSize, bool border)
+ {
+   if (fractalMarkerCollection.size() < 1)
+-    throw cv::Exception(9001, "There is not any fractal marker loaded",
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "There is not any fractal marker loaded",
+                         "FractalMarkerSet::getFractalMarkerImage", __FILE__, __LINE__);
+ 
+   // Smallest fractal marker
+diff --git a/src/aruco/fractallabelers/fractalposetracker.cpp b/src/aruco/fractallabelers/fractalposetracker.cpp
+index ac17b7f..5fbb2f2 100755
+--- a/src/aruco/fractallabelers/fractalposetracker.cpp
++++ b/src/aruco/fractallabelers/fractalposetracker.cpp
+@@ -5,7 +5,8 @@
+ #include "timers.h"
+ 
+ 
+-#include "opencv2/calib3d/calib3d.hpp"
++#include "opencv2/calib3d.hpp"
++#include "opencv2/features2d.hpp"
+ #include "aruco_cvversioning.h"
+ 
+ namespace aruco
+@@ -238,15 +239,15 @@ void FractalPoseTracker::setParams(const CameraParameters &cam_params,
+   _fractalMarker = msconf;
+ 
+   if (!cam_params.isValid())
+-    throw cv::Exception(9001, "Invalid camera parameters",
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "Invalid camera parameters",
+                         "FractalPoseTracker::setParams", __FILE__, __LINE__);
+   if (_fractalMarker.mInfoType == aruco::FractalMarkerSet::NONE)
+-    throw cv::Exception(9001, "Invalid FractalMarker", "FractalPoseTracker::setParams",
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "Invalid FractalMarker", "FractalPoseTracker::setParams",
+                         __FILE__, __LINE__);
+   if ((_fractalMarker.mInfoType == aruco::FractalMarkerSet::PIX ||
+        _fractalMarker.mInfoType == aruco::FractalMarkerSet::NORM) &&
+       markerSize <= 0)
+-    throw cv::Exception(9001, "You should indicate the markersize since the Fractal Marker is in pixels or normalized",
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "You should indicate the markersize since the Fractal Marker is in pixels or normalized",
+                         "FractalPoseTracker::setParams", __FILE__, __LINE__);
+   if (_fractalMarker.mInfoType == aruco::FractalMarkerSet::PIX ||
+       _fractalMarker.mInfoType == aruco::FractalMarkerSet::NORM)
+diff --git a/src/aruco/marker.cpp b/src/aruco/marker.cpp
+index 917ba63..083aede 100755
+--- a/src/aruco/marker.cpp
++++ b/src/aruco/marker.cpp
+@@ -19,7 +19,7 @@ Copyright 2020 Rafael Muñoz Salinas. All rights reserved.
+ /// \todo set this definition in the cmake code
+ #define _USE_MATH_DEFINES
+ 
+-#include <opencv2/calib3d/calib3d.hpp>
++#include <opencv2/calib3d.hpp>
+ #include <opencv2/imgproc/imgproc.hpp>
+ 
+ #include <cstdio>
+@@ -111,7 +111,7 @@ void Marker::glGetModelViewMatrix(double modelview_matrix[16])
+       invalid |= false;
+   }
+   if (invalid)
+-    throw cv::Exception(9003, "extrinsic parameters are not set",
++    throw cv::Exception(static_cast<cv::Error::Code>(9003), "extrinsic parameters are not set",
+                         "Marker::getModelViewMatrix", __FILE__, __LINE__);
+   cv::Mat Rot(3, 3, CV_32FC1), Jacob;
+   cv::Rodrigues(Rvec, Rot, Jacob);
+@@ -168,7 +168,7 @@ void Marker::OgreGetPoseParameters(double position[3], double orientation[4])
+       invalid |= false;
+   }
+   if (invalid)
+-    throw cv::Exception(9003, "extrinsic parameters are not set",
++    throw cv::Exception(static_cast<cv::Error::Code>(9003), "extrinsic parameters are not set",
+                         "Marker::getModelViewMatrix", __FILE__, __LINE__);
+ 
+   // calculate position vector
+@@ -301,7 +301,7 @@ void Marker::draw(cv::Mat& in, cv::Scalar color, int lineWidth, bool writeId, bo
+ void Marker::calculateExtrinsics(float markerSize, const CameraParameters& CP, bool setYPerpendicular)
+ {
+   if (!CP.isValid())
+-    throw cv::Exception(9004, "!CP.isValid(): invalid camera parameters. It is not possible to calculate extrinsics",
++    throw cv::Exception(static_cast<cv::Error::Code>(9004), "!CP.isValid(): invalid camera parameters. It is not possible to calculate extrinsics",
+                         "calculateExtrinsics", __FILE__, __LINE__);
+   calculateExtrinsics(markerSize, CP.CameraMatrix, CP.Distorsion, CP.ExtrinsicMatrix,
+                       setYPerpendicular);
+@@ -317,13 +317,13 @@ void Marker::calculateExtrinsics(float markerSizeMeters, cv::Mat camMatrix, cv::
+                                  cv::Mat Extrinsics, bool setYPerpendicular, bool correctFisheye)
+ {
+   if (!isValid())
+-    throw cv::Exception(9004, "!isValid(): invalid marker. It is not possible to calculate extrinsics",
++    throw cv::Exception(static_cast<cv::Error::Code>(9004), "!isValid(): invalid marker. It is not possible to calculate extrinsics",
+                         "calculateExtrinsics", __FILE__, __LINE__);
+   if (markerSizeMeters <= 0)
+-    throw cv::Exception(9004, "markerSize<=0: invalid markerSize", "calculateExtrinsics",
++    throw cv::Exception(static_cast<cv::Error::Code>(9004), "markerSize<=0: invalid markerSize", "calculateExtrinsics",
+                         __FILE__, __LINE__);
+   if (camMatrix.rows == 0 || camMatrix.cols == 0)
+-    throw cv::Exception(9004, "CameraMatrix is empty", "calculateExtrinsics", __FILE__, __LINE__);
++    throw cv::Exception(static_cast<cv::Error::Code>(9004), "CameraMatrix is empty", "calculateExtrinsics", __FILE__, __LINE__);
+ 
+   std::vector<cv::Point3f> objpoints = get3DPoints(markerSizeMeters);
+ 
+diff --git a/src/aruco/markerdetector.cpp b/src/aruco/markerdetector.cpp
+index debc1f4..66de492 100755
+--- a/src/aruco/markerdetector.cpp
++++ b/src/aruco/markerdetector.cpp
+@@ -21,8 +21,8 @@ Copyright 2020 Rafael Muñoz Salinas. All rights reserved.
+ 
+ #include <opencv2/core/core.hpp>
+ #include <opencv2/imgproc/imgproc.hpp>
+-#include <opencv2/features2d/features2d.hpp>
+-#include <opencv2/calib3d/calib3d.hpp>
++#include <opencv2/features2d.hpp>
++#include <opencv2/calib3d.hpp>
+ #include <fstream>
+ #include <iostream>
+ #include <valarray>
+diff --git a/src/aruco/markerdetector_impl.cpp b/src/aruco/markerdetector_impl.cpp
+index e1a21a6..575645f 100755
+--- a/src/aruco/markerdetector_impl.cpp
++++ b/src/aruco/markerdetector_impl.cpp
+@@ -21,8 +21,8 @@ Copyright 2020 Rafael Muñoz Salinas. All rights reserved.
+ 
+ #include <opencv2/core/core.hpp>
+ #include <opencv2/imgproc/imgproc.hpp>
+-#include <opencv2/features2d/features2d.hpp>
+-#include <opencv2/calib3d/calib3d.hpp>
++#include <opencv2/features2d.hpp>
++#include <opencv2/calib3d.hpp>
+ #include <fstream>
+ #include <iostream>
+ #include <valarray>
+@@ -1433,7 +1433,7 @@ int MarkerDetector_Impl::getMinMarkerSizePix(cv::Size orginput_imageSize) const
+ bool MarkerDetector_Impl::warp(Mat &in, Mat &out, Size size, vector<Point2f> points)
+ {
+   if (points.size() != 4)
+-    throw cv::Exception(9001, "point.size()!=4", "MarkerDetector_Impl::warp", __FILE__, __LINE__);
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "point.size()!=4", "MarkerDetector_Impl::warp", __FILE__, __LINE__);
+   // obtain the perspective transform
+   Point2f pointsRes[4], pointsIn[4];
+   for (int i = 0; i < 4; i++)
+diff --git a/src/aruco/markermap.cpp b/src/aruco/markermap.cpp
+index 5afc105..55dd028 100755
+--- a/src/aruco/markermap.cpp
++++ b/src/aruco/markermap.cpp
+@@ -17,7 +17,7 @@ Copyright 2020 Rafael Muñoz Salinas. All rights reserved.
+ #include "markermap.h"
+ #include "dictionary.h"
+ 
+-#include <opencv2/calib3d/calib3d.hpp>
++#include <opencv2/calib3d.hpp>
+ #include <opencv2/imgproc/imgproc.hpp>
+ 
+ #include <fstream>
+@@ -94,13 +94,13 @@ void MarkerMap::readFromFile(string sfile)
+   {
+     cv::FileStorage fs(sfile, cv::FileStorage::READ);
+     if (!fs.isOpened())
+-      throw cv::Exception(81818, "MarkerMap::readFromFile",
++      throw cv::Exception(static_cast<cv::Error::Code>(81818), "MarkerMap::readFromFile",
+                           string(" file not opened ") + sfile, __FILE__, __LINE__);
+     readFromFile(fs);
+   }
+   catch (std::exception& ex)
+   {
+-    throw cv::Exception(81818, "MarkerMap::readFromFile",
++    throw cv::Exception(static_cast<cv::Error::Code>(81818), "MarkerMap::readFromFile",
+                         ex.what() + string(" file=)") + sfile, __FILE__, __LINE__);
+   }
+ }
+@@ -112,7 +112,7 @@ void MarkerMap::readFromFile(cv::FileStorage& fs)
+   int aux = 0;
+   // look for the nmarkers
+   if (fs["aruco_bc_nmarkers"].name() != "aruco_bc_nmarkers")
+-    throw cv::Exception(81818, "MarkerMap::readFromFile", "invalid file type", __FILE__, __LINE__);
++    throw cv::Exception(static_cast<cv::Error::Code>(81818), "MarkerMap::readFromFile", "invalid file type", __FILE__, __LINE__);
+   fs["aruco_bc_nmarkers"] >> aux;
+   resize(aux);
+   fs["aruco_bc_mInfoType"] >> mInfoType;
+@@ -127,7 +127,7 @@ void MarkerMap::readFromFile(cv::FileStorage& fs)
+       vector<float> coordinates3d;
+       (*itc) >> coordinates3d;
+       if (coordinates3d.size() != 3)
+-        throw cv::Exception(81818, "MarkerMap::readFromFile", "invalid file type 3",
++        throw cv::Exception(static_cast<cv::Error::Code>(81818), "MarkerMap::readFromFile", "invalid file type 3",
+                             __FILE__, __LINE__);
+       cv::Point3f point(coordinates3d[0], coordinates3d[1], coordinates3d[2]);
+       at(i).push_back(point);
+@@ -155,7 +155,7 @@ const Marker3DInfo& MarkerMap::getMarker3DInfo(int id) const
+   for (size_t i = 0; i < size(); i++)
+     if (at(i).id == id)
+       return at(i);
+-  throw cv::Exception(111, "MarkerMap::getMarker3DInfo",
++  throw cv::Exception(static_cast<cv::Error::Code>(111), "MarkerMap::getMarker3DInfo",
+                       "Marker with the id given is not found", __FILE__, __LINE__);
+ }
+ 
+@@ -171,7 +171,7 @@ void __glGetModelViewMatrix(double modelview_matrix[16], const cv::Mat& Rvec, co
+       invalid |= false;
+   }
+   if (invalid)
+-    throw cv::Exception(9002, "extrinsic parameters are not set",
++    throw cv::Exception(static_cast<cv::Error::Code>(9002), "extrinsic parameters are not set",
+                         "Marker::getModelViewMatrix", __FILE__, __LINE__);
+   Mat Rot(3, 3, CV_32FC1), Jacob;
+   Rodrigues(Rvec, Rot, Jacob);
+@@ -229,7 +229,7 @@ void __OgreGetPoseParameters(double position[3], double orientation[4],
+       invalid |= false;
+   }
+   if (invalid)
+-    throw cv::Exception(9003, "extrinsic parameters are not set",
++    throw cv::Exception(static_cast<cv::Error::Code>(9003), "extrinsic parameters are not set",
+                         "Marker::getModelViewMatrix", __FILE__, __LINE__);
+ 
+   // calculate position vector
+@@ -320,7 +320,7 @@ void MarkerMap::getIdList(std::vector<int>& ids, bool append) const
+ MarkerMap MarkerMap::convertToMeters(float markerSize_meters) const
+ {
+   if (!isExpressedInPixels())
+-    throw cv::Exception(-1, "The board is not expressed in pixels",
++    throw cv::Exception(static_cast<cv::Error::Code>(-1), "The board is not expressed in pixels",
+                         "MarkerMap::convertToMeters", __FILE__, __LINE__);
+   // first, we are assuming all markers are equally sized. So, lets get the size in pixels
+   int markerSizePix = static_cast<int>(cv::norm(at(0)[0] - at(0)[1]));
+@@ -340,10 +340,10 @@ MarkerMap MarkerMap::convertToMeters(float markerSize_meters) const
+ cv::Mat MarkerMap::getImage(float METER2PIX) const
+ {
+   if (mInfoType == NONE)
+-    throw cv::Exception(-1, "The board is not valid mInfoType==NONE  ",
++    throw cv::Exception(static_cast<cv::Error::Code>(-1), "The board is not valid mInfoType==NONE  ",
+                         "MarkerMap::getImage", __FILE__, __LINE__);
+   if (METER2PIX <= 0 && mInfoType != PIX)
+-    throw cv::Exception(-1, "The board is not expressed in pixels and not METER2PIX indicated",
++    throw cv::Exception(static_cast<cv::Error::Code>(-1), "The board is not expressed in pixels and not METER2PIX indicated",
+                         "MarkerMap::getImage", __FILE__, __LINE__);
+ 
+   auto Dict = Dictionary::loadPredefined(dictionary);
+diff --git a/src/aruco/posetracker.cpp b/src/aruco/posetracker.cpp
+index 4cb14f4..7b571a2 100755
+--- a/src/aruco/posetracker.cpp
++++ b/src/aruco/posetracker.cpp
+@@ -416,13 +416,13 @@ void MarkerMapPoseTracker::setParams(const CameraParameters& cam_params,
+   _msconf = msconf;
+   _cam_params = cam_params;
+   if (!cam_params.isValid())
+-    throw cv::Exception(9001, "Invalid camera parameters",
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "Invalid camera parameters",
+                         "MarkerMapPoseTracker::setParams", __FILE__, __LINE__);
+   if (_msconf.mInfoType == MarkerMap::PIX && markerSize <= 0)
+-    throw cv::Exception(9001, "You should indicate the markersize since the MarkerMap is in pixels",
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "You should indicate the markersize since the MarkerMap is in pixels",
+                         "MarkerMapPoseTracker::setParams", __FILE__, __LINE__);
+   if (_msconf.mInfoType == MarkerMap::NONE)
+-    throw cv::Exception(9001, "Invalid MarkerMap", "MarkerMapPoseTracker::setParams",
++    throw cv::Exception(static_cast<cv::Error::Code>(9001), "Invalid MarkerMap", "MarkerMapPoseTracker::setParams",
+                         __FILE__, __LINE__);
+   if (_msconf.mInfoType == MarkerMap::PIX)
+     _msconf = _msconf.convertToMeters(markerSize);
