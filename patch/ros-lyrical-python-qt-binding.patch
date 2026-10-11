@@ -1,0 +1,24 @@
+diff --git a/src/python_qt_binding/binding_helper.py b/src/python_qt_binding/binding_helper.py
+index cb6b835..cdb8369 100644
+--- a/src/python_qt_binding/binding_helper.py
++++ b/src/python_qt_binding/binding_helper.py
+@@ -32,7 +32,6 @@
+ 
+ import builtins
+ import os
+-import platform
+ import sys
+ import traceback
+ 
+@@ -48,10 +47,7 @@ def _select_qt_binding(binding_name=None, binding_order=None):
+     global QT_BINDING, QT_BINDING_VERSION
+ 
+     # order of default bindings can be changed here
+-    if platform.system() == 'Darwin':
+-        DEFAULT_BINDING_ORDER = ['pyside']
+-    else:
+-        DEFAULT_BINDING_ORDER = ['pyqt', 'pyside']
++    DEFAULT_BINDING_ORDER = ['pyqt', 'pyside']
+ 
+     binding_order = binding_order or DEFAULT_BINDING_ORDER
+ 
