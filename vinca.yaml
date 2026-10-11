@@ -50,7 +50,6 @@ packages_select_by_deps:
   - ament_cmake_core
   - ament_cmake_mypy
   - apriltag_detector
-  - aruco_ros
   - asio_cmake_module
   - autoware_adapi_v1_msgs
   - autoware_adapi_version_msgs
@@ -357,6 +356,7 @@ packages_select_by_deps:
       - apriltag_detector_umich
       - apriltag_draw
       - apriltag_tools
+      - aruco_ros
       - automatika_embodied_agents
       - automatika_ros_sugar
       - autoware_core
