@@ -1,0 +1,27 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 6107b23..97ea89f 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,8 +14,7 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+   # issues #1285 #1288
+   find_library(
+     builtin_interfaces__rosidl_generator_c_LIB NAMES builtin_interfaces__rosidl_generator_c
+-    PATHS "/opt/ros/$ENV{ROS_DISTRO}/lib"
+-    NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED
++    REQUIRED
+   )
+ endif()
+ 
+diff --git a/src/CoreWrapper.cpp b/src/CoreWrapper.cpp
+index c1fb75b..bb732d6 100644
+--- a/src/CoreWrapper.cpp
++++ b/src/CoreWrapper.cpp
+@@ -1474,7 +1474,7 @@ void CoreWrapper::commonMultiCameraCallbackImpl(
+ 		cv::Mat leftMono;
+ 		if(rgb.channels() == 3)
+ 		{
+-			cv::cvtColor(rgb, leftMono, CV_BGR2GRAY);
++			cv::cvtColor(rgb, leftMono, cv::COLOR_BGR2GRAY);
+ 		}
+ 		else
+ 		{

@@ -432,6 +432,7 @@ packages_select_by_deps:
       - rqt_reconfigure
       - rqt_tf_tree
       - rslidar_sdk
+      - rtabmap_ros
       - rviz_2d_overlay_plugins
       - rviz_satellite
       - serial_driver

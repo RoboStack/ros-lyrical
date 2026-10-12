@@ -1,0 +1,56 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index add21b0..371140e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -9,18 +9,15 @@ if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+   # issues #1285 #1288
+   find_library(
+     builtin_interfaces__rosidl_generator_c_LIB NAMES builtin_interfaces__rosidl_generator_c
+-    PATHS "/opt/ros/$ENV{ROS_DISTRO}/lib"
+-    NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED
++    REQUIRED
+   )
+   find_library(
+     rcutils_LIB NAMES rcutils
+-    PATHS "/opt/ros/$ENV{ROS_DISTRO}/lib"
+-    NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED
++    REQUIRED
+   )
+   find_library(
+     crypto_LIB NAMES crypto
+-    PATHS "/usr/lib/${CMAKE_SYSTEM_PROCESSOR}-linux-gnu"
+-    NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH REQUIRED
++    REQUIRED
+   )
+ endif()
+ 
+diff --git a/src/GuiNode.cpp b/src/GuiNode.cpp
+index 88895ed..e62af21 100644
+--- a/src/GuiNode.cpp
++++ b/src/GuiNode.cpp
+@@ -32,6 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ #include <rtabmap/gui/MainWindow.h>
+ #include <rtabmap/utilite/ULogger.h>
+ #include <signal.h>
++#include <QSurfaceFormat>
++#include <vtkVersionMacros.h>
++#if VTK_MAJOR_VERSION > 9 || (VTK_MAJOR_VERSION==9 && VTK_MINOR_VERSION >= 1)
++#include <QVTKRenderWidget.h>
++#endif
+ 
+ QApplication * app = 0;
+ 
+@@ -49,6 +54,13 @@ int main(int argc, char** argv)
+ 
+ 	rclcpp::init(argc, argv);
+ 
++#if VTK_MAJOR_VERSION > 9 || (VTK_MAJOR_VERSION==9 && VTK_MINOR_VERSION >= 1)
++	// needed to ensure appropriate OpenGL context is created for VTK rendering
++	// (without it, macOS creates a legacy OpenGL 2.1 context and VTK crashes).
++	QSurfaceFormat::setDefaultFormat(QVTKRenderWidget::defaultFormat());
++#endif
++	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
++
+ 	app = new QApplication(argc, argv);
+ 	app->connect( app, SIGNAL( lastWindowClosed() ), app, SLOT( quit() ) );
+ 
