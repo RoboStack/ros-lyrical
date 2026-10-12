@@ -356,6 +356,7 @@ packages_select_by_deps:
       - apriltag_detector_umich
       - apriltag_draw
       - apriltag_tools
+      - aruco_ros
       - automatika_embodied_agents
       - automatika_ros_sugar
       - autoware_core

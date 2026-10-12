@@ -1,0 +1,149 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5f6f4a9..d2d1190 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -28,6 +28,20 @@ foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
+   find_package(${Dependency} REQUIRED)
+ endforeach()
+ 
++set(THIS_PACKAGE_TARGETS
++    cv_bridge::cv_bridge
++    ${geometry_msgs_TARGETS}
++    image_transport::image_transport
++    rclcpp::rclcpp
++    tf2::tf2
++    tf2_ros::tf2_ros
++    tf2_geometry_msgs::tf2_geometry_msgs
++    ${aruco_LIBRARIES}
++    ${aruco_msgs_TARGETS}
++    ${sensor_msgs_TARGETS}
++    ${visualization_msgs_TARGETS}
++)
++
+ #generate_dynamic_reconfigure_options(
+ #  cfg/ArucoThreshold.cfg
+ #)
+@@ -40,8 +54,9 @@ target_include_directories(aruco_ros_utils
+ target_include_directories(aruco_ros_utils
+   SYSTEM PUBLIC
+   ${OpenCV_INCLUDE_DIRS}
++  ${aruco_INCLUDE_DIRS}
+ )
+-ament_target_dependencies(aruco_ros_utils ${THIS_PACKAGE_INCLUDE_DEPENDS})
++target_link_libraries(aruco_ros_utils ${THIS_PACKAGE_TARGETS})
+ target_link_libraries(aruco_ros_utils ${OpenCV_LIBRARIES})
+ 
+ add_executable(single src/simple_single.cpp
+@@ -54,8 +69,9 @@ target_include_directories(single
+ target_include_directories(single
+   SYSTEM PUBLIC
+   ${OpenCV_INCLUDE_DIRS}
++  ${aruco_INCLUDE_DIRS}
+ )
+-ament_target_dependencies(single ${THIS_PACKAGE_INCLUDE_DEPENDS})
++target_link_libraries(single ${THIS_PACKAGE_TARGETS})
+ target_link_libraries(single ${OpenCV_LIBRARIES})
+ 
+ add_executable(double src/simple_double.cpp
+@@ -67,8 +83,9 @@ target_include_directories(double
+ target_include_directories(double
+   SYSTEM PUBLIC
+   ${OpenCV_INCLUDE_DIRS}
++  ${aruco_INCLUDE_DIRS}
+ )
+-ament_target_dependencies(double ${THIS_PACKAGE_INCLUDE_DEPENDS})
++target_link_libraries(double ${THIS_PACKAGE_TARGETS})
+ target_link_libraries(double ${OpenCV_LIBRARIES})
+ 
+ add_executable(marker_publisher src/marker_publish.cpp
+@@ -80,8 +97,9 @@ target_include_directories(marker_publisher
+ target_include_directories(marker_publisher
+   SYSTEM PUBLIC
+   ${OpenCV_INCLUDE_DIRS}
++  ${aruco_INCLUDE_DIRS}
+ )
+-ament_target_dependencies(marker_publisher ${THIS_PACKAGE_INCLUDE_DEPENDS})
++target_link_libraries(marker_publisher ${THIS_PACKAGE_TARGETS})
+ target_link_libraries(marker_publisher ${OpenCV_LIBRARIES})
+ 
+ if(BUILD_TESTING)
+diff --git a/include/aruco_ros/aruco_ros_utils.hpp b/include/aruco_ros/aruco_ros_utils.hpp
+index b030211..7586a53 100644
+--- a/include/aruco_ros/aruco_ros_utils.hpp
++++ b/include/aruco_ros/aruco_ros_utils.hpp
+@@ -9,8 +9,8 @@
+ #include "geometry_msgs/msg/pose_stamped.hpp"
+ #include "sensor_msgs/msg/camera_info.hpp"
+ #include "sensor_msgs/msg/image.hpp"
+-#include "tf2/LinearMath/Transform.h"
+-#include "tf2/transform_datatypes.h"
++#include "tf2/LinearMath/Transform.hpp"
++#include "tf2/transform_datatypes.hpp"
+ #include "visualization_msgs/msg/marker.hpp"
+ 
+ namespace aruco_ros
+diff --git a/src/aruco_ros_utils.cpp b/src/aruco_ros_utils.cpp
+index c501b61..392b154 100644
+--- a/src/aruco_ros_utils.cpp
++++ b/src/aruco_ros_utils.cpp
+@@ -8,9 +8,9 @@
+ #else
+ #include "cv_bridge/cv_bridge.h"
+ #endif
+-#include "opencv4/opencv2/calib3d.hpp"
++#include "opencv2/calib3d.hpp"
+ #include "rclcpp/logging.hpp"
+-#include "tf2/transform_datatypes.h"
++#include "tf2/transform_datatypes.hpp"
+ 
+ aruco::CameraParameters aruco_ros::rosCameraInfo2ArucoCamParams(
+   const sensor_msgs::msg::CameraInfo & cam_info,
+diff --git a/src/marker_publish.cpp b/src/marker_publish.cpp
+index a578e77..4765f19 100644
+--- a/src/marker_publish.cpp
++++ b/src/marker_publish.cpp
+@@ -50,8 +50,8 @@
+ #include "rcpputils/asserts.hpp"
+ #include "sensor_msgs/image_encodings.hpp"
+ #include "std_msgs/msg/u_int32_multi_array.hpp"
+-#include "tf2_ros/transform_listener.h"
+-#include "tf2_ros/buffer.h"
++#include "tf2_ros/transform_listener.hpp"
++#include "tf2_ros/buffer.hpp"
+ #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
+ 
+ using namespace std::chrono_literals;
+diff --git a/src/simple_double.cpp b/src/simple_double.cpp
+index afb7ada..3f41cba 100644
+--- a/src/simple_double.cpp
++++ b/src/simple_double.cpp
+@@ -52,9 +52,9 @@
+ #include "rclcpp/rclcpp.hpp"
+ #include "rcpputils/asserts.hpp"
+ #include "sensor_msgs/image_encodings.hpp"
+-#include "tf2_ros/transform_broadcaster.h"
+-#include "tf2_ros/buffer.h"
+-#include "tf2_ros/transform_listener.h"
++#include "tf2_ros/transform_broadcaster.hpp"
++#include "tf2_ros/buffer.hpp"
++#include "tf2_ros/transform_listener.hpp"
+ #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
+ #include "visualization_msgs/msg/marker.hpp"
+ 
+diff --git a/src/simple_single.cpp b/src/simple_single.cpp
+index 6a4035d..bc7c784 100644
+--- a/src/simple_single.cpp
++++ b/src/simple_single.cpp
+@@ -50,9 +50,9 @@
+ #include "rclcpp/rclcpp.hpp"
+ #include "rcpputils/asserts.hpp"
+ #include "sensor_msgs/image_encodings.hpp"
+-#include "tf2_ros/transform_broadcaster.h"
+-#include "tf2_ros/buffer.h"
+-#include "tf2_ros/transform_listener.h"
++#include "tf2_ros/transform_broadcaster.hpp"
++#include "tf2_ros/buffer.hpp"
++#include "tf2_ros/transform_listener.hpp"
+ #include "tf2_geometry_msgs/tf2_geometry_msgs.hpp"
+ #include "visualization_msgs/msg/marker.hpp"
+ 
