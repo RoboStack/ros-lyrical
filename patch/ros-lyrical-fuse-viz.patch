@@ -1,0 +1,29 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5a24db7..540d97e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -23,13 +23,13 @@ find_package(tf2_geometry_msgs REQUIRED)
+ 
+ find_package(Eigen3 REQUIRED)
+ find_package(gtest_vendor)
+-find_package(Qt5 COMPONENTS Core Widgets REQUIRED)
++find_package(Qt6 COMPONENTS Core Widgets REQUIRED)
+ 
+ ###########
+ ## Build ##
+ ###########
+ 
+-qt5_wrap_cpp(moc_files
++qt6_wrap_cpp(moc_files
+   include/fuse_viz/mapped_covariance_property.hpp
+   include/fuse_viz/pose_2d_stamped_property.hpp
+   include/fuse_viz/relative_pose_2d_stamped_constraint_property.hpp
+@@ -61,7 +61,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
+ target_include_directories(${PROJECT_NAME} PUBLIC
+   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+-  ${Qt5Widgets_INCLUDE_DIRS}
++  ${Qt6Widgets_INCLUDE_DIRS}
+ )
+ 
+ #############
