@@ -18650,9 +18650,9 @@ rmw_zenoh_cpp:
   - tracetools
   - zenoh_cpp_vendor
   repository: https://github.com/ros2/rmw_zenoh
-  tag: release/lyrical/rmw_zenoh_cpp/0.10.5-1
+  tag: release/lyrical/rmw_zenoh_cpp/0.10.6-1
   url: https://github.com/ros2-gbp/rmw_zenoh-release.git
-  version: 0.10.5
+  version: 0.10.6
 roboplan:
   dependencies:
   - ament_cmake
@@ -26513,9 +26513,9 @@ zenoh_cpp_vendor:
   - ament_cmake
   - ament_cmake_vendor_package
   repository: https://github.com/ros2/rmw_zenoh
-  tag: release/lyrical/zenoh_cpp_vendor/0.10.5-1
+  tag: release/lyrical/zenoh_cpp_vendor/0.10.6-1
   url: https://github.com/ros2-gbp/rmw_zenoh-release.git
-  version: 0.10.5
+  version: 0.10.6
 zenoh_security_tools:
   dependencies:
   - ament_lint_auto
@@ -26525,9 +26525,9 @@ zenoh_security_tools:
   - rmw_security_common
   - zenoh_cpp_vendor
   repository: https://github.com/ros2/rmw_zenoh
-  tag: release/lyrical/zenoh_security_tools/0.10.5-1
+  tag: release/lyrical/zenoh_security_tools/0.10.6-1
   url: https://github.com/ros2-gbp/rmw_zenoh-release.git
-  version: 0.10.5
+  version: 0.10.6
 zlib_point_cloud_transport:
   dependencies:
   - ament_cmake

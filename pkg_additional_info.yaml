@@ -232,6 +232,7 @@ visp:
     override_version: '3.6.0'
 zenoh_cpp_vendor:
   additional_cmake_args: "-DAMENT_VENDOR_POLICY=NEVER_VENDOR_IGNORE_SATISFIED_CHECK -DUSE_SYSTEM_ZENOH=ON"
+  build_number: 26  # rmw_zenoh 0.10.6 backport onto mutex 0.20
 # Remove build_number fields below on new full rebuild
 diagnostic_updater:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
@@ -240,4 +241,7 @@ robot_state_publisher:
   additional_cmake_args: "-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON"
   build_number: 26
 tf2_ros:
+  build_number: 26
+# rmw_zenoh 0.10.6 backport onto ros2-distro-mutex 0.20 (fixes a bug in 0.10.5).
+rmw_zenoh_cpp:
   build_number: 26
